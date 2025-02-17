@@ -5,13 +5,18 @@ import { useAuctions } from "modules/auction/hooks/use-auctions";
 export function PageBrancher() {
   const auctionQuery = useAuctions();
 
-  if (auctionQuery.isLoading) return <AuctionPageLoading />;
+  let element;
 
-  if (auctionQuery.isMultiple) {
-    return <AuctionListPage />;
+  if (auctionQuery.isLoading) {
+    element = <AuctionPageLoading />;
+  } else {
+    const auction = auctionQuery.data[0];
+    element = auctionQuery.isMultiple ? (
+      <AuctionListPage />
+    ) : (
+      <AuctionPage auction={auction} />
+    );
   }
 
-  const auction = auctionQuery.data[0];
-
-  return <AuctionPage _auction={auction} />;
+  return <div id="__AXIS_HOME_PAGE__">{element}</div>;
 }

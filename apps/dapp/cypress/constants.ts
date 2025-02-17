@@ -11,9 +11,6 @@ const LAUNCH_ID =
 
 const URLS = {
   HOME: `${BASE_URL}/#/`,
-  CREATE_LAUNCH: `${BASE_URL}/#/create/auction`,
-  CURATOR: `${BASE_URL}/#/curator`,
-  CURATORS: `${BASE_URL}/#/curators`,
   REFERRALS: `${BASE_URL}/#/refer`,
   LAUNCH: `${BASE_URL}/#/${LAUNCH_ID}/0`,
 

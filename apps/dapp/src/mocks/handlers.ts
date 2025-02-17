@@ -3,6 +3,7 @@ import { stubGetAuctionLotsQuery } from "./stubs/get-auction-lots-query";
 import { stubGetBatchAuctionLotQuery } from "./stubs/get-batch-auction-lot-query";
 import { extractChainName } from "./utils";
 import { getChainById } from "utils/chain";
+import { stubGetAuctionByTokenAddressQuery } from "./stubs/get-auction-by-token-address-query";
 
 export const handlers = [
   graphql.query("getAuctionLots", ({ variables }) => {
@@ -20,6 +21,13 @@ export const handlers = [
 
     return HttpResponse.json({
       data: stubGetBatchAuctionLotQuery({ id, lotId, chain }),
+    });
+  }),
+  graphql.query("getBatchAuctionLotsByBaseTokenAddress", ({ variables }) => {
+    const baseTokenAddress = variables?.baseTokenAddress as string;
+
+    return HttpResponse.json({
+      data: stubGetAuctionByTokenAddressQuery({ baseTokenAddress }),
     });
   }),
 ];

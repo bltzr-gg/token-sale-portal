@@ -42,12 +42,12 @@ const statuses: Record<
 };
 
 /** Displays Auction details and status*/
-export default function AuctionPage({ _auction }: { _auction?: Auction }) {
+export default function AuctionPage(props: { auction?: Auction }) {
   const { chainId, lotId } = useParams();
   const { data } = useAuctions();
 
   const auction =
-    _auction ??
+    props.auction ??
     data.find((a) => a.lotId === lotId && a.chainId === Number(chainId));
 
   const { isConnected, chainId: connectedChainId } = useAccount();

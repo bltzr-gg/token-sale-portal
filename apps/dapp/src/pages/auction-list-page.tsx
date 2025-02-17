@@ -56,7 +56,7 @@ export default function AuctionListPage() {
   );
 
   return (
-    <div id="__AXIS_HOME_PAGE__">
+    <div>
       <ScrollTargetElement name="auctions">
         <PageContainer>
           {!isAllUSD && (
