@@ -14,7 +14,7 @@ export const Primary: Story = {
     label: "Spend Amount",
     symbol: "ETH",
     usdPrice: "$4200.00",
-    balance: "10,000",
+    balance: "10000",
   },
 };
 

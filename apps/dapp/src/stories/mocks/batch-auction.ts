@@ -12,6 +12,7 @@ const getBatchAuctionMock = (
       symbol: "ZYN",
       name: "Zyn Token",
       chainId: 168587773,
+      totalSupply: 1000000,
     },
     quoteToken: {
       address: "0xe292cf4e316191cbfebd74909356df3cd9455e96",
@@ -62,6 +63,7 @@ const getBatchAuctionMock = (
     protocolFee: "25",
     referrerFee: "10",
     capacity: "800",
+    capacityInitial: "800",
     sold: "200",
     purchased: "200",
     lastUpdatedBlockNumber: "12345679",
@@ -126,6 +128,10 @@ const getBatchAuctionMock = (
       minBidSize: "100",
       marginalPrice: "500",
       hasPartialFill: false,
+    },
+    fixedPrice: {
+      price: "1",
+      minFilled: "500",
     },
     settled: {
       id: "1",
