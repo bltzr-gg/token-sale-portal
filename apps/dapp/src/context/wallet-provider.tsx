@@ -37,12 +37,6 @@ export default function WalletProvider(props: PropsWithChildren) {
       appInfo={{
         appName: APP_NAME,
         learnMoreUrl: AXIS_DOCS_URL,
-        disclaimer: () => (
-          <p>
-            This application is in alpha stage, so there&apos;s obviously bugs
-            and broken stuff.
-          </p>
-        ),
       }}
       theme={midnightTheme()}
       modalSize="compact"

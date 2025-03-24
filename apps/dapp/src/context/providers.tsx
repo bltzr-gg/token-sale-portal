@@ -18,14 +18,17 @@ const sdk = createSdk({
 });
 
 type ProviderProps = React.PropsWithChildren<{
-  disableDevTools?: boolean;
   disableDialogProvider?: boolean;
 }>;
 
 export function Providers(props: ProviderProps) {
   return (
     <ToggleProvider initialToggle={true}>
-      <BlockchainProvider disableDevTools={props.disableDevTools}>
+      <BlockchainProvider
+        disableDevTools={
+          import.meta.env.VITE_DISABLE_REACT_QUERY_DEV_TOOLS === "true"
+        }
+      >
         <OriginSdkProvider sdk={sdk}>
           <TooltipProvider delayDuration={350}>
             <DialogProvider disabled={props.disableDialogProvider}>

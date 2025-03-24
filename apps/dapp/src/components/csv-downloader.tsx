@@ -7,6 +7,7 @@ type CSVDownloaderProps = {
   headers: string[];
   filename?: string;
   tooltip?: string;
+  className?: string;
 };
 
 /**
@@ -18,6 +19,7 @@ export function CSVDownloader(props: CSVDownloaderProps) {
       content={props.tooltip ?? "Download this table's data in CSV format"}
     >
       <CSVLink
+        className={props.className}
         target="_blank"
         filename={props.filename}
         headers={props.headers}

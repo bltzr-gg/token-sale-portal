@@ -3,7 +3,7 @@ import {
   RouterProvider as ReactRouterProvider,
 } from "react-router-dom";
 import ErrorPage from "../pages/error-page";
-import AuctionPage from "../pages/home";
+import AuctionPage from "../pages/auction/page";
 import App from "src/App";
 
 const router: ReturnType<typeof createHashRouter> = createHashRouter([

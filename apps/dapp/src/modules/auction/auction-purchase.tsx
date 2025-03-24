@@ -305,7 +305,7 @@ export function AuctionPurchase({ auction, ...props }: AuctionPurchaseProps) {
             <Card
               tooltip={
                 isEMP
-                  ? "Spend Amount is your total bid size and Bid Price is the maximum amount you’re willing to pay per token"
+                  ? "Spend Amount is your total bid size and Bid Price is the maximum amount you're willing to pay per token"
                   : undefined
               }
               title={

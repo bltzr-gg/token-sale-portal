@@ -7,9 +7,7 @@ import ConnectButton from "./connect-button";
 const Navbar: React.FC = () => {
   return (
     <>
-      <nav className="fixed z-30 flex w-full items-center justify-between gap-3 px-6 py-5 lg:p-8 lg:py-6">
-        <div className="bg-background/25 fixed right-0 top-0 h-24 w-full backdrop-blur-lg lg:hidden" />
-
+      <nav className="bg-background/25 fixed z-30  flex w-full items-center justify-between gap-3 px-6 py-5 backdrop-blur-lg lg:p-8 lg:py-6">
         <a
           className="flex items-center gap-3 text-white hover:text-gray-300"
           href="/"
@@ -52,8 +50,6 @@ const Navbar: React.FC = () => {
         </a>
         <ConnectButton />
       </nav>
-      {/* Spacer */}
-      <div className="h-[5.125rem]" />
     </>
   );
 };

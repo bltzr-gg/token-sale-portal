@@ -3,9 +3,9 @@ import { getCallbacksType } from "../utils/get-callbacks-type";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Form, FormField, FormItemWrapper, Input } from "@bltzr-gg/ui";
+import { Form, FormField, Input } from "@bltzr-gg/ui";
 import { encodeAbiParameters } from "viem";
-import { useEffect } from "react";
+import { useCallback, useEffect } from "react";
 
 const uniswapSchema = z
   .object({
@@ -43,39 +43,42 @@ export function SettleAuctionCallbackInput({
     defaultValues: { maxSlippage: DEFAULT_MAX_SLIPPAGE },
   });
 
-  const updateUniswapDtlCallbackData = (maxSlippage: number) => {
-    // Validate
-    if (maxSlippage < 0.001 || maxSlippage >= 100) {
-      setCallbackDataIsValid(false);
-      return;
-    }
+  const updateUniswapDtlCallbackData = useCallback(
+    (maxSlippage: number) => {
+      // Validate
+      if (maxSlippage < 0.001 || maxSlippage >= 100) {
+        setCallbackDataIsValid(false);
+        return;
+      }
 
-    // Upscale
-    const maxSlippageUpscaled = maxSlippage * 1e3;
+      // Upscale
+      const maxSlippageUpscaled = maxSlippage * 1e3;
 
-    // Encode
-    const encodedCallbackData = encodeAbiParameters(
-      [
-        {
-          name: "OnClaimProceedsParams",
-          type: "tuple",
-          components: [{ name: "maxSlippage", type: "uint24" }],
-        },
-      ],
-      [
-        {
-          maxSlippage: maxSlippageUpscaled,
-        },
-      ],
-    );
+      // Encode
+      const encodedCallbackData = encodeAbiParameters(
+        [
+          {
+            name: "OnClaimProceedsParams",
+            type: "tuple",
+            components: [{ name: "maxSlippage", type: "uint24" }],
+          },
+        ],
+        [
+          {
+            maxSlippage: maxSlippageUpscaled,
+          },
+        ],
+      );
 
-    // Pass to parent
-    setCallbackData(encodedCallbackData);
+      // Pass to parent
+      setCallbackData(encodedCallbackData);
 
-    // Flag as valid
-    setCallbackDataIsValid(true);
-    console.debug("SettleAuctionCallbackInput: Updated callback data");
-  };
+      // Flag as valid
+      setCallbackDataIsValid(true);
+      console.debug("SettleAuctionCallbackInput: Updated callback data");
+    },
+    [setCallbackData, setCallbackDataIsValid],
+  );
 
   // Update callback data on mount
   useEffect(() => {
@@ -90,7 +93,12 @@ export function SettleAuctionCallbackInput({
     // Otherwise set the callback data to undefined and mark it as valid
     setCallbackData(undefined);
     setCallbackDataIsValid(true);
-  }, [callbackType]);
+  }, [
+    callbackType,
+    setCallbackData,
+    setCallbackDataIsValid,
+    updateUniswapDtlCallbackData,
+  ]);
 
   if (
     callbackType === CallbacksType.UNIV2_DTL ||
@@ -112,12 +120,10 @@ export function SettleAuctionCallbackInput({
               control={form.control}
               name="maxSlippage"
               render={({ field }) => (
-                <FormItemWrapper
-                  label="Max Slippage"
-                  tooltip="The percentage of slippage tolerated when depositing into the pool."
-                >
+                <>
+                  <label className="sr-only">Max Slippage</label>
                   <Input placeholder="0.5" type="number" {...field} />
-                </FormItemWrapper>
+                </>
               )}
             />
           </div>

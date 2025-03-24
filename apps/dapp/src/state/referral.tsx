@@ -7,18 +7,17 @@ export const refAtom = atomWithStorage<Address>(
   "referrer",
   `0x${"0".repeat(40)}`,
 );
-//Tracks loading state from storage for referrer
-//
-export const isLoadingRefAtom = atom(true);
+
+export const referrerLoadingStateAtom = atom(true);
 
 export const loadingRefAtom = atom(
   (get) => {
     const referrer = get(refAtom);
-    const isLoading = get(isLoadingRefAtom);
+    const isLoading = get(referrerLoadingStateAtom);
     return { referrer, isLoading };
   },
   (_get, set, newValue: Address) => {
-    set(isLoadingRefAtom, false);
+    set(referrerLoadingStateAtom, false);
     set(refAtom, newValue);
   },
 );
@@ -30,7 +29,7 @@ export const useReferrer = () => useAtomValue(refAtom);
 // find a way to simplify
 export const useInitializeLoadingState = () => {
   const address = useAtomValue(refAtom);
-  const setIsLoading = useSetAtom(isLoadingRefAtom);
+  const setIsLoading = useSetAtom(referrerLoadingStateAtom);
 
   useEffect(() => {
     if (address !== null) {

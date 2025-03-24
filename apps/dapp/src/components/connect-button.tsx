@@ -2,7 +2,6 @@ import { ConnectButton as RKConnectButton } from "@rainbow-me/rainbowkit";
 import {
   Avatar,
   Button,
-  cn,
   type ButtonProps,
   DropdownMenu,
   DropdownMenuTrigger,
@@ -24,7 +23,7 @@ export default function ConnectButton({
 
         return (
           <div
-            className={cn("w-full max-w-md", className)}
+            className={className}
             {...(!ready && {
               "aria-hidden": true,
               style: {
@@ -37,12 +36,7 @@ export default function ConnectButton({
             {(() => {
               if (!connected) {
                 return (
-                  <Button
-                    variant="accent"
-                    size={size}
-                    className={"w-full"}
-                    onClick={openConnectModal}
-                  >
+                  <Button size={size} onClick={openConnectModal}>
                     Connect
                   </Button>
                 );

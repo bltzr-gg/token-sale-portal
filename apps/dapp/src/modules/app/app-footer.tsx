@@ -1,15 +1,10 @@
-import { cn } from "@bltzr-gg/ui";
-import { AxisWordmark } from "./axis-wordmark";
+import { Link } from "@bltzr-gg/ui";
+import AxisWordmark from "./axis-wordmark";
 
 export function AppFooter() {
   return (
-    <div className="max-w-limit mx-auto hidden w-full py-6 lg:block">
-      <div
-        className={cn(
-          "flex h-12 items-center justify-between rounded-full",
-          "bg-neutral-200 dark:bg-neutral-50",
-        )}
-      >
+    <div className="pb-5">
+      <div className="bg-lighter flex h-12 items-center justify-end rounded-full px-5">
         <PoweredByAxis />
       </div>
     </div>
@@ -18,11 +13,11 @@ export function AppFooter() {
 
 function PoweredByAxis() {
   return (
-    <div className="text-foreground ml-4 flex items-center dark:text-neutral-500">
-      {" "}
-      <a href="https://axis.finance/docs/overview">
-        Powered by <AxisWordmark className="-mt-0.5 inline size-10" />
-      </a>
-    </div>
+    <span className="text-foreground">
+      <Link href="https://axis.finance/docs/overview">
+        Powered by{" "}
+        <AxisWordmark className="fill-foreground -mt-0.5 inline size-10" />
+      </Link>
+    </span>
   );
 }

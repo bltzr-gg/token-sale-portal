@@ -6,7 +6,7 @@ import {
   BatchAuction,
 } from "@axis-finance/types";
 import { BlockExplorerLink } from "components/blockexplorer-link";
-import { Button, Card, Chip, DataTable, Text } from "@bltzr-gg/ui";
+import { Button, Card, DataTable, Text } from "@bltzr-gg/ui";
 import {
   useAccount,
   useWaitForTransactionReceipt,
@@ -14,7 +14,7 @@ import {
 } from "wagmi";
 import { TransactionDialog } from "modules/transaction/transaction-dialog";
 import { LoadingIndicator } from "modules/app/loading-indicator";
-import React from "react";
+import React, { useMemo } from "react";
 import { useAuction } from "./hooks/use-auction";
 import { getAuctionHouse } from "utils/contracts";
 import { useBidIndex } from "./hooks/use-bid-index";
@@ -24,6 +24,7 @@ import { CSVDownloader } from "components/csv-downloader";
 import { arrayToCSV } from "utils/csv";
 import { PriceCell } from "./cells/PriceCell";
 import { AmountInCell } from "./cells/AmountInCell";
+import { FilterIcon } from "lucide-react";
 
 export const bidListColumnHelper = createColumnHelper<
   BatchAuctionBid & { auction: Auction }
@@ -68,6 +69,7 @@ export const amountInCol = bidListColumnHelper.accessor("amountIn", {
     <AmountInCell bid={info.row.original} value={+info.getValue()} />
   ),
 });
+
 export const bidderCol = bidListColumnHelper.accessor("bidder", {
   header: "Bidder",
   enableSorting: true,
@@ -136,7 +138,7 @@ export function BidList(props: BidListProps) {
   const auction = props.auction as BatchAuction;
 
   const auctionHouse = getAuctionHouse(props.auction);
-  const encryptedBids = auction?.bids ?? [];
+  const encryptedBids = useMemo(() => auction?.bids ?? [], [auction]);
 
   const { refetch: refetchAuction } = useAuction(
     props.auction.chainId,
@@ -175,7 +177,7 @@ export function BidList(props: BidListProps) {
             auction: props.auction,
           };
         }) ?? [],
-    [props.auction, address, onlyUserBids],
+    [encryptedBids, onlyUserBids, address, userBids, props.auction],
   );
 
   const isLoading = refund.isPending || refundReceipt.isLoading;
@@ -232,14 +234,14 @@ export function BidList(props: BidListProps) {
         },
       }),
     ],
-    [props.auction, address],
+    [props.auction.status, address, bidToRefund?.bidId, isLoading],
   );
 
   React.useEffect(() => {
     if (refund.isSuccess) {
       refetchAuction();
     }
-  }, [refund.isSuccess]);
+  }, [refetchAuction, refund.isSuccess]);
 
   //Format bids for CSV download
   const [headers, body] = React.useMemo(() => {
@@ -255,53 +257,54 @@ export function BidList(props: BidListProps) {
   }, [auction]);
 
   return (
-    <Card
-      title={"Bid History"}
-      headerRightElement={
-        <div className="flex gap-x-3">
-          <Chip
-            variant={onlyUserBids ? "active" : "default"}
-            className="cursor-pointer"
-            onClick={() => setOnlyUserBids((prev) => !prev)}
-          >
-            {onlyUserBids ? "All" : "My"} Bids
-          </Chip>
+    <div>
+      <div className="flex justify-end gap-3 px-3 py-2">
+        <Button
+          variant="ghost"
+          className="min-w-0"
+          onClick={() => setOnlyUserBids((prev) => !prev)}
+        >
+          <FilterIcon className="mr-1" />
+          {onlyUserBids ? "All" : "My"} Bids
+        </Button>
+        <Button asChild variant="ghost" className="min-w-0">
           <CSVDownloader
             tooltip="Download this bid history in CSV format."
             filename={`bids-${auction.auctionType}-${auction.id}`}
             headers={headers}
             data={body}
           />
-        </div>
-      }
-    >
-      <DataTable
-        emptyText={
-          props.auction.status == "created" || props.auction.status == "live"
-            ? "No bids yet"
-            : onlyUserBids
-              ? "No bids from this address"
-              : "No bids received"
-        }
-        columns={columns as ColumnDef<BatchAuctionBid>[]}
-        data={mappedBids}
-      />
+        </Button>
+      </div>
+      <Card title={"Bid History"}>
+        <DataTable
+          emptyText={
+            props.auction.status == "created" || props.auction.status == "live"
+              ? "No bids yet"
+              : onlyUserBids
+                ? "No bids from this address"
+                : "No bids received"
+          }
+          columns={columns as ColumnDef<BatchAuctionBid>[]}
+          data={mappedBids}
+        />
 
-      <TransactionDialog
-        signatureMutation={refund}
-        open={dialogOpen}
-        onOpenChange={(open) => {
-          setDialogOpen(open);
-          if (!open) refund.reset();
-        }}
-        onConfirm={() => handleRefund(bidToRefund?.bidId)}
-        mutation={refundReceipt}
-        chainId={props.auction.chainId}
-        hash={refund.data}
-        error={refundReceipt.error}
-        disabled={isLoading}
-        screens={screens}
-      />
-    </Card>
+        <TransactionDialog
+          signatureMutation={refund}
+          open={dialogOpen}
+          onOpenChange={(open) => {
+            setDialogOpen(open);
+            if (!open) refund.reset();
+          }}
+          onConfirm={() => handleRefund(bidToRefund?.bidId)}
+          mutation={refundReceipt}
+          chainId={props.auction.chainId}
+          hash={refund.data}
+          error={refundReceipt.error}
+          disabled={isLoading}
+          screens={screens}
+        />
+      </Card>
+    </div>
   );
 }

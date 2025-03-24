@@ -10,7 +10,7 @@ import {
   bidderCol,
   timestampCol,
 } from "./bid-list";
-import { Format } from "modules/token/format";
+import { Format } from "components/format";
 
 const amountOutCol = bidListColumnHelper.accessor("settledAmountOut", {
   header: "Amount Out",
@@ -47,17 +47,13 @@ export function PurchaseList({ auction }: PropsWithAuction) {
   }, [bids]);
 
   return (
-    <Card
-      title={"Purchase History"}
-      headerRightElement={
-        <CSVDownloader
-          tooltip="Download this bid history in CSV format."
-          filename={`purchases-${auction.auctionType}-${auction.id}`}
-          headers={headers}
-          data={body}
-        />
-      }
-    >
+    <Card className="relative" title={"Purchase History"}>
+      <CSVDownloader
+        tooltip="Download this bid history in CSV format."
+        filename={`purchases-${auction.auctionType}-${auction.id}`}
+        headers={headers}
+        data={body}
+      />
       <DataTable
         emptyText={
           auction.status == "created" || auction.status == "live"

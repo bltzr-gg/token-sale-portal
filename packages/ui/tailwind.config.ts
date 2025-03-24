@@ -102,10 +102,15 @@ export default {
           '0%, 100%': { backgroundColor: 'hsl(0 0% 6%)' },
           '50%': { backgroundColor: 'hsl(0 0% 10%)' },
         },
+        fadeIn: {
+          '0%': { opacity: '0' },
+          '100%': { opacity: '1' },
+        },
       },
       animation: {
         pulse: 'pulse 1.25s infinite',
         skeleton: 'skeleton 1.25s infinite',
+        'fade-in': 'fadeIn 2s ease-in-out forwards',
       },
     },
   },

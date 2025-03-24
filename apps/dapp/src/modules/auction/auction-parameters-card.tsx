@@ -55,11 +55,10 @@ function AuctionCardDetails(
 ) {
   const isEMP = props.auction.auctionType === AuctionType.SEALED_BID;
   const isFPB = props.auction.auctionType === AuctionType.FIXED_PRICE_BATCH;
-  const hasCurator = !!props.auction.curator && props.auction.curatorApproved;
 
   const isRegistrationLaunch = props.auction.status === "registering";
 
-  let detailsPageUrl =
+  const detailsPageUrl =
     getAuctionPath(props.auction) + (isRegistrationLaunch ? "/register" : "");
 
   const isLive = props.auction.status === "live";

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type { PropsWithAuction } from "@axis-finance/types";
 import { Metric, Text, cn } from "@bltzr-gg/ui";
 import { getCountdown, formatDate } from "utils/date";
@@ -10,8 +10,17 @@ export function Countdown({
   className?: string;
 }) {
   const [timeDistance, setTimeDistance] = useState<string | null>("");
-  const startDate = new Date(Number(auction.start) * 1000);
-  const endDate = new Date(Number(auction.conclusion) * 1000);
+
+  const startDate = useMemo(
+    () => new Date(Number(auction.start) * 1000),
+    [auction.start],
+  );
+
+  const endDate = useMemo(
+    () => new Date(Number(auction.conclusion) * 1000),
+    [auction.conclusion],
+  );
+
   const now = new Date();
 
   const isOngoing = startDate <= now && endDate > now;
@@ -44,7 +53,7 @@ export function Countdown({
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [startDate, endDate, isOngoing]);
+  }, [startDate, endDate, isOngoing, isntFinished, targetDate]);
 
   return (
     <div className={cn("flex items-center gap-x-6", className)}>

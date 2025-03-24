@@ -62,7 +62,14 @@ export function ReferrerChecker() {
     if (!isLoading && currentReferrer !== zeroAddress) {
       navigate(location.pathname, { replace: true });
     }
-  }, [isLoading, currentReferrer, setReferrer]);
+  }, [
+    isLoading,
+    currentReferrer,
+    setReferrer,
+    referrerAddress,
+    navigate,
+    location.pathname,
+  ]);
 
   return null;
 }

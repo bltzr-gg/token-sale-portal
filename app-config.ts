@@ -16,9 +16,6 @@ export const BANNER_URL =
 
 // App Metadata
 export const APP_NAME = "Axis Finance";
-export const WALLET_DISCLAIMER_MESSAGE =
-  "This application is in alpha stage, so there&apos;s obviously bugs and broken stuff.";
-
 // Socials
 export const DISCORD_URL = "https://discord.gg/tx9CrvPZWF";
 export const TWITTER_URL = "https://twitter.com/axis_fi";
