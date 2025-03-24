@@ -1,4 +1,4 @@
-@import "./fonts.css";
+@import './fonts.css';
 
 @tailwind base;
 @tailwind components;
@@ -23,12 +23,12 @@
     --card-foreground: 0 0% 100%;
     --popover: var(--background-light);
     --popover-foreground: 0 0% 100%;
-    --primary: 0 100% 81%;
-    --primary-foreground: var(--background);
+    --primary: 356 92% 60%;
+    --primary-foreground: 0 0% 0%; /* Changed to black */
     --muted: #7f7f7f;
     --muted-foreground: var(--background-lightest);
-    --accent: 356 92% 60%;
-    --accent-foreground: 0 0% 100%;
+    --accent: 0 100% 81%; /* Swapped with --primary */
+    --accent-foreground: var(--background);
     --destructive: 0 97% 33%;
     --destructive-foreground: var(--foreground);
     --warning: 30 100% 60%;
@@ -41,9 +41,9 @@
     --chart-4: 43 74% 66%;
     --chart-5: 27 87% 67%;
     --radius: 0.5rem;
-    --font-aeonik: "Aeonik";
-    --font-tusker-grotesk: "Tusker Grotesk";
-    --font-monoline: "LD MonoLine Solid";
+    --font-aeonik: 'Aeonik';
+    --font-tusker-grotesk: 'Tusker Grotesk';
+    --font-monoline: 'LD MonoLine Solid';
   }
 }
 

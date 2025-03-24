@@ -34,3 +34,5 @@ export * from './components/metric';
 export * from './components/toggle';
 export * from './components/toggle-group';
 export * from './components/chip';
+export * from './components/label-wrapper';
+export * from './components/iconed-label';

@@ -1,100 +1,125 @@
-import * as React from "react";
-import { cn } from "@/lib/cn";
-import { Skeleton } from "./skeleton";
+import * as React from 'react';
 
-type CardProps = React.HTMLAttributes<HTMLDivElement>;
+import { cn } from '@/lib/cn';
+import { textVariants } from './text';
+import { Tooltip } from './tooltip';
+import { InfoCircledIcon } from '@radix-ui/react-icons';
 
-const Card = React.forwardRef<HTMLDivElement, CardProps>(
-  ({ className, ...props }, ref) => (
-    <div
-      ref={ref}
-      className={cn(
-        "relative flex flex-col overflow-hidden rounded-3xl bg-card text-card-foreground shadow",
-        className,
-      )}
-      {...props}
-    >
-      {props.children}
-    </div>
-  ),
-);
-Card.displayName = "Card";
+const CardRoot = React.forwardRef<
+  HTMLDivElement,
+  React.HTMLAttributes<HTMLDivElement>
+>(({ className, ...props }, ref) => (
+  <div
+    ref={ref}
+    className={cn(
+      'bg-surface border-surface-outline rounded-lg border p-4 text-foreground',
+      className,
+    )}
+    {...props}
+  />
+));
+CardRoot.displayName = 'Card';
 
-// CardHeader component
 const CardHeader = React.forwardRef<
   HTMLDivElement,
   React.HTMLAttributes<HTMLDivElement>
 >(({ className, ...props }, ref) => (
   <div
     ref={ref}
-    className={cn("flex flex-col space-y-1.5 p-6 pb-4", className)}
+    className={cn('mb-4 flex items-center justify-between ', className)}
     {...props}
   />
 ));
-CardHeader.displayName = "CardHeader";
+CardHeader.displayName = 'CardHeader';
 
-// CardTitle component
 const CardTitle = React.forwardRef<
   HTMLParagraphElement,
   React.HTMLAttributes<HTMLHeadingElement>
 >(({ className, ...props }, ref) => (
   <h3
     ref={ref}
-    className={cn("text-xl leading-none tracking-tight", className)}
+    className={cn(
+      textVariants({ color: 'secondary', size: '3xl', weight: 'light' }),
+      'font-mono tracking-tight',
+      'text-[40px]',
+      'leading-[40px]',
+      className,
+    )}
     {...props}
   />
 ));
-CardTitle.displayName = "CardTitle";
+CardTitle.displayName = 'CardTitle';
 
-// CardDescription component
 const CardDescription = React.forwardRef<
   HTMLParagraphElement,
   React.HTMLAttributes<HTMLParagraphElement>
 >(({ className, ...props }, ref) => (
-  <div
+  <p
     ref={ref}
-    className={cn("text-sm text-muted-foreground", className)}
+    className={cn('text-foreground-secondary text-sm', className)}
     {...props}
   />
 ));
-CardDescription.displayName = "CardDescription";
+CardDescription.displayName = 'CardDescription';
 
-// CardContent component
-interface CardContentProps extends React.HTMLAttributes<HTMLDivElement> {
-  loading?: boolean;
-  skeleton?: React.ReactNode;
-}
+const CardContent = React.forwardRef<
+  HTMLDivElement,
+  React.HTMLAttributes<HTMLDivElement>
+>(({ className, ...props }, ref) => (
+  <div ref={ref} className={cn(className)} {...props} />
+));
+CardContent.displayName = 'CardContent';
 
-const CardContent = React.forwardRef<HTMLDivElement, CardContentProps>(
-  ({ className, loading = false, ...props }, ref) => (
-    <div
-      ref={ref}
-      className={cn("relative grow p-6 pt-0", className)}
-      {...props}
-    >
-      {loading && (
-        <Skeleton className="absolute inset-0 z-10 animate-skeleton" />
-      )}
-      {props.children}
-    </div>
-  ),
-);
-CardContent.displayName = "CardContent";
-
-// CardFooter component
 const CardFooter = React.forwardRef<
   HTMLDivElement,
   React.HTMLAttributes<HTMLDivElement>
 >(({ className, ...props }, ref) => (
-  <div ref={ref} className={cn("p-5 pt-0", className)} {...props} />
+  <div
+    ref={ref}
+    className={cn('flex items-center pt-0', className)}
+    {...props}
+  />
 ));
-CardFooter.displayName = "CardFooter";
+CardFooter.displayName = 'CardFooter';
+
+type CardProps = {
+  title?: React.ReactNode;
+  footer?: React.ReactNode;
+  headerRightElement?: React.ReactNode;
+  tooltip?: string;
+};
+
+const Card = React.forwardRef<
+  HTMLDivElement,
+  Omit<React.HTMLAttributes<HTMLDivElement>, 'title'> & CardProps
+>((props, ref) => {
+  return (
+    <CardRoot ref={ref} className={cn('transition-all', props.className)}>
+      {(props.title || props.headerRightElement) && (
+        <CardHeader>
+          <Tooltip content={props.tooltip}>
+            <div className="flex items-center">
+              <CardTitle className="inline-block">{props.title}</CardTitle>
+              {props.tooltip && <InfoCircledIcon className="ml-1" />}
+            </div>
+          </Tooltip>
+          {props.headerRightElement}
+        </CardHeader>
+      )}
+      <CardContent className="h-full">{props.children}</CardContent>
+    </CardRoot>
+  );
+});
+
+Card.displayName = 'Card';
 
 export {
   Card,
+  CardRoot,
   CardHeader,
   CardFooter,
   CardTitle,
   CardDescription,
   CardContent,
+  type CardProps,
 };
