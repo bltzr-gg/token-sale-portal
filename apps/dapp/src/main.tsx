@@ -4,7 +4,6 @@ import "./polyfills.ts";
 import React from "react";
 import ReactDOM from "react-dom/client";
 import { RouterProvider } from "./context/router.tsx";
-import { ThemeProvider } from "@repo/ui";
 import { environment } from "utils/environment";
 import { initializeVerifiedFetch } from "utils/verified-fetch";
 
@@ -27,9 +26,7 @@ async function initialize() {
 initialize().then(() => {
   ReactDOM.createRoot(document.getElementById("root")!).render(
     <React.StrictMode>
-      <ThemeProvider>
-        <RouterProvider />
-      </ThemeProvider>
+      <RouterProvider />
     </React.StrictMode>,
   );
 });

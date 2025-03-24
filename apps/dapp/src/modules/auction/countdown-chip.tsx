@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import type { PropsWithAuction } from "@axis-finance/types";
-import { Badge, Metric } from "@repo/ui";
+import { Badge, Metric } from "@bltzr-gg/ui";
 import { getCountdown } from "utils";
 
 export function CountdownChip({ auction }: PropsWithAuction) {

@@ -1,0 +1,50 @@
+
+@font-face {
+  font-family: 'Tusker Grotesk';
+  src:
+    url('../assets/fonts/TuskerGrotesk-3600Semibold.ttf') format('truetype'),
+    url('../assets/fonts/TuskerGrotesk-3600Semibold.otf') format('opentype');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'LD MonoLine Outline';
+  src: url('../assets/fonts/LD_MonoLine_Outline-Regular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'LD MonoLine Solid';
+  src: url('../assets/fonts/LD_MonoLine_Solid-Regular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Aeonik';
+  src: url('../assets/fonts/Aeonik-Regular.otf') format('opentype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Aeonik';
+  src: url('../assets/fonts/Aeonik-Medium.otf') format('opentype');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Aeonik';
+  src: url('../assets/fonts/Aeonik-Bold.otf') format('opentype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}

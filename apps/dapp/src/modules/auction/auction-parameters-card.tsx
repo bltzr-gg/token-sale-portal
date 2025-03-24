@@ -1,6 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { Button, Card, IconedLabel, Skeleton, cn } from "@repo/ui";
+import { Button, Card, IconedLabel, Skeleton, cn } from "@bltzr-gg/ui";
 import {
   AuctionType,
   type Auction,

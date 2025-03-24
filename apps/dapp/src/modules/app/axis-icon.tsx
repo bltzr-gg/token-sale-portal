@@ -1,4 +1,4 @@
-import { useTheme } from "@repo/ui";
+import { useTheme } from "@bltzr-gg/ui";
 
 export default function AxisIcon() {
   const { themeColor } = useTheme();

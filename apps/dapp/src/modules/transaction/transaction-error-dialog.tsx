@@ -4,8 +4,7 @@ import {
   AccordionRoot,
   AccordionTrigger,
   Button,
-} from "@repo/ui";
-import { ReachOutMessage } from "modules/app/reach-out";
+} from "@bltzr-gg/ui";
 import { getCustomException } from "utils/error-mapper";
 
 export function TransactionErrorDialog(props: { error: Error }) {
@@ -38,7 +37,6 @@ export function TransactionErrorDialog(props: { error: Error }) {
           </AccordionContent>
         </AccordionItem>
       </AccordionRoot>
-      <ReachOutMessage className="mt-2" />
     </div>
   );
 }

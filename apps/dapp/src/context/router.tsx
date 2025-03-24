@@ -3,25 +3,15 @@ import {
   RouterProvider as ReactRouterProvider,
 } from "react-router-dom";
 import ErrorPage from "../pages/error-page";
-import AuctionPage from "../pages/auction-page";
+import AuctionPage from "../pages/home";
 import App from "src/App";
-import { FaucetPage } from "pages/faucet-page";
-import { DeployTokenPage } from "pages/deploy-token-page";
-import { BridgePage } from "pages/bridge-page";
-import { PageBrancher } from "pages/page-brancher";
 
 const router: ReturnType<typeof createHashRouter> = createHashRouter([
   {
     path: "/*",
     element: <App />,
     errorElement: <ErrorPage />,
-    children: [
-      { path: "", element: <PageBrancher /> },
-      { path: "faucet", element: <FaucetPage /> },
-      { path: "deploy", element: <DeployTokenPage /> },
-      { path: ":chainId/:lotId", element: <AuctionPage /> },
-      { path: "bridge", element: <BridgePage /> },
-    ],
+    children: [{ path: "", element: <AuctionPage /> }],
   },
 ]);
 

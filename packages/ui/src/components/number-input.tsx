@@ -1,24 +1,24 @@
-import React from "react";
-import { Input, InputProps } from "./primitives/input";
+import React from 'react';
+import { Input, InputProps } from './input';
 
 export type NumberInputProps = {
   value: string;
   onChange: (value: string) => void;
-} & Omit<InputProps, "value" | "onChange">;
+} & Omit<InputProps, 'value' | 'onChange'>;
 
 const formatNumber = (value: string) => {
-  const [int, dec] = value.split(".");
-  const formattedInt = int.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  const [int, dec] = value.split('.');
+  const formattedInt = int?.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
   return dec !== undefined ? `${formattedInt}.${dec}` : formattedInt;
 };
 
 export const NumberInput = React.forwardRef<HTMLInputElement, NumberInputProps>(
   ({ value, onChange, ...props }, ref) => {
     const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-      let newValue = event.target.value.replace(/[^\d.]/g, "");
+      let newValue = event.target.value.replace(/[^\d.]/g, '');
 
-      if (newValue.startsWith(".")) {
-        newValue = "0" + newValue;
+      if (newValue.startsWith('.')) {
+        newValue = '0' + newValue;
       }
 
       if ((newValue.match(/\./g) || []).length <= 1) {
@@ -38,6 +38,6 @@ export const NumberInput = React.forwardRef<HTMLInputElement, NumberInputProps>(
   },
 );
 
-NumberInput.displayName = "NumberInput";
+NumberInput.displayName = 'NumberInput';
 
 export default NumberInput;

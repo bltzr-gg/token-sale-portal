@@ -1,4 +1,4 @@
-import { Badge, cn } from "@repo/ui";
+import { Badge, cn } from "@bltzr-gg/ui";
 import { AuctionStatus } from "@axis-finance/types";
 
 /** Displays a indicator with the auction's current status */

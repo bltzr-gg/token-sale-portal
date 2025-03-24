@@ -1,5 +1,5 @@
 import React from "react";
-import { Text, cn } from "@repo/ui";
+import { Text, cn } from "@bltzr-gg/ui";
 
 type TriggerMessageProps = React.HTMLProps<HTMLDivElement> & {
   message?: string;

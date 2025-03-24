@@ -1,4 +1,4 @@
-import { Button } from "@repo/ui";
+import { Button } from "@bltzr-gg/ui";
 import {
   UseWaitForTransactionReceiptReturnType,
   UseWriteContractReturnType,
@@ -6,12 +6,12 @@ import {
 import { TransactionHashCard } from "./transaction-hash-card";
 import { Address } from "viem";
 import {
-  DialogRoot,
+  Dialog,
   DialogContent,
   DialogFooter,
   DialogHeader,
   DialogTrigger,
-} from "@repo/ui";
+} from "@bltzr-gg/ui";
 import React from "react";
 
 export type TransactionDialogElementProps = {
@@ -88,7 +88,7 @@ export function TransactionDialog({
   const showFooter = status === "idle";
 
   return (
-    <DialogRoot open={open} onOpenChange={onOpenChange}>
+    <Dialog open={open} onOpenChange={onOpenChange}>
       {props.triggerContent && (
         <DialogTrigger className="w-full max-w-lg" disabled={props.disabled}>
           <Button className="w-full max-w-sm" disabled={props.disabled}>
@@ -118,6 +118,6 @@ export function TransactionDialog({
           )}
         </DialogFooter>
       </DialogContent>
-    </DialogRoot>
+    </Dialog>
   );
 }

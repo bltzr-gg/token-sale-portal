@@ -1,4 +1,4 @@
-import { cn } from "@repo/ui";
+import { cn } from "@bltzr-gg/ui";
 import React from "react";
 
 type ImageBannerProps = React.HTMLProps<HTMLDivElement> & {

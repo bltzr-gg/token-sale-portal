@@ -1,7 +1,7 @@
 import React from "react";
 import { formatUnits } from "viem";
 import { PropsWithAuction } from "@axis-finance/types";
-import { Card, DataTable } from "@repo/ui";
+import { Card, DataTable } from "@bltzr-gg/ui";
 import { CSVDownloader } from "components/csv-downloader";
 import { arrayToCSV } from "utils/csv";
 import {

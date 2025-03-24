@@ -1,4 +1,4 @@
-import { Link, cn, trimAddress } from "@repo/ui";
+import { Link, cn, trimAddress } from "@bltzr-gg/ui";
 import { chains } from "@axis-finance/env";
 import { ArrowUpRightIcon } from "lucide-react";
 

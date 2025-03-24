@@ -1,8 +1,7 @@
 import { useEffect, useState } from "react";
 import type { PropsWithAuction } from "@axis-finance/types";
-import { Metric, Text, cn } from "@repo/ui";
-import { formatDate } from "@repo/ui";
-import { getCountdown } from "utils/date";
+import { Metric, Text, cn } from "@bltzr-gg/ui";
+import { getCountdown, formatDate } from "utils/date";
 
 export function Countdown({
   auction,

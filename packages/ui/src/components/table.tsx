@@ -1,15 +1,16 @@
 import * as React from "react";
 
-import { cn } from "@/utils";
+import { cn } from "@/lib/cn";
+import { Skeleton } from "./skeleton";
 
 const Table = React.forwardRef<
   HTMLTableElement,
   React.HTMLAttributes<HTMLTableElement>
 >(({ className, ...props }, ref) => (
-  <div className="relative w-full overflow-auto border-none">
+  <div className="relative w-full overflow-auto rounded-lg border border-lighter/50 bg-light">
     <table
       ref={ref}
-      className={cn("w-full caption-bottom text-sm", className)}
+      className={cn("w-full caption-bottom", className)}
       {...props}
     />
   </div>
@@ -22,10 +23,7 @@ const TableHeader = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <thead
     ref={ref}
-    className={cn(
-      "bg-surface-secondary border-neutral-400 [&_tr]:border-b",
-      className,
-    )}
+    className={cn("bg-lighter/50 text-lighter-foreground", className)}
     {...props}
   />
 ));
@@ -50,7 +48,7 @@ const TableFooter = React.forwardRef<
   <tfoot
     ref={ref}
     className={cn(
-      "bg-muted/50 border-t border-neutral-400 font-medium [&>tr]:last:border-b-0",
+      "bg-muted/50 border-t font-medium [&>tr]:last:border-b-0",
       className,
     )}
     {...props}
@@ -65,7 +63,7 @@ const TableRow = React.forwardRef<
   <tr
     ref={ref}
     className={cn(
-      "hover:bg-muted/50 data-[state=selected]:bg-muted border-b border-neutral-400 transition-colors",
+      "transition-colors even:bg-lighter/50 hover:bg-lighter data-[state=selected]:bg-muted",
       className,
     )}
     {...props}
@@ -80,7 +78,7 @@ const TableHead = React.forwardRef<
   <th
     ref={ref}
     className={cn(
-      "text-foreground h-10 px-2 text-left align-middle font-medium [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px]",
+      "h-10 p-3 text-left align-middle font-bold [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px]",
       className,
     )}
     {...props}
@@ -95,7 +93,7 @@ const TableCell = React.forwardRef<
   <td
     ref={ref}
     className={cn(
-      "p-2 align-middle [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px]",
+      "p-3 align-middle [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px]",
       className,
     )}
     {...props}
@@ -109,11 +107,46 @@ const TableCaption = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <caption
     ref={ref}
-    className={cn("text-muted-foreground mt-4 text-sm", className)}
+    className={cn("sr-only mt-4 text-sm text-muted-foreground", className)}
     {...props}
   />
 ));
 TableCaption.displayName = "TableCaption";
+
+export const TableBodySkeleton: React.FC<{ cols: number; rows: number }> = ({
+  cols,
+  rows,
+}) => (
+  <TableBody className="[&_tr:last-child]:border-0">
+    {Array.from({ length: rows }).map((_, rowIndex) => (
+      <TableRow className="animate-pulse" key={rowIndex}>
+        <TableCell colSpan={cols}>
+          <Skeleton className="h-6 w-full" />
+        </TableCell>
+      </TableRow>
+    ))}
+  </TableBody>
+);
+
+export const TableSkeleton: React.FC<{ cols: number; rows: number }> = ({
+  cols,
+  rows,
+}) => {
+  return (
+    <Table>
+      <TableHeader className="animate-pulse">
+        <TableRow>
+          {Array.from({ length: cols }).map((_, index) => (
+            <TableHead key={index}>
+              <Skeleton className="h-6 w-full" />
+            </TableHead>
+          ))}
+        </TableRow>
+      </TableHeader>
+      <TableBodySkeleton cols={cols} rows={rows} />
+    </Table>
+  );
+};
 
 export {
   Table,

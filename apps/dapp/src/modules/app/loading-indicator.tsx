@@ -1,5 +1,5 @@
 import { SVGProps } from "react";
-import { cn } from "@repo/ui";
+import { cn } from "@bltzr-gg/ui";
 
 export function LoadingIndicator(
   props: SVGProps<SVGSVGElement> & { rootClassName?: string },

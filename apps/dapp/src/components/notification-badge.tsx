@@ -1,4 +1,4 @@
-import { Badge } from "@repo/ui";
+import { Badge } from "@bltzr-gg/ui";
 
 /** Notification count badge */
 export function NotificationBadge({ count }: { count: number }) {

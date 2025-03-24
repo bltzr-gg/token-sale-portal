@@ -3,7 +3,7 @@ import { getCallbacksType } from "../utils/get-callbacks-type";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Form, FormField, FormItemWrapper, Input } from "@repo/ui";
+import { Form, FormField, FormItemWrapper, Input } from "@bltzr-gg/ui";
 import { encodeAbiParameters } from "viem";
 import { useEffect } from "react";
 

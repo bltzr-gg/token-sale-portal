@@ -1,5 +1,5 @@
 import { useAccount } from "wagmi";
-import { Metric } from "@repo/ui";
+import { Metric } from "@bltzr-gg/ui";
 import type { PropsWithAuction } from "@axis-finance/types";
 import { shorten } from "utils/number";
 

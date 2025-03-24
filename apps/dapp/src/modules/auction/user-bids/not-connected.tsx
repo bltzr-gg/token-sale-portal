@@ -1,4 +1,4 @@
-import { Badge, Card, Text } from "@repo/ui";
+import { Badge, Card, Text } from "@bltzr-gg/ui";
 import type { BatchAuction, PropsWithAuction } from "@axis-finance/types";
 import { RequiresChain } from "components/requires-chain";
 

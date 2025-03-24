@@ -1,14 +1,9 @@
-import config from "@repo/tailwind-config/tailwind";
+import tailwindcssAnimate from "tailwindcss-animate";
+import config from "@bltzr-gg/ui/tailwind";
 
-/** @type {import('tailwindcss').Config} */
 export default {
-  ...config,
-  content: [
-    "../../packages/ui/src/**/*.{ts,tsx}",
-    "./pages/**/*.{ts,tsx}",
-    "./components/**/*.{ts,tsx}",
-    "./src/stories/*.{tsx,ts}",
-    "./app/**/*.{ts,tsx}",
-    "./src/**/*.{ts,tsx}",
-  ],
+  darkMode: ["class"],
+  content: ["./src/**/*.tsx", "../../packages/ui/src/**/*.{js,ts,jsx,tsx}"],
+  presets: [config],
+  plugins: [tailwindcssAnimate],
 };

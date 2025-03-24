@@ -2,13 +2,11 @@ import { ConnectButton as RKConnectButton } from "@rainbow-me/rainbowkit";
 import {
   Avatar,
   Button,
-  Text,
   cn,
   type ButtonProps,
   DropdownMenu,
   DropdownMenuTrigger,
-} from "@repo/ui";
-import { useMediaQueries } from "loaders/use-media-queries";
+} from "@bltzr-gg/ui";
 
 export default function ConnectButton({
   className,
@@ -17,8 +15,6 @@ export default function ConnectButton({
   className?: string;
   size?: ButtonProps["size"];
 }) {
-  const { isTabletOrMobile } = useMediaQueries();
-
   return (
     <RKConnectButton.Custom>
       {({ account, chain, openChainModal, openConnectModal, mounted }) => {
@@ -42,21 +38,18 @@ export default function ConnectButton({
               if (!connected) {
                 return (
                   <Button
+                    variant="accent"
                     size={size}
                     className={"w-full"}
                     onClick={openConnectModal}
                   >
-                    CONNECT {isTabletOrMobile ? "" : "WALLET"}
+                    Connect
                   </Button>
                 );
               }
               if (chain.unsupported) {
                 return (
-                  <Button
-                    size={size}
-                    variant="secondary"
-                    onClick={openChainModal}
-                  >
+                  <Button size={size} onClick={openChainModal}>
                     Wrong network
                   </Button>
                 );
@@ -68,11 +61,10 @@ export default function ConnectButton({
                     <DropdownMenuTrigger asChild>
                       <button className="flex items-center gap-x-1">
                         <div className="space-y-1">
-                          <Text className="leading-none">
+                          <div className="leading-none">
                             {account.ensName ?? account.displayName}
-                          </Text>
+                          </div>
                         </div>
-                        {/*account.displayBalance ? ` (${account.displayBalance})` : ""*/}
                       </button>
                     </DropdownMenuTrigger>
                   </DropdownMenu>

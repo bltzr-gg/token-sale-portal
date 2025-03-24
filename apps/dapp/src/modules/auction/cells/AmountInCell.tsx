@@ -1,6 +1,6 @@
 import { Auction, BatchAuctionBid } from "@axis-finance/types";
 import { ToggledUsdAmount } from "../toggled-usd-amount";
-import { useToggle } from "@repo/ui";
+import { useToggle } from "../hooks/use-toggle";
 
 export function AmountInCell({
   bid,

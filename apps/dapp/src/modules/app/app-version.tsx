@@ -1,4 +1,4 @@
-import { cn } from "@repo/ui";
+import { cn } from "@bltzr-gg/ui";
 import { version } from "../../../package.json";
 
 export function AppVersion({ className }: { className?: string }) {

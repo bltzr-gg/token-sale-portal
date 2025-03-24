@@ -7,7 +7,7 @@ import {
   useReactTable,
   getPaginationRowModel,
   getSortedRowModel,
-} from "@tanstack/react-table";
+} from '@tanstack/react-table';
 
 import {
   Table,
@@ -16,11 +16,46 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-  Button,
-} from "./";
-import { useState } from "react";
-import { ArrowLeftIcon, ArrowRightIcon } from "@radix-ui/react-icons";
-import { TableTitle } from "./table-title";
+} from './table';
+import { Button } from './button';
+import { useState } from 'react';
+import { ArrowLeftIcon, ArrowRightIcon } from '@radix-ui/react-icons';
+import { cn } from '@/lib/cn';
+
+type TableTitleProps = {
+  title?: React.ReactNode;
+  subtitle?: React.ReactNode;
+  titleRightElement?: React.ReactNode;
+  className?: string;
+};
+
+const TableTitle = ({
+  className,
+  title,
+  subtitle,
+  titleRightElement,
+}: TableTitleProps) => {
+  if (!title) return null;
+
+  return (
+    <div
+      className={cn(
+        'mb-xs flex items-center justify-between text-nowrap ',
+        className,
+      )}
+    >
+      <div className="flex flex-col justify-end">
+        <div className="text-lg lg:text-xl">{title}</div>
+        <div>{subtitle}</div>
+      </div>
+      {titleRightElement && (
+        <div className="flex grow items-center space-x-2">
+          {titleRightElement}
+        </div>
+      )}
+    </div>
+  );
+};
 
 interface DataTableProps<TData, TValue> {
   title?: React.ReactNode;
@@ -58,7 +93,7 @@ export function DataTable<TData, TValue>({
   return (
     <div>
       <div>
-        {typeof title === "string" && (
+        {typeof title === 'string' && (
           <TableTitle
             title={title}
             subtitle={subtitle}
@@ -89,7 +124,7 @@ export function DataTable<TData, TValue>({
               table.getRowModel().rows.map((row) => (
                 <TableRow
                   key={row.id}
-                  data-state={row.getIsSelected() && "selected"}
+                  data-state={row.getIsSelected() && 'selected'}
                   onClick={() => props.onClickRow?.(row)}
                 >
                   {row.getVisibleCells().map((cell) => (
@@ -108,7 +143,7 @@ export function DataTable<TData, TValue>({
                   colSpan={columns.length}
                   className="h-24 text-center"
                 >
-                  {emptyText ?? "No results"}
+                  {emptyText ?? 'No results'}
                 </TableCell>
               </TableRow>
             )}
@@ -131,7 +166,6 @@ export function DataTable<TData, TValue>({
         <div className="flex items-center justify-end space-x-2 py-4">
           <>
             <Button
-              variant="secondary"
               size="sm"
               onClick={() => table.previousPage()}
               disabled={!table.getCanPreviousPage()}
@@ -139,7 +173,6 @@ export function DataTable<TData, TValue>({
               <ArrowLeftIcon />
             </Button>
             <Button
-              variant="secondary"
               size="sm"
               onClick={() => table.nextPage()}
               disabled={!table.getCanNextPage()}

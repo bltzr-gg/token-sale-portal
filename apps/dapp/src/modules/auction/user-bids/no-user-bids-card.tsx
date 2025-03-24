@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { ArrowRightIcon } from "lucide-react";
-import { Badge, Button, Card, Text } from "@repo/ui";
+import { Badge, Button, Card, Text } from "@bltzr-gg/ui";
 
 export function NoUserBidsCard() {
   return (

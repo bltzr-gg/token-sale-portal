@@ -1,9 +1,7 @@
-import { cn } from "@repo/ui";
+import { cn } from "@bltzr-gg/ui";
 import { PropsWithAuction } from "@axis-finance/types";
-import { getLinkUrl } from "./utils/auction-details";
 
 import { ReferrerPopover } from "modules/referral/referrer-popover";
-import { SocialRow } from "components/social-row";
 
 type ProjectInfoCardProps = PropsWithAuction &
   React.HTMLAttributes<HTMLDivElement> & {
@@ -18,10 +16,6 @@ export function ProjectInfoCard({
   const description =
     auction.info?.description ?? "No description found for this project.";
 
-  const website = getLinkUrl("website", auction);
-  const twitter = getLinkUrl("twitter", auction);
-  const discord = getLinkUrl("discord", auction);
-  const farcaster = getLinkUrl("farcaster", auction);
   const canRefer = parseFloat(auction.referrerFee) > 0;
 
   return (
@@ -33,13 +27,6 @@ export function ProjectInfoCard({
       <div className="mb-4 flex">{description}</div>
       <div className="flex items-end justify-between space-x-4">
         {canRefer && <ReferrerPopover auction={auction} />}
-        <SocialRow
-          iconClassName="size-10"
-          twitter={twitter}
-          discord={discord}
-          website={website}
-          farcaster={farcaster}
-        />
       </div>
     </div>
   );

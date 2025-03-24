@@ -1,4 +1,4 @@
-import { Tooltip, cn } from "@repo/ui";
+import { Tooltip, cn } from "@bltzr-gg/ui";
 import { LoadingIndicator } from "modules/app/loading-indicator";
 
 /** Displays an icon with a color representing the status and a loading spinner in case of loading */

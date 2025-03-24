@@ -1,4 +1,4 @@
-import { Card, Metric } from "@repo/ui";
+import { Card, Metric } from "@bltzr-gg/ui";
 import { AuctionType, type PropsWithAuction } from "@axis-finance/types";
 import { useBaseDTLCallback } from "modules/auction/hooks/use-base-dtl-callback";
 import { AuctionMetrics } from "./auction-metrics";

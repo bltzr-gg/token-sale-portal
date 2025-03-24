@@ -1,4 +1,4 @@
-import { Button, Tooltip, cn } from "@repo/ui";
+import { Button, Tooltip, cn } from "@bltzr-gg/ui";
 import { RefreshCwIcon } from "lucide-react";
 
 type ReloadButtonProps = React.HTMLAttributes<HTMLButtonElement> & {

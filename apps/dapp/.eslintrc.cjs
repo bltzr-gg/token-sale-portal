@@ -2,7 +2,7 @@
 module.exports = {
   root: true,
   extends: [
-    "@repo/eslint-config/react.js",
+    "@bltzr-gg/eslint-config/react.js",
     "plugin:storybook/recommended",
     "plugin:@tanstack/eslint-plugin-query/recommended",
   ],

@@ -2,7 +2,8 @@ import { useState } from "react";
 import { useAccount } from "wagmi";
 import { formatUnits } from "viem";
 import type { PropsWithAuction } from "@axis-finance/types";
-import { Badge, Button, Card, formatDate, Metric, Progress } from "@repo/ui";
+import { Button, Card, Metric, Progress } from "@bltzr-gg/ui";
+import { formatDate } from "utils/date";
 import { RequiresChain } from "components/requires-chain";
 import { trimCurrency } from "utils/currency";
 import { useVestingTokenId } from "modules/auction/hooks/use-vesting-tokenid";
@@ -129,16 +130,6 @@ export function VestingCard({ auction }: PropsWithAuction) {
       ? (vestingProgress / 100) * userTotalTokensWon
       : 0);
 
-  const vestingBadgeColour =
-    vestingProgress >= 100 ? "active" : vestingProgress < 0 ? "ghost" : "blue";
-
-  const vestingBadgeText =
-    vestingProgress >= 100
-      ? "Complete"
-      : vestingProgress < 0
-        ? "Upcoming"
-        : "Vesting";
-
   // Allow user to eagerly claim the vesting derivative, if the vesting period hasn't started yet
   const shouldShowClaimVesting = !userHasClaimedVestingDerivative;
 
@@ -153,12 +144,7 @@ export function VestingCard({ auction }: PropsWithAuction) {
     !hasVestingPeriodStarted && userHasClaimedVestingDerivative;
 
   return (
-    <Card
-      title={`${shouldShowClaimVesting ? "Claim" : "Redeem"}`}
-      headerRightElement={
-        <Badge color={vestingBadgeColour}>{vestingBadgeText}</Badge>
-      }
-    >
+    <Card title={`${shouldShowClaimVesting ? "Claim" : "Redeem"}`}>
       <div className="gap-y-md flex flex-col">
         <BidOutcome auction={auction} />
 

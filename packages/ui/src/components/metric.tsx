@@ -1,10 +1,10 @@
-import { cn } from "@/utils";
-import { Text, type TextWeight } from "./primitives";
-import { Tooltip } from "./tooltip";
+import { cn } from '@/lib/cn';
+import { Text, type TextWeight } from './text';
+import { Tooltip } from './tooltip';
 
-export type MetricProps = Omit<React.HTMLProps<HTMLDivElement>, "size"> & {
+export type MetricProps = Omit<React.HTMLProps<HTMLDivElement>, 'size'> & {
   label: string;
-  size?: "s" | "m" | "l" | "xl";
+  size?: 's' | 'm' | 'l' | 'xl';
   metricWeight?: TextWeight;
   tooltip?: string;
   isLabelSpaced?: boolean;
@@ -17,14 +17,14 @@ export function Metric({
   children,
   className,
   childrenClassName,
-  size = "m",
-  metricWeight = "default",
+  size = 'm',
+  metricWeight = 'default',
   tooltip,
   isLabelSpaced = false,
   mono,
 }: MetricProps) {
   const metricSize =
-    size === "xl" ? "2xl" : size === "l" ? "xl" : size === "m" ? "lg" : "md";
+    size === 'xl' ? '2xl' : size === 'l' ? 'xl' : size === 'm' ? 'lg' : 'md';
 
   return (
     <div className={className}>
@@ -46,8 +46,8 @@ export function Metric({
         weight={metricWeight}
         spaced={isLabelSpaced}
         className={cn(
-          "tracking-wide",
-          size === "l" && "mt-sm",
+          'tracking-wide',
+          size === 'l' && 'mt-sm',
           childrenClassName,
         )}
       >

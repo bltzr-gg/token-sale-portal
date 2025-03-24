@@ -5,13 +5,14 @@ import {
   type Auction,
   type PropsWithAuction,
 } from "@axis-finance/types";
-import { Metric, MetricProps, useToggle } from "@repo/ui";
+import { Metric, MetricProps } from "@bltzr-gg/ui";
+import { useToggle } from "./hooks/use-toggle";
 import { trimCurrency } from "utils/currency";
 import { shorten, formatPercentage } from "utils/number";
 import { getCallbacksType } from "./utils/get-callbacks-type";
 import { getMinFilled, getPrice, hasDerivative } from "./utils/auction-details";
 import { formatDate, getDaysBetweenDates } from "utils/date";
-import { Format } from "modules/token/format";
+import { Format } from "components/format";
 import { UsdAmount } from "./usd-amount";
 import { ToggledUsdAmount } from "./toggled-usd-amount";
 import { DtlProceedsDisplay } from "./dtl-proceeds-display";
@@ -128,7 +129,6 @@ const handlers: MetricHandlers = {
   start: {
     label: "Start",
     handler: (auction) => {
-      console.log({ auction });
       return formatDate.simple(new Date(+auction.start * 1000));
     },
   },

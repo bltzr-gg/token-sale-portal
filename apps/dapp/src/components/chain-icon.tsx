@@ -1,4 +1,4 @@
-import { Avatar } from "@repo/ui";
+import { Avatar } from "@bltzr-gg/ui";
 import { chains } from "@axis-finance/env";
 
 import { environment } from "utils/environment";

@@ -1,5 +1,5 @@
 {
-  "extends": "@repo/typescript-config/react-app.json",
+  "extends": "@bltzr-gg/typescript-config/react-app.json",
   "include": [
     "src",
     "../../packages/ui/src/components/sort-button.tsx",
@@ -22,11 +22,7 @@
       "state/*": ["src/state/*"],
       "utils/*": ["src/utils/*"],
       "utils": ["src/utils/index"],
-      "@/utils": ["../../packages/ui/src/utils.ts"],
-      "@/components/primitives/*": [
-        "../../packages/ui/src/components/primitives/*"
-      ],
-      "@/components": ["../../packages/ui/src/components/index.ts"]
+      "@/utils": ["../../packages/ui/src/utils.ts"]
     },
     "moduleResolution": "Bundler"
   },

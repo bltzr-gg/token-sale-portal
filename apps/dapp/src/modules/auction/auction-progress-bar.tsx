@@ -1,5 +1,5 @@
 import { PropsWithAuction } from "@axis-finance/types";
-import { Progress, Text, cn } from "@repo/ui";
+import { Progress, Text, cn } from "@bltzr-gg/ui";
 import { calculateAuctionProgress } from "./utils/get-auction-progress";
 import { ToggledUsdAmount } from "./toggled-usd-amount";
 import { trimCurrency } from "utils/currency";

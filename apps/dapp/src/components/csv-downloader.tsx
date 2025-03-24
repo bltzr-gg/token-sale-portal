@@ -1,6 +1,6 @@
 import { DownloadIcon } from "lucide-react";
 import { CSVLink } from "react-csv";
-import { Tooltip } from "@repo/ui";
+import { Tooltip } from "@bltzr-gg/ui";
 
 type CSVDownloaderProps = {
   data: string[][];

@@ -2,7 +2,7 @@ import { PropsWithAuction } from "@axis-finance/types";
 import { AuctionCoreMetrics } from "../auction-core-metrics";
 import { AuctionPurchase } from "../auction-purchase";
 import React from "react";
-import { cn } from "@repo/ui";
+import { cn } from "@bltzr-gg/ui";
 
 export function AuctionLive({ auction }: PropsWithAuction) {
   const [showMetrics, setShowMetrics] = React.useState(false);

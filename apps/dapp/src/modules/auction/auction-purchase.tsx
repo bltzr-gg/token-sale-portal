@@ -1,4 +1,4 @@
-import { Button, Card, Link, Metric, Text, Tooltip, cn } from "@repo/ui";
+import { Button, Card, Link, Metric, Text, Tooltip, cn } from "@bltzr-gg/ui";
 import { formatUnits, parseUnits } from "viem";
 import { AuctionBidInput } from "./auction-bid-input";
 import { Auction, AuctionType, PropsWithAuction } from "@axis-finance/types";

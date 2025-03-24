@@ -1,4 +1,4 @@
-import { Text, cn } from "@repo/ui";
+import { Text, cn } from "@bltzr-gg/ui";
 
 type PageContainerProps = {
   title?: React.ReactNode;

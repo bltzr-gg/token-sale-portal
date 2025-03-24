@@ -1,8 +1,8 @@
-import React from "react";
+import React from 'react';
 
 const Link = React.forwardRef<
   HTMLAnchorElement,
-  React.ComponentPropsWithoutRef<"a">
+  React.ComponentPropsWithoutRef<'a'>
 >((props, ref) => (
   <a
     className="inline leading-none"
@@ -13,6 +13,6 @@ const Link = React.forwardRef<
   />
 ));
 
-Link.displayName = "Link";
+Link.displayName = 'Link';
 
 export { Link };

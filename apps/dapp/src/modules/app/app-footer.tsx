@@ -1,10 +1,5 @@
-import { Button, Link, Tooltip, cn, useTheme } from "@repo/ui";
-import { SocialRow } from "../../components/social-row";
-import { SOCIALS } from "../../../../../app-config";
-import { AppVersion } from "./app-version";
+import { cn } from "@bltzr-gg/ui";
 import { AxisWordmark } from "./axis-wordmark";
-
-const { DISCORD_URL, TWITTER_URL, WEBSITE_URL, CONTACT_URL } = SOCIALS;
 
 export function AppFooter() {
   return (
@@ -16,55 +11,18 @@ export function AppFooter() {
         )}
       >
         <PoweredByAxis />
-
-        <div
-          className={cn(
-            "text-surface flex items-center gap-x-3 px-4",
-            "text-foreground dark:text-neutral-500",
-          )}
-        >
-          <SocialRow
-            discord={DISCORD_URL}
-            twitter={TWITTER_URL}
-            website={WEBSITE_URL}
-            iconClassName={"size-8"}
-          />
-          <Link href={CONTACT_URL} target="_blank">
-            <Button
-              size="sm"
-              className={cn(
-                "text-surface px-0 uppercase ",
-                "text-foreground dark:text-neutral-500",
-              )}
-              variant="link"
-            >
-              Contact
-            </Button>
-          </Link>
-        </div>
       </div>
     </div>
   );
 }
 
 function PoweredByAxis() {
-  const { themeColor } = useTheme();
   return (
     <div className="text-foreground ml-4 flex items-center dark:text-neutral-500">
       {" "}
-      <Tooltip
-        content={
-          <>
-            App Version: <AppVersion />
-          </>
-        }
-      >
-        Powered by{" "}
-        <AxisWordmark
-          className="-mt-0.5 inline size-10"
-          light={themeColor === "dark"}
-        />
-      </Tooltip>
+      <a href="https://axis.finance/docs/overview">
+        Powered by <AxisWordmark className="-mt-0.5 inline size-10" />
+      </a>
     </div>
   );
 }

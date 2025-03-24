@@ -11,7 +11,7 @@ import type {
   AuctionId,
 } from "@axis-finance/types";
 import { formatUnits } from "viem";
-import { formatDate } from "@repo/ui";
+import { formatDate } from "utils/date";
 import { formatDistanceToNow } from "date-fns";
 import { trimCurrency } from "utils";
 import { useTokenLists } from "state/tokenlist";

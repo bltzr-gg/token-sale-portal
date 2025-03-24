@@ -1,4 +1,4 @@
-import { Link, cn } from "@repo/ui";
+import { Link, cn } from "@bltzr-gg/ui";
 import { ArrowUpRightIcon } from "lucide-react";
 import React from "react";
 

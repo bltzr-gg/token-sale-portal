@@ -1,4 +1,5 @@
-import { ToggleProvider, TooltipProvider } from "@repo/ui";
+import { TooltipProvider } from "@bltzr-gg/ui";
+import { ToggleProvider } from "modules/auction/hooks/use-toggle";
 import { BlockchainProvider } from "./blockchain-provider";
 import { OriginSdkProvider } from "@axis-finance/sdk/react";
 import { createSdk } from "@axis-finance/sdk";

@@ -1,7 +1,7 @@
-import { FormField, FormItemWrapperSlim } from "@repo/ui";
+import { FormField } from "@bltzr-gg/ui";
 import { useFormContext } from "react-hook-form";
 import { PropsWithAuction } from "@axis-finance/types";
-import { TokenAmountInput } from "modules/token/token-amount-input";
+import { TokenAmountInput } from "components/token-amount-input";
 import { trimCurrency } from "utils/currency";
 import { useState } from "react";
 import { formatUnits, parseUnits } from "viem";
@@ -57,51 +57,49 @@ export function AuctionBidInput({
             name="quoteTokenAmount"
             control={form.control}
             render={({ field }) => (
-              <FormItemWrapperSlim>
-                <TokenAmountInput
-                  {...field}
-                  disabled={disabled}
-                  label="Spend Amount"
-                  balance={formatUnits(balance, auction.quoteToken.decimals)}
-                  limit={
-                    limit
-                      ? trimCurrency(
-                          formatUnits(limit, auction.quoteToken.decimals),
-                        )
-                      : undefined
+              <TokenAmountInput
+                {...field}
+                disabled={disabled}
+                label="Spend Amount"
+                balance={formatUnits(balance, auction.quoteToken.decimals)}
+                limit={
+                  limit
+                    ? trimCurrency(
+                        formatUnits(limit, auction.quoteToken.decimals),
+                      )
+                    : undefined
+                }
+                token={auction.quoteToken}
+                onChange={(e) => {
+                  field.onChange(e);
+
+                  // Display USD value of input amount
+                  const rawAmountIn = e as string;
+                  // Update amount out value
+                  handleAmountOutChange(
+                    parseUnits(rawAmountIn, auction.quoteToken.decimals),
+                  );
+                }}
+                onClickMaxButton={() => {
+                  // Take the minimum of the balance and the limit
+                  let maxSpend = balance;
+                  if (limit) {
+                    maxSpend = balance < limit ? balance : limit;
                   }
-                  token={auction.quoteToken}
-                  onChange={(e) => {
-                    field.onChange(e);
 
-                    // Display USD value of input amount
-                    const rawAmountIn = e as string;
-                    // Update amount out value
-                    handleAmountOutChange(
-                      parseUnits(rawAmountIn, auction.quoteToken.decimals),
-                    );
-                  }}
-                  onClickMaxButton={() => {
-                    // Take the minimum of the balance and the limit
-                    let maxSpend = balance;
-                    if (limit) {
-                      maxSpend = balance < limit ? balance : limit;
-                    }
+                  const maxSpendStr = formatUnits(
+                    maxSpend,
+                    auction.quoteToken.decimals,
+                  );
 
-                    const maxSpendStr = formatUnits(
-                      maxSpend,
-                      auction.quoteToken.decimals,
-                    );
+                  form.setValue("quoteTokenAmount", maxSpendStr);
+                  // Force re-validation
+                  form.trigger("quoteTokenAmount");
 
-                    form.setValue("quoteTokenAmount", maxSpendStr);
-                    // Force re-validation
-                    form.trigger("quoteTokenAmount");
-
-                    // Update amount out value
-                    handleAmountOutChange(maxSpend);
-                  }}
-                />
-              </FormItemWrapperSlim>
+                  // Update amount out value
+                  handleAmountOutChange(maxSpend);
+                }}
+              />
             )}
           />
         </div>
@@ -113,48 +111,46 @@ export function AuctionBidInput({
             name="bidPrice"
             control={form.control}
             render={({ field }) => (
-              <FormItemWrapperSlim>
-                <TokenAmountInput
-                  {...field}
-                  label="Bid Price"
-                  tokenLabel={`${auction.quoteToken.symbol} per ${auction.baseToken.symbol}`}
-                  disabled={disabled}
-                  disableMaxButton={true}
-                  token={auction.quoteToken}
-                  message={
-                    showAmountOut
-                      ? `If successful, you will receive at least: ${trimCurrency(minAmountOutFormatted)} ${auction.baseToken.symbol}`
-                      : ""
+              <TokenAmountInput
+                {...field}
+                label="Bid Price"
+                tokenLabel={`${auction.quoteToken.symbol} per ${auction.baseToken.symbol}`}
+                disabled={disabled}
+                disableMaxButton={true}
+                token={auction.quoteToken}
+                message={
+                  showAmountOut
+                    ? `If successful, you will receive at least: ${trimCurrency(minAmountOutFormatted)} ${auction.baseToken.symbol}`
+                    : ""
+                }
+                onChange={(e) => {
+                  field.onChange(e);
+                  // Update amount out value
+                  const rawPrice = e as string;
+                  setBidPrice(rawPrice);
+                  const price = parseUnits(
+                    rawPrice,
+                    auction.quoteToken.decimals,
+                  );
+
+                  let spendAmount = formAmount;
+
+                  if (formAmount === undefined || formAmount === "") {
+                    spendAmount = "0";
                   }
-                  onChange={(e) => {
-                    field.onChange(e);
-                    // Update amount out value
-                    const rawPrice = e as string;
-                    setBidPrice(rawPrice);
-                    const price = parseUnits(
-                      rawPrice,
-                      auction.quoteToken.decimals,
-                    );
 
-                    let spendAmount = formAmount;
-
-                    if (formAmount === undefined || formAmount === "") {
-                      spendAmount = "0";
-                    }
-
-                    const minAmountOut = getMinAmountOut(
-                      parseUnits(spendAmount, auction.quoteToken.decimals),
-                      price,
-                    );
-                    const minAmountOutDecimal = formatUnits(
-                      minAmountOut,
-                      auction.baseToken.decimals,
-                    );
-                    form.setValue("baseTokenAmount", minAmountOutDecimal);
-                    setMinAmountOutFormatted(trimCurrency(minAmountOutDecimal));
-                  }}
-                />
-              </FormItemWrapperSlim>
+                  const minAmountOut = getMinAmountOut(
+                    parseUnits(spendAmount, auction.quoteToken.decimals),
+                    price,
+                  );
+                  const minAmountOutDecimal = formatUnits(
+                    minAmountOut,
+                    auction.baseToken.decimals,
+                  );
+                  form.setValue("baseTokenAmount", minAmountOutDecimal);
+                  setMinAmountOutFormatted(trimCurrency(minAmountOutDecimal));
+                }}
+              />
             )}
           />
         </div>

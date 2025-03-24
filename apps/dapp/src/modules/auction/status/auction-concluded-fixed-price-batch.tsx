@@ -1,4 +1,4 @@
-import { Badge, Button, Card, Text } from "@repo/ui";
+import { Badge, Button, Card, Text } from "@bltzr-gg/ui";
 import { type PropsWithAuction } from "@axis-finance/types";
 import React, { useState } from "react";
 import { TransactionDialog } from "modules/transaction/transaction-dialog";

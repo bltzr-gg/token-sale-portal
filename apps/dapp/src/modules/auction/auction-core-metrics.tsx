@@ -3,7 +3,7 @@ import {
   BatchAuction,
   PropsWithAuction,
 } from "@axis-finance/types";
-import { Card, Metric } from "@repo/ui";
+import { Card, Metric } from "@bltzr-gg/ui";
 import { BlockExplorerLink } from "components/blockexplorer-link";
 import { AuctionMetricsContainer } from "./auction-metrics-container";
 import { AuctionMetric } from "./auction-metric";

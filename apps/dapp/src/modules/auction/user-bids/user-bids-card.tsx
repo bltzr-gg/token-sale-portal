@@ -3,7 +3,7 @@ import { useAccount } from "wagmi";
 import { Link } from "react-router-dom";
 import { ArrowRightIcon } from "lucide-react";
 
-import { Badge, Button, Card } from "@repo/ui";
+import { Badge, Button, Card } from "@bltzr-gg/ui";
 import type { PropsWithAuction } from "@axis-finance/types";
 import { RequiresChain } from "components/requires-chain";
 import { TransactionDialog } from "modules/transaction/transaction-dialog";

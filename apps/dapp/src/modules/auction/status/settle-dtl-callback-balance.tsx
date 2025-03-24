@@ -4,7 +4,7 @@ import { useBaseDTLCallback } from "../hooks/use-base-dtl-callback";
 import useERC20Balance from "loaders/use-erc20-balance";
 import { formatUnits } from "viem";
 import { trimCurrency } from "utils/currency";
-import { Text } from "@repo/ui";
+import { Text } from "@bltzr-gg/ui";
 import { useEffect } from "react";
 
 export function SettleAuctionDtlCallbackBalance({

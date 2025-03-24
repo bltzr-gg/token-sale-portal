@@ -3,7 +3,13 @@ import type {
   PropsWithAuction,
   BatchAuction,
 } from "@axis-finance/types";
-import { Card, cn, Metric, type MetricProps, type TextWeight } from "@repo/ui";
+import {
+  Card,
+  cn,
+  Metric,
+  type MetricProps,
+  type TextWeight,
+} from "@bltzr-gg/ui";
 import { SettledAuctionChart } from "./settled-auction-chart";
 import { useToggleUsdAmount } from "./hooks/use-toggle-usd-amount";
 import { getTimestamp } from "utils/date";

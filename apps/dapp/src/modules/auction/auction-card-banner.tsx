@@ -1,5 +1,5 @@
 import type { Chain, PropsWithAuction } from "@axis-finance/types";
-import { Badge, cn } from "@repo/ui";
+import { Badge, cn } from "@bltzr-gg/ui";
 import { CountdownChip } from "./countdown-chip";
 
 type AuctionCardBannerProps = PropsWithAuction & {

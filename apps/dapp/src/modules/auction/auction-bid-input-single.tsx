@@ -1,4 +1,4 @@
-import { FormField, FormItemWrapperSlim } from "@repo/ui";
+import { FormField } from "@bltzr-gg/ui";
 import { useFormContext } from "react-hook-form";
 import { PropsWithAuction } from "@axis-finance/types";
 import { BidForm } from "./auction-purchase";
@@ -46,58 +46,56 @@ export function AuctionBidInputSingle({
             name="quoteTokenAmount"
             control={form.control}
             render={({ field }) => (
-              <FormItemWrapperSlim>
-                <TokenAmountInput
-                  {...field}
-                  disabled={disabled}
-                  label="Spend Amount"
-                  message={
-                    showAmountOut
-                      ? `You will receive ${trimCurrency(formAmountOut)} ${auction.baseToken.symbol}`
-                      : ""
+              <TokenAmountInput
+                {...field}
+                disabled={disabled}
+                label="Spend Amount"
+                message={
+                  showAmountOut
+                    ? `You will receive ${trimCurrency(formAmountOut)} ${auction.baseToken.symbol}`
+                    : ""
+                }
+                balance={formatUnits(balance, auction.quoteToken.decimals)}
+                limit={
+                  limit
+                    ? trimCurrency(
+                        formatUnits(limit, auction.quoteToken.decimals),
+                      )
+                    : undefined
+                }
+                token={auction.quoteToken}
+                onChange={(e) => {
+                  field.onChange(e);
+
+                  const rawAmountIn = e as string;
+                  const amountIn = parseUnits(
+                    rawAmountIn,
+                    auction.quoteToken.decimals,
+                  );
+
+                  // Update amount out value, if applicable
+                  handleAmountOutChange(amountIn);
+                }}
+                onClickMaxButton={() => {
+                  // Take the minimum of the balance and the limit
+                  let maxSpend = balance;
+                  if (limit) {
+                    maxSpend = balance < limit ? balance : limit;
                   }
-                  balance={formatUnits(balance, auction.quoteToken.decimals)}
-                  limit={
-                    limit
-                      ? trimCurrency(
-                          formatUnits(limit, auction.quoteToken.decimals),
-                        )
-                      : undefined
-                  }
-                  token={auction.quoteToken}
-                  onChange={(e) => {
-                    field.onChange(e);
 
-                    const rawAmountIn = e as string;
-                    const amountIn = parseUnits(
-                      rawAmountIn,
-                      auction.quoteToken.decimals,
-                    );
+                  const maxSpendStr = formatUnits(
+                    maxSpend,
+                    auction.quoteToken.decimals,
+                  );
 
-                    // Update amount out value, if applicable
-                    handleAmountOutChange(amountIn);
-                  }}
-                  onClickMaxButton={() => {
-                    // Take the minimum of the balance and the limit
-                    let maxSpend = balance;
-                    if (limit) {
-                      maxSpend = balance < limit ? balance : limit;
-                    }
+                  form.setValue("quoteTokenAmount", maxSpendStr);
+                  // Force re-validation
+                  form.trigger("quoteTokenAmount");
 
-                    const maxSpendStr = formatUnits(
-                      maxSpend,
-                      auction.quoteToken.decimals,
-                    );
-
-                    form.setValue("quoteTokenAmount", maxSpendStr);
-                    // Force re-validation
-                    form.trigger("quoteTokenAmount");
-
-                    // Update amount out value, if applicable
-                    handleAmountOutChange(maxSpend);
-                  }}
-                />
-              </FormItemWrapperSlim>
+                  // Update amount out value, if applicable
+                  handleAmountOutChange(maxSpend);
+                }}
+              />
             )}
           />
         </div>

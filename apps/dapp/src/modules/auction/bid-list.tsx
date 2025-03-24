@@ -6,7 +6,7 @@ import {
   BatchAuction,
 } from "@axis-finance/types";
 import { BlockExplorerLink } from "components/blockexplorer-link";
-import { Button, Card, Chip, DataTable, Text } from "@repo/ui";
+import { Button, Card, Chip, DataTable, Text } from "@bltzr-gg/ui";
 import {
   useAccount,
   useWaitForTransactionReceipt,

@@ -1,5 +1,6 @@
 import type { Auction, BatchAuctionBid } from "@axis-finance/types";
-import { Tooltip, useToggle } from "@repo/ui";
+import { Tooltip } from "@bltzr-gg/ui";
+import { useToggle } from "../hooks/use-toggle";
 import { trimCurrency } from "utils/currency";
 import { ToggledUsdAmount } from "../toggled-usd-amount";
 import { LockClosedIcon, LockOpen1Icon } from "@radix-ui/react-icons";

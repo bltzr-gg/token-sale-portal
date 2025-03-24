@@ -4,9 +4,8 @@ import {
   AccordionRoot,
   AccordionTrigger,
   Button,
-} from "@repo/ui";
+} from "@bltzr-gg/ui";
 import { environment } from "utils/environment";
-import { ReachOutMessage } from "modules/app/reach-out";
 import { ErrorResponse, Link, useRouteError } from "react-router-dom";
 
 const showError = !environment.isProduction;
@@ -54,8 +53,6 @@ export default function ErrorPage() {
             </AccordionItem>
           </AccordionRoot>
         )}
-
-        <ReachOutMessage />
 
         <Button className="mt-4" variant="secondary" size="sm">
           <Link to="/">Head back</Link>

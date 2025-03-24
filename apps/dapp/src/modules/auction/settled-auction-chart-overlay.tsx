@@ -1,6 +1,6 @@
 import { useSdk } from "@axis-finance/sdk/react";
 import type { PropsWithAuction } from "@axis-finance/types";
-import { UsdToggle } from "@repo/ui";
+import { UsdToggle } from "components/usd-toggle";
 
 export const SettledAuctionChartOverlay = ({ auction }: PropsWithAuction) => {
   const sdk = useSdk();

@@ -2,7 +2,7 @@ import { createColumnHelper } from "@tanstack/react-table";
 import { formatUnits } from "viem";
 import { useAccount } from "wagmi";
 import type { BatchAuctionBid, PropsWithAuction } from "@axis-finance/types";
-import { Card, DataTable, Text } from "@/components";
+import { Card, DataTable, Text } from "@bltzr-gg/ui";
 import { trimCurrency } from "utils/currency";
 import { shorten } from "utils/number";
 

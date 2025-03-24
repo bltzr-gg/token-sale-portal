@@ -1,6 +1,6 @@
-import { useToggle } from "@repo/ui";
+import { useToggle } from "./hooks/use-toggle";
 import { UsdAmount, type UsdAmountProps } from "./usd-amount";
-import { Format } from "modules/token/format";
+import { Format } from "components/format";
 
 type ToggledUsdAmountProps = UsdAmountProps & {
   untoggledFormat?: (amount: number) => string;
