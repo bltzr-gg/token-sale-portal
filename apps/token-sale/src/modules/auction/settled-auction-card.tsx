@@ -1,8 +1,4 @@
-import type {
-  Token,
-  PropsWithAuction,
-  BatchAuction,
-} from "@axis-finance/types";
+import type { Token } from "@/hooks/use-auction/types";
 import {
   Card,
   cn,
@@ -12,13 +8,13 @@ import {
 } from "@bltzr-gg/ui";
 import { SettledAuctionChart } from "./settled-auction-chart";
 import { useToggleUsdAmount } from "./hooks/use-toggle-usd-amount";
-import { getTimestamp } from "utils/date";
+import { useAuctionSuspense } from "@/hooks/use-auction";
 
 type ToggledAmountProps = {
   label: string;
   token: Token;
   amount: number;
-  timestamp?: number;
+  timestamp?: Date;
   weight?: TextWeight;
   className?: string;
 } & Pick<MetricProps, "size">;
@@ -45,60 +41,51 @@ const ToggledAmount = ({
   );
 };
 
-const AuctionHeader = ({ auction }: PropsWithAuction) => {
-  const batchAuction = auction as BatchAuction;
+const AuctionHeader = () => {
+  const { data: auction } = useAuctionSuspense();
 
-  const clearingPrice = Number(
-    batchAuction.encryptedMarginalPrice?.marginalPrice ?? 0,
-  );
-  const fdv = Number(batchAuction.baseToken.totalSupply ?? 0) * clearingPrice;
-  const auctionEndTimestamp = batchAuction?.formatted
-    ? getTimestamp(batchAuction.formatted.endDate)
-    : undefined;
+  const clearingPrice = auction.marginalPrice;
+  const fdv = Number(auction.baseToken.totalSupply ?? 0) * clearingPrice;
 
   return (
     <div className="flex- flex items-end gap-x-[8px] pb-[16px]">
-      {batchAuction.formatted?.cleared && (
+      {auction.settled && (
         <>
           <ToggledAmount
             label="Clearing price"
             amount={clearingPrice}
-            token={batchAuction.quoteToken}
-            timestamp={auctionEndTimestamp}
+            token={auction.quoteToken}
+            timestamp={auction.end}
             className="min-w-[292px]"
           />
           <ToggledAmount
             label={` Raised`}
-            amount={Number(batchAuction.purchased) ?? 0}
-            token={batchAuction.quoteToken}
-            timestamp={auctionEndTimestamp}
+            amount={Number(auction.purchased) ?? 0}
+            token={auction.quoteToken}
+            timestamp={auction.end}
             className="min-w-[188px]"
           />
           <ToggledAmount
             label="FDV"
-            token={batchAuction.quoteToken}
+            token={auction.quoteToken}
             amount={fdv ?? 0}
-            timestamp={auctionEndTimestamp}
+            timestamp={auction.end}
             className="min-w-[188px]"
           />
         </>
       )}
       <Metric label="Participants" className="min-w-[188px] flex-grow">
-        {batchAuction.formatted?.uniqueBidders}
+        {auction.bidStats.unique}
       </Metric>
     </div>
   );
 };
 
-const SettledAuctionCard = (
-  props: React.HTMLAttributes<HTMLDivElement> & PropsWithAuction,
-) => {
-  const { auction } = props;
-
+const SettledAuctionCard = () => {
   return (
     <Card className="min-h-64 md:aspect-video">
-      <AuctionHeader auction={auction} />
-      <SettledAuctionChart auction={auction as BatchAuction} />
+      <AuctionHeader />
+      <SettledAuctionChart />
     </Card>
   );
 };

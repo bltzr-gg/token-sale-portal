@@ -45,7 +45,7 @@ export function AuctionCardBanner(props: AuctionCardBannerProps) {
           </Badge>
         )}
 
-        <CountdownChip auction={props.auction} />
+        <CountdownChip />
       </div>
     </div>
   );

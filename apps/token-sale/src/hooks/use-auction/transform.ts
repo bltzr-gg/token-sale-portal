@@ -178,7 +178,7 @@ export const transform = (auction: BatchAuctionLot, tokens: Token[] = []) => {
     capacity: parseFloat(auction.capacity ?? "0"),
     capacityInitial: auction.capacityInitial,
     chainId: AUCTION_CHAIN_ID,
-    end: auction.conclusion,
+    end: new Date(Number(auction.conclusion) * 1000),
     derivativeType: auction.derivativeType,
     id: auction.id,
     linearVesting: auction.linearVesting,
@@ -194,11 +194,12 @@ export const transform = (auction: BatchAuctionLot, tokens: Token[] = []) => {
     protocolFee: auction.protocolFee,
     purchased: parseFloat(auction.purchased ?? "0"),
     quoteToken,
+    urlPath: `/${AUCTION_CHAIN_ID}/${auction.id}`,
     referrerFee: auction.referrerFee,
     seller: auction.seller as `0x${string}`,
     settled: !!auction.encryptedMarginalPrice?.settlementSuccessful,
     sold: parseFloat(auction.sold ?? "0"),
-    start: auction.start,
+    start: new Date(Number(auction.start) * 1000),
     status,
     symbol: `${auction.quoteToken.symbol}/${auction.baseToken.symbol}`,
     symbols: `${auction.quoteToken.symbol}/${auction.baseToken.symbol}`,
@@ -207,5 +208,7 @@ export const transform = (auction: BatchAuctionLot, tokens: Token[] = []) => {
     type: AuctionType.SEALED_BID,
   };
 };
-
+type GetArrayElementType<ArrayType extends readonly unknown[]> =
+  ArrayType extends readonly (infer ElementType)[] ? ElementType : never;
 export type Auction = ReturnType<typeof transform>;
+export type AuctionBid = GetArrayElementType<Auction["bids"]>;

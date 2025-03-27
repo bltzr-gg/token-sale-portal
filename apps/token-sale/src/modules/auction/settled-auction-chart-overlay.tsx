@@ -1,8 +1,9 @@
+import { useAuctionSuspense } from "@/hooks/use-auction";
 import { useSdk } from "@axis-finance/sdk/react";
-import type { PropsWithAuction } from "@axis-finance/types";
 import { UsdToggle } from "components/usd-toggle";
 
-export const SettledAuctionChartOverlay = ({ auction }: PropsWithAuction) => {
+export const SettledAuctionChartOverlay = () => {
+  const { data: auction } = useAuctionSuspense();
   const sdk = useSdk();
   const isTokenAlreadyUsd = sdk.isUsdToken(auction.quoteToken.symbol);
 

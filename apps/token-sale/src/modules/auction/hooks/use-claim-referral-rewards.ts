@@ -7,8 +7,8 @@ import {
   type UseWaitForTransactionReceiptReturnType,
 } from "wagmi";
 import { getAuctionHouse } from "utils/contracts";
-import type { PropsWithAuction } from "@axis-finance/types";
 import { abis } from "@axis-finance/abis";
+import { useAuctionSuspense } from "@/hooks/use-auction";
 
 type UseClaimRerralRewardsTxn = {
   transact: () => void;
@@ -25,12 +25,11 @@ type UseClaimRerralRewardsTxn = {
     | UseWaitForTransactionReceiptReturnType["error"];
 };
 
-export function useClaimReferralRewards({
-  auction,
-}: PropsWithAuction): UseClaimRerralRewardsTxn {
+export function useClaimReferralRewards(): UseClaimRerralRewardsTxn {
+  const { data: auction } = useAuctionSuspense();
   const chainId = auction.chainId;
   const rewardTokenAddress = auction.quoteToken.address;
-  const auctionType = auction.auctionType;
+  const auctionType = auction.type;
 
   const auctionHouseAddress = getAuctionHouse({ chainId, auctionType }).address;
 

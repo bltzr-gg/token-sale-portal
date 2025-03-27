@@ -1,10 +1,12 @@
 import { createColumnHelper } from "@tanstack/react-table";
 import { formatUnits } from "viem";
-import { useAccount } from "wagmi";
-import type { BatchAuctionBid, PropsWithAuction } from "@axis-finance/types";
 import { Card, DataTable, Text } from "@bltzr-gg/ui";
 import { trimCurrency } from "utils/currency";
 import { shorten } from "utils/number";
+import { useUserBids } from "@/hooks/use-user-bids";
+import { useAuctionSuspense } from "@/hooks/use-auction";
+import { useMemo } from "react";
+import { AuctionBid } from "@/hooks/use-auction/types";
 
 const TableCell = ({ top, bottom }: { top: string; bottom: string }) => {
   return (
@@ -23,16 +25,11 @@ const TableHeader = ({ children }: { children: React.ReactNode }) => {
   return <div className="flex flex-col">{children}</div>;
 };
 
-const column = createColumnHelper<BatchAuctionBid>();
+const column = createColumnHelper<AuctionBid>();
 
-export function UserBidInfoCard({ auction }: PropsWithAuction) {
-  const { address } = useAccount();
-
-  const userBids = auction.bids.filter(
-    (bid) => bid.bidder.toLowerCase() === address?.toLowerCase(),
-  );
-
-  // if (userBids.length === 0) return null;
+export function UserBidInfoCard() {
+  const { data: auction } = useAuctionSuspense();
+  const userBids = useUserBids();
 
   const columns = [
     column.accessor("amountIn", {
@@ -84,7 +81,7 @@ export function UserBidInfoCard({ auction }: PropsWithAuction) {
       header: "Refund",
       cell: (info) => {
         const settledAmountIn = Number(info.getValue() as string);
-        const bid = info.row.original as BatchAuctionBid;
+        const bid = info.row.original;
         const refundAmount = shorten(Number(bid.amountIn) - settledAmountIn);
         return (
           <TableCell top={refundAmount} bottom={auction.quoteToken.symbol} />
@@ -93,9 +90,18 @@ export function UserBidInfoCard({ auction }: PropsWithAuction) {
     }),
   ];
 
+  const bidIdRemapped = useMemo(
+    () =>
+      userBids.bids.map((bid) => ({
+        ...bid,
+        id: bid.bidId,
+      })),
+    [userBids.bids],
+  );
+
   return (
     <Card title="Bid Info">
-      <DataTable columns={columns} data={userBids} />
+      <DataTable columns={columns} data={bidIdRemapped} />
     </Card>
   );
 }

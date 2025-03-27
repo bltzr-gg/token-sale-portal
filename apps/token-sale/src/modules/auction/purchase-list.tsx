@@ -1,6 +1,5 @@
 import React from "react";
 import { formatUnits } from "viem";
-import { PropsWithAuction } from "@axis-finance/types";
 import { Card, DataTable } from "@bltzr-gg/ui";
 import { CSVDownloader } from "components/csv-downloader";
 import { arrayToCSV } from "utils/csv";
@@ -11,21 +10,24 @@ import {
   timestampCol,
 } from "./bid-list";
 import { Format } from "components/format";
+import { useAuctionSuspense } from "@/hooks/use-auction";
 
-const amountOutCol = bidListColumnHelper.accessor("settledAmountOut", {
-  header: "Amount Out",
-  cell: (info) => {
-    return (
-      <>
-        <Format value={info.getValue() ?? 0} />{" "}
-        {info.row.original.auction.baseToken.symbol}
-      </>
-    );
-  },
-});
-const columns = [timestampCol, amountInCol, amountOutCol, bidderCol];
+export function PurchaseList() {
+  const { data: auction } = useAuctionSuspense();
 
-export function PurchaseList({ auction }: PropsWithAuction) {
+  const amountOutCol = bidListColumnHelper.accessor("settledAmountOut", {
+    header: "Amount Out",
+    cell: (info) => {
+      return (
+        <>
+          <Format value={info.getValue() ?? 0} /> {auction.baseToken.symbol}
+        </>
+      );
+    },
+  });
+
+  const columns = [timestampCol, amountInCol, amountOutCol, bidderCol];
+
   const bids = auction.bids.map((b) => ({
     ...b,
     settledAmountOut:
@@ -50,7 +52,7 @@ export function PurchaseList({ auction }: PropsWithAuction) {
     <Card className="relative" title={"Purchase History"}>
       <CSVDownloader
         tooltip="Download this bid history in CSV format."
-        filename={`purchases-${auction.auctionType}-${auction.id}`}
+        filename={`purchases-${auction.type}-${auction.id}`}
         headers={headers}
         data={body}
       />

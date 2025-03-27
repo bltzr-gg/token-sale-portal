@@ -1,10 +1,8 @@
 import { Badge, Card, Text } from "@bltzr-gg/ui";
-import type { BatchAuction, PropsWithAuction } from "@axis-finance/types";
 import { RequiresChain } from "components/requires-chain";
+import { AUCTION_CHAIN_ID } from "../../../../../../app-config";
 
-export function NotConnectedClaimCard({ auction: _auction }: PropsWithAuction) {
-  const auction = _auction as BatchAuction;
-
+export function NotConnectedClaimCard() {
   return (
     <Card title="Claim" headerRightElement={<Badge>Auction Closed</Badge>}>
       <div className="flex flex-col gap-y-4">
@@ -19,7 +17,7 @@ export function NotConnectedClaimCard({ auction: _auction }: PropsWithAuction) {
             <Text>Connect your wallet to claim your tokens</Text>
           </div>
         </div>
-        <RequiresChain className="w-full max-w-lg" chainId={auction.chainId} />
+        <RequiresChain className="w-full max-w-lg" chainId={AUCTION_CHAIN_ID} />
       </div>
     </Card>
   );

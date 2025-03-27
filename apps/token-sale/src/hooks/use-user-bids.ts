@@ -1,6 +1,7 @@
 import { useAccount } from "wagmi";
 import { useAuctionSuspense } from "./use-auction";
 import { useMemo } from "react";
+import { BID_OUTCOME } from "@/modules/auction/hooks/use-sorted-bids";
 
 const useUserBids = () => {
   const { address } = useAccount();
@@ -19,7 +20,7 @@ const useUserBids = () => {
     0,
   );
 
-  const claimedFullRefund = useMemo(
+  const hasFullyClaimed = useMemo(
     () =>
       bids.every(
         (bid) => bid.status === "refunded" || bid.status === "claimed",
@@ -36,11 +37,23 @@ const useUserBids = () => {
     [bids],
   );
 
+  const unsuccessfulBids = useMemo(
+    () => bids.filter((bid) => bid.outcome === BID_OUTCOME.LOST, 0).length,
+    [bids],
+  );
+
+  const tokensWon = useMemo(
+    () => bids.reduce((acc, bid) => acc + Number(bid.settledAmountOut ?? 0), 0),
+    [bids],
+  );
+
   return {
     bids,
     totalAmount,
-    claimedFullRefund,
+    hasFullyClaimed,
     refundTotal,
+    unsuccessfulBids,
+    tokensWon,
   };
 };
 

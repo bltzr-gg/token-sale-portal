@@ -13,9 +13,8 @@ import {
   Line,
 } from "recharts";
 import { format } from "date-fns";
-import type { Auction, BatchAuction } from "@axis-finance/types";
 import { shorten } from "utils/number";
-import { formatDate, getTimestamp } from "utils/date";
+import { formatDate } from "utils/date";
 import { useGetToggledUsdAmount } from "./hooks/use-get-toggled-usd-amount";
 import { SettledAuctionChartOverlay } from "./settled-auction-chart-overlay";
 import {
@@ -24,10 +23,9 @@ import {
   useSortedBids,
 } from "./hooks/use-sorted-bids";
 import { OriginIcon } from "./origin-icon";
+import { useAuctionSuspense } from "@/hooks/use-auction";
 
-type BidTooltipProps = {
-  auction?: Auction;
-} & TooltipProps<number, "timestamp" | "price" | "amountIn">;
+type BidTooltipProps = TooltipProps<number, "timestamp" | "price" | "amountIn">;
 
 type FormatterProps = {
   dataKey: string;
@@ -52,13 +50,11 @@ const plainTextFormatter = (value: string) => (
 );
 
 const BidTooltip = (props: BidTooltipProps) => {
-  const auctionEndTimestamp = props?.auction?.formatted
-    ? getTimestamp(props.auction.formatted.endDate)
-    : undefined;
+  const { data: auction } = useAuctionSuspense();
 
   const { getToggledUsdAmount } = useGetToggledUsdAmount(
-    props.auction?.quoteToken,
-    auctionEndTimestamp,
+    auction.quoteToken,
+    auction.end,
   );
 
   const payload = props.payload?.[0]?.payload;
@@ -79,7 +75,7 @@ const BidTooltip = (props: BidTooltipProps) => {
       <div>Amount: {getToggledUsdAmount(amountIn)}</div>
       <div>Price: {getToggledUsdAmount(price)}</div>
       <div>
-        Settled: {shorten(settledAmountOut)} {props.auction?.baseToken.symbol}
+        Settled: {shorten(settledAmountOut)} {auction?.baseToken.symbol}
       </div>
       <div>At: {formatDate.fullLocal(new Date(timestamp ?? 0))}</div>
     </div>
@@ -94,7 +90,8 @@ const filterWinningBids = (bids: SortedBid[]) => {
   );
 };
 
-export const SettledAuctionChart = ({ auction }: { auction: BatchAuction }) => {
+export const SettledAuctionChart = () => {
+  const { data: auction } = useAuctionSuspense();
   /* Recharts doesn't support classNames, so we obtain the colors from the stylesheet */
   const primary500 = `hsl(var(--primary-500))`;
   const red500 = `hsl(var(--red-500))`;
@@ -102,26 +99,19 @@ export const SettledAuctionChart = ({ auction }: { auction: BatchAuction }) => {
   const textTertiary = `#8d8d8d`;
   const neutral400 = `hsl(var(--neutral-400))`;
 
-  const batchAuction = auction as BatchAuction;
-  const auctionEndTimestamp = auction?.formatted
-    ? getTimestamp(auction.formatted.endDate)
-    : undefined;
-
   const { getToggledUsdAmount } = useGetToggledUsdAmount(
-    auction?.quoteToken,
-    auctionEndTimestamp,
+    auction.quoteToken,
+    auction.end,
   );
 
-  const bids = useSortedBids(auction);
-  const clearingPrice = Number(
-    batchAuction.encryptedMarginalPrice?.marginalPrice ?? 0,
-  );
+  const bids = useSortedBids();
+  const clearingPrice = auction.marginalPrice;
   const amountRaised = Number(auction?.sold) * clearingPrice;
   const winning = filterWinningBids(bids);
 
   return (
     <div className="relative -ml-8 size-full pb-16 md:-ml-5">
-      {auction && <SettledAuctionChartOverlay auction={auction} />}
+      {auction && <SettledAuctionChartOverlay />}
       <ResponsiveContainer className="font-mono">
         <ComposedChart data={bids}>
           <CartesianGrid
@@ -202,7 +192,7 @@ export const SettledAuctionChart = ({ auction }: { auction: BatchAuction }) => {
             cursor={{ strokeDasharray: "3 3" }}
             // @ts-expect-error TODO
             formatter={formatter}
-            content={(props) => <BidTooltip {...props} auction={auction} />}
+            content={(props) => <BidTooltip {...props} />}
           />
           <Legend
             align="left"

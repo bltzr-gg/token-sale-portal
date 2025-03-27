@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { Button, Card, Text } from "@bltzr-gg/ui";
-import { PropsWithAuction } from "@axis-finance/types";
 import { useSettleAuction } from "../hooks/use-settle-auction";
 import { TransactionDialog } from "modules/transaction/transaction-dialog";
 import { RequiresChain } from "components/requires-chain";
@@ -8,8 +7,10 @@ import { LoadingIndicator } from "modules/app/loading-indicator";
 import { SettleAuctionCallbackInput } from "./settle-callback-input";
 import { SettleAuctionDtlCallbackBalance } from "./settle-dtl-callback-balance";
 import { AuctionCoreMetrics } from "../auction-core-metrics";
+import { useAuctionSuspense } from "@/hooks/use-auction";
 
-export function AuctionDecrypted({ auction }: PropsWithAuction) {
+export function AuctionDecrypted() {
+  const { data: auction } = useAuctionSuspense();
   const [isDialogOpen, setIsDialogOpen] = React.useState(false);
   const [
     hasSufficientBalanceForCallbacks,
@@ -28,7 +29,6 @@ export function AuctionDecrypted({ auction }: PropsWithAuction) {
   );
 
   const settle = useSettleAuction({
-    auction: auction,
     callbackData: callbackData,
   });
 
@@ -37,7 +37,7 @@ export function AuctionDecrypted({ auction }: PropsWithAuction) {
   return (
     <div>
       <div className="w-full">
-        <AuctionCoreMetrics auction={auction} />
+        <AuctionCoreMetrics />
       </div>
 
       <div className="mt-8 w-full">
@@ -66,7 +66,6 @@ export function AuctionDecrypted({ auction }: PropsWithAuction) {
           {hasCallbacks && (
             <div>
               <SettleAuctionCallbackInput
-                auction={auction}
                 setCallbackData={setCallbackData}
                 setCallbackDataIsValid={setCallbackDataIsValid}
               />
@@ -74,7 +73,6 @@ export function AuctionDecrypted({ auction }: PropsWithAuction) {
           )}
           {
             <SettleAuctionDtlCallbackBalance
-              auction={auction}
               setHasSufficientBalanceForCallbacks={
                 setHasSufficientBalanceForCallbacks
               }

@@ -1,19 +1,14 @@
-import { Auction, BatchAuctionBid } from "@axis-finance/types";
 import { ToggledUsdAmount } from "../toggled-usd-amount";
 import { useToggle } from "../hooks/use-toggle";
+import { useAuctionSuspense } from "@/hooks/use-auction";
 
-export function AmountInCell({
-  bid,
-  value,
-}: {
-  bid: BatchAuctionBid & { auction: Auction };
-  value: number;
-}) {
+export function AmountInCell({ value }: { value: number }) {
+  const { data: auction } = useAuctionSuspense();
   const { isToggled } = useToggle();
   return (
     <>
-      <ToggledUsdAmount format token={bid.auction.quoteToken} amount={value} />{" "}
-      {!isToggled && bid.auction.quoteToken.symbol}
+      <ToggledUsdAmount format token={auction.quoteToken} amount={value} />{" "}
+      {!isToggled && auction.quoteToken.symbol}
     </>
   );
 }

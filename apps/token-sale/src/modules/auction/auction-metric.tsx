@@ -12,7 +12,7 @@ import { Format } from "components/format";
 import { UsdAmount } from "./usd-amount";
 import { ToggledUsdAmount } from "./toggled-usd-amount";
 import { DtlProceedsDisplay } from "./dtl-proceeds-display";
-import { useAuction, Auction } from "@/hooks/use-auction";
+import { Auction, useAuctionSuspense } from "@/hooks/use-auction";
 import { formatDistanceToNow } from "date-fns";
 
 export const getMaxTokensLaunched = (
@@ -337,7 +337,7 @@ const handlers: MetricHandlers = {
     label: "Direct to Liquidity",
     tooltip:
       "The percentage of proceeds that will be automatically deposited into the liquidity pool",
-    handler: (auction) => <DtlProceedsDisplay auction={auction} />,
+    handler: () => <DtlProceedsDisplay />,
   },
 };
 
@@ -347,10 +347,12 @@ type AuctionMetricProps = Partial<PropsWithAuction> & {
 } & Partial<Pick<MetricProps, "size">>;
 
 export function AuctionMetric(props: AuctionMetricProps) {
+  const { data: auction } = useAuctionSuspense();
   const element = handlers[props.id];
-  const { data: auction } = useAuction();
 
-  if (!auction || !element) return null;
+  if (!element) {
+    throw new Error(`No element found for ${props.id}`);
+  }
 
   const value = element.handler(auction);
 

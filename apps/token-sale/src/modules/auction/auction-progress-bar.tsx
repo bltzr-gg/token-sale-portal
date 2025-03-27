@@ -1,23 +1,54 @@
-import { PropsWithAuction } from "@axis-finance/types";
 import { Progress, Text, cn } from "@bltzr-gg/ui";
-import { calculateAuctionProgress } from "./utils/get-auction-progress";
 import { ToggledUsdAmount } from "./toggled-usd-amount";
 import { trimCurrency } from "utils/currency";
-import { useMemo } from "react";
+import { useAuctionSuspense } from "@/hooks/use-auction";
+
+type ProgressMetricProps = {
+  label: string;
+  value: number;
+  className?: string;
+};
+
+function ProgressMetric({ className, label, value }: ProgressMetricProps) {
+  const { data: auction } = useAuctionSuspense();
+  return (
+    <div className={cn("flex flex-col gap-y-0.5 px-2.5", className)}>
+      <Text
+        mono
+        className="dark:text-background -mt-1 font-bold leading-none lg:text-lg"
+      >
+        <ToggledUsdAmount
+          token={auction.quoteToken}
+          amount={value}
+          untoggledFormat={(val) =>
+            trimCurrency(val) + " " + auction.quoteToken.symbol
+          }
+        />
+      </Text>
+
+      <Text
+        mono
+        uppercase
+        className="text-foreground dark:text-background p-0 leading-none"
+      >
+        {label}
+      </Text>
+    </div>
+  );
+}
 
 /** Renders a progress bar with the amount of tokens commited in bids*/
-export default function AuctionProgressBar({ auction }: PropsWithAuction) {
-  const { currentPercent, minTarget, targetAmount, currentAmount } = useMemo(
-    () => calculateAuctionProgress(auction),
-    [auction],
-  );
-  const showCurrentProgress = auction.status !== "created" && currentAmount > 0;
+export default function AuctionProgressBar() {
+  const { data: auction } = useAuctionSuspense();
+
+  const showCurrentProgress =
+    auction.status !== "created" && auction.amount > 0;
 
   return (
     <Progress
       hideMinTarget
-      value={currentPercent}
-      minTarget={minTarget}
+      value={auction.progress.currentPercent}
+      minTarget={auction.progress.minTarget}
       className="mt-1 flex h-[64px] w-[320px] items-center lg:w-[900px]"
     >
       <div
@@ -28,51 +59,16 @@ export default function AuctionProgressBar({ auction }: PropsWithAuction) {
       >
         {showCurrentProgress && (
           <ProgressMetric
-            auction={auction}
             label="Raised"
-            value={currentAmount}
+            value={auction.progress.currentAmount}
           />
         )}
         <ProgressMetric
-          auction={auction}
           label="Target"
-          value={targetAmount}
+          value={auction.progress.targetAmount}
           className="text-right"
         />
       </div>
     </Progress>
-  );
-}
-
-type ProgressMetricProps = {
-  label: string;
-  value: number;
-  className?: string;
-} & PropsWithAuction;
-
-function ProgressMetric(props: ProgressMetricProps) {
-  return (
-    <div className={cn("flex flex-col gap-y-0.5 px-2.5", props.className)}>
-      <Text
-        mono
-        className="dark:text-background -mt-1 font-bold leading-none lg:text-lg"
-      >
-        <ToggledUsdAmount
-          token={props.auction.quoteToken}
-          amount={props.value}
-          untoggledFormat={(val) =>
-            trimCurrency(val) + " " + props.auction.quoteToken.symbol
-          }
-        />
-      </Text>
-
-      <Text
-        mono
-        uppercase
-        className="text-foreground dark:text-background p-0 leading-none"
-      >
-        {props.label}
-      </Text>
-    </div>
   );
 }

@@ -26,7 +26,7 @@ export function ProjectInfoCard({
       <div className="flex justify-between">{children}</div>
       <div className="mb-4 flex">{description}</div>
       <div className="flex items-end justify-between space-x-4">
-        {canRefer && <ReferrerPopover auction={auction} />}
+        {canRefer && <ReferrerPopover />}
       </div>
     </div>
   );

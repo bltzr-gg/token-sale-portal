@@ -1,10 +1,4 @@
 import { ColumnDef, createColumnHelper } from "@tanstack/react-table";
-import {
-  BatchAuctionBid,
-  Auction,
-  PropsWithAuction,
-  BatchAuction,
-} from "@axis-finance/types";
 import { BlockExplorerLink } from "components/blockexplorer-link";
 import { Button, Card, DataTable, Text } from "@bltzr-gg/ui";
 import {
@@ -15,8 +9,7 @@ import {
 import { TransactionDialog } from "modules/transaction/transaction-dialog";
 import { LoadingIndicator } from "modules/app/loading-indicator";
 import React, { useMemo } from "react";
-import { useAuction } from "./hooks/use-auction";
-import { getAuctionHouse } from "utils/contracts";
+import { useAuctionSuspense } from "@/hooks/use-auction";
 import { useBidIndex } from "./hooks/use-bid-index";
 import { format } from "date-fns";
 import { useStorageBids } from "state/bids/handlers";
@@ -25,10 +18,11 @@ import { arrayToCSV } from "utils/csv";
 import { PriceCell } from "./cells/PriceCell";
 import { AmountInCell } from "./cells/AmountInCell";
 import { FilterIcon } from "lucide-react";
+import { auctionHouse } from "@/constants/contracts";
+import { AuctionBid } from "@/hooks/use-auction/types";
+import { AUCTION_CHAIN_ID } from "../../../../../app-config";
 
-export const bidListColumnHelper = createColumnHelper<
-  BatchAuctionBid & { auction: Auction }
->();
+export const bidListColumnHelper = createColumnHelper<AuctionBid>();
 
 export const timestampCol = bidListColumnHelper.accessor("blockTimestamp", {
   header: "Date",
@@ -65,9 +59,7 @@ const priceCol = bidListColumnHelper.accessor("submittedPrice", {
 export const amountInCol = bidListColumnHelper.accessor("amountIn", {
   header: "Amount In",
   enableSorting: true,
-  cell: (info) => (
-    <AmountInCell bid={info.row.original} value={+info.getValue()} />
-  ),
+  cell: (info) => <AmountInCell value={+info.getValue()} />,
 });
 
 export const bidderCol = bidListColumnHelper.accessor("bidder", {
@@ -91,7 +83,7 @@ export const bidderCol = bidListColumnHelper.accessor("bidder", {
     return (
       <div className="flex flex-col">
         <BlockExplorerLink
-          chainId={info.row.original.auction.chainId}
+          chainId={AUCTION_CHAIN_ID}
           address={info.getValue()}
           icon={true}
           trim
@@ -106,7 +98,7 @@ export const bidderCol = bidListColumnHelper.accessor("bidder", {
   },
 });
 
-const cols = [timestampCol, priceCol, amountInCol, bidderCol];
+const cols = [timestampCol, priceCol, amountInCol, bidderCol] as const;
 
 const screens = {
   idle: {
@@ -123,41 +115,25 @@ const screens = {
   },
 };
 
-type BidListProps = PropsWithAuction & {
-  address?: `0x${string}`;
-};
-
-export function BidList(props: BidListProps) {
+export function BidList() {
+  const { data: auction, refetch: refetchAuction } = useAuctionSuspense();
   const { address } = useAccount();
 
   const userBids = useStorageBids({
-    auctionId: props.auction.id,
+    auctionId: auction.id,
     address,
   });
-
-  const auction = props.auction as BatchAuction;
-
-  const auctionHouse = getAuctionHouse(props.auction);
-  const encryptedBids = useMemo(() => auction?.bids ?? [], [auction]);
-
-  const { refetch: refetchAuction } = useAuction(
-    props.auction.chainId,
-    props.auction.lotId,
-  );
 
   const refund = useWriteContract();
   const refundReceipt = useWaitForTransactionReceipt({ hash: refund.data });
   const [dialogOpen, setDialogOpen] = React.useState(false);
-  const [bidToRefund, setBidToRefund] = React.useState<BatchAuctionBid>();
+  const [bidToRefund, setBidToRefund] = React.useState<AuctionBid>();
   const [onlyUserBids, setOnlyUserBids] = React.useState(false);
-  const { index: bidIndex } = useBidIndex(
-    props.auction,
-    BigInt(bidToRefund?.bidId ?? -1),
-  );
+  const { index: bidIndex } = useBidIndex(BigInt(bidToRefund?.bidId ?? -1));
 
-  const mappedBids = React.useMemo(
+  const mappedBids = useMemo(
     () =>
-      encryptedBids
+      auction.bids
         .filter(
           (b) =>
             !onlyUserBids || address?.toLowerCase() === b.bidder.toLowerCase(),
@@ -174,10 +150,10 @@ export function BidList(props: BidListProps) {
           return {
             ...bid,
             ...storedBid,
-            auction: props.auction,
+            auction: auction,
           };
         }) ?? [],
-    [encryptedBids, onlyUserBids, address, userBids, props.auction],
+    [onlyUserBids, address, userBids, auction],
   );
 
   const isLoading = refund.isPending || refundReceipt.isLoading;
@@ -190,7 +166,7 @@ export function BidList(props: BidListProps) {
       abi: auctionHouse.abi,
       address: auctionHouse.address,
       functionName: "refundBid",
-      args: [BigInt(props.auction.lotId), BigInt(bidId), BigInt(bidIndex)],
+      args: [BigInt(auction.lotId), BigInt(bidId), BigInt(bidIndex)],
     });
   };
 
@@ -202,7 +178,7 @@ export function BidList(props: BidListProps) {
         id: "actions",
         cell: (info) => {
           const bid = info.row.original;
-          const isLive = props.auction.status === "live";
+          const isLive = auction.status === "live";
           if (!address || !isLive) return;
           if (bid.bidder.toLowerCase() !== address.toLowerCase()) return;
           if (bid.status === "claimed" && !bid.settledAmountOut) return;
@@ -234,7 +210,7 @@ export function BidList(props: BidListProps) {
         },
       }),
     ],
-    [props.auction.status, address, bidToRefund?.bidId, isLoading],
+    [auction.status, address, bidToRefund?.bidId, isLoading],
   );
 
   React.useEffect(() => {
@@ -243,7 +219,7 @@ export function BidList(props: BidListProps) {
     }
   }, [refetchAuction, refund.isSuccess]);
 
-  //Format bids for CSV download
+  // Format bids for CSV download
   const [headers, body] = React.useMemo(() => {
     const values = auction.bids.map((b) => ({
       date: b.date,
@@ -270,7 +246,7 @@ export function BidList(props: BidListProps) {
         <Button asChild variant="ghost" className="min-w-0">
           <CSVDownloader
             tooltip="Download this bid history in CSV format."
-            filename={`bids-${auction.auctionType}-${auction.id}`}
+            filename={`bids-${auction.type}-${auction.id}`}
             headers={headers}
             data={body}
           />
@@ -279,13 +255,14 @@ export function BidList(props: BidListProps) {
       <Card title={"Bid History"}>
         <DataTable
           emptyText={
-            props.auction.status == "created" || props.auction.status == "live"
+            auction.status == "created" || auction.status == "live"
               ? "No bids yet"
               : onlyUserBids
                 ? "No bids from this address"
                 : "No bids received"
           }
-          columns={columns as ColumnDef<BatchAuctionBid>[]}
+          // hate doing a cast here but the type error is too huge/complex
+          columns={columns as ColumnDef<AuctionBid>[]}
           data={mappedBids}
         />
 
@@ -298,7 +275,7 @@ export function BidList(props: BidListProps) {
           }}
           onConfirm={() => handleRefund(bidToRefund?.bidId)}
           mutation={refundReceipt}
-          chainId={props.auction.chainId}
+          chainId={auction.chainId}
           hash={refund.data}
           error={refundReceipt.error}
           disabled={isLoading}

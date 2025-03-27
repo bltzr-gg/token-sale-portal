@@ -1,4 +1,6 @@
-import type { BatchAuction, BatchAuctionBid, Token } from "@axis-finance/types";
+import { useAuctionSuspense } from "@/hooks/use-auction";
+import { AuctionBid } from "@/hooks/use-auction/transform";
+import type { Token } from "@axis-finance/types";
 import { formatUnits } from "viem";
 
 const BID_OUTCOME = {
@@ -19,7 +21,7 @@ type SortedBid = {
   outcome: string | undefined | null;
 };
 
-const sortBids = (bids: BatchAuctionBid[], quoteToken: Token): SortedBid[] => {
+const sortBids = (bids: AuctionBid[], quoteToken: Token): SortedBid[] => {
   const sortedBids = bids
     .filter(({ status }) => status !== REFUNDED_BID_STATUS)
     .flatMap((bid) => {
@@ -83,8 +85,8 @@ const sortBids = (bids: BatchAuctionBid[], quoteToken: Token): SortedBid[] => {
   return sortedBids;
 };
 
-const useSortedBids = (auction: BatchAuction | undefined): SortedBid[] => {
-  if (!auction) return [];
+const useSortedBids = (): SortedBid[] => {
+  const { data: auction } = useAuctionSuspense();
 
   const sortedBids = sortBids(auction.bids, auction.quoteToken);
 

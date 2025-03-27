@@ -4,7 +4,7 @@ import { useUsdAmount } from "./hooks/use-usd-amount";
 type UsdAmountProps = {
   token: Token;
   amount: number;
-  timestamp?: number;
+  timestamp?: Date;
   decimal?: boolean;
 };
 

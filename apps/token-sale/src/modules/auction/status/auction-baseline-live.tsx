@@ -1,10 +1,9 @@
-import { PropsWithAuction } from "@axis-finance/types";
 import { AuctionPurchase } from "../auction-purchase";
 
-export function AuctionBaselineLive(props: PropsWithAuction) {
+export function AuctionBaselineLive() {
   return (
     <div className="auction-action-container">
-      <AuctionPurchase auction={props.auction} />
+      <AuctionPurchase />
     </div>
   );
 }

@@ -1,52 +1,26 @@
 import { useState } from "react";
-import { useAccount } from "wagmi";
 import { Link } from "react-router-dom";
 import { ArrowRightIcon } from "lucide-react";
 
 import { Badge, Button, Card, Metric } from "@bltzr-gg/ui";
-import type { PropsWithAuction } from "@axis-finance/types";
 import { RequiresChain } from "components/requires-chain";
 import { TransactionDialog } from "modules/transaction/transaction-dialog";
 import { useClaimBids } from "modules/auction/hooks/use-claim-bids";
 import { UserBidInfoCard } from "./user-bid-info-card";
 import { shorten } from "@/utils/number";
+import { useUserBids } from "@/hooks/use-user-bids";
+import { useAuctionSuspense } from "@/hooks/use-auction";
 
-export function UserBidsCard({ auction }: PropsWithAuction) {
-  const { address } = useAccount();
+export function UserBidsCard() {
+  const { data: auction } = useAuctionSuspense();
   const [isTxnDialogOpen, setTxnDialogOpen] = useState(false);
   const claimBidsTxn = useClaimBids();
-
-  const userBids = auction.bids.filter(
-    (bid) => bid.bidder.toLowerCase() === address?.toLowerCase(),
-  );
-
-  const userTotalSuccessfulBidAmount = userBids.reduce(
-    (acc, bid) => acc + Number(bid.settledAmountIn ?? 0),
-    0,
-  );
-
-  const userHasClaimed = userBids.every(
-    (bid) => bid.status === "claimed" || bid.status === "refunded",
-  );
+  const userBids = useUserBids();
 
   const buttonText =
-    userTotalSuccessfulBidAmount > 0 ? "Claim winnings" : "Claim refund";
-  const badgeText = userTotalSuccessfulBidAmount > 0 ? "You Won!" : "You Lost";
-  const badgeColour = userTotalSuccessfulBidAmount > 0 ? "active" : "alert";
-
-  const userTotalBidAmount = userBids.reduce(
-    (acc, bid) => acc + Number(bid.amountIn ?? 0),
-    0,
-  );
-
-  const userTotalUnsuccessfulBidAmount = userBids.reduce(
-    (acc, bid) => acc + Number(bid.settledAmountInRefunded ?? 0),
-    0,
-  );
-
-  const userTotalTokensWon = auction.bids
-    .filter((bid) => bid.bidder.toLowerCase() === address?.toLowerCase())
-    .reduce((acc, bid) => acc + Number(bid.settledAmountOut ?? 0), 0);
+    userBids.unsuccessfulBids > 0 ? "Claim winnings" : "Claim refund";
+  const badgeText = userBids.unsuccessfulBids > 0 ? "You Won!" : "You Lost";
+  const badgeColour = userBids.unsuccessfulBids > 0 ? "active" : "alert";
 
   return (
     <div className="gap-y-md flex flex-col">
@@ -57,19 +31,18 @@ export function UserBidsCard({ auction }: PropsWithAuction) {
         <RequiresChain chainId={auction.chainId}>
           <div className="gap-y-md flex flex-col">
             <Metric size="l" label="You Bid">
-              {shorten(userTotalBidAmount)} {auction.quoteToken.symbol}
+              {shorten(userBids.totalAmount)} {auction.quoteToken.symbol}
             </Metric>
-            {userTotalUnsuccessfulBidAmount > 0 && (
+            {userBids.unsuccessfulBids > 0 && (
               <Metric size="l" label="Your Refund">
-                {shorten(userTotalUnsuccessfulBidAmount)}{" "}
-                {auction.quoteToken.symbol}
+                {shorten(userBids.refundTotal)} {auction.quoteToken.symbol}
               </Metric>
             )}
             <Metric size="l" label="You Get">
-              {shorten(userTotalTokensWon)} {auction.baseToken.symbol}
+              {shorten(userBids.tokensWon)} {auction.baseToken.symbol}
             </Metric>
 
-            {!userHasClaimed && (
+            {!userBids.hasFullyClaimed && (
               <Button
                 size="lg"
                 className="w-full"
@@ -78,9 +51,11 @@ export function UserBidsCard({ auction }: PropsWithAuction) {
                 {buttonText}
               </Button>
             )}
-            {userHasClaimed && (
+            {userBids.hasFullyClaimed && (
               <>
-                <p>You&apos;ve claimed all your winnings.</p>
+                <p>
+                  You&apos;ve claimed all your winnings and/or refunded tokens.
+                </p>
                 <Link to="/auctions">
                   <Button size="lg" variant="secondary" className="w-full">
                     View live auctions <ArrowRightIcon className="size-6" />
@@ -128,7 +103,7 @@ export function UserBidsCard({ auction }: PropsWithAuction) {
         />
       </Card>
 
-      <UserBidInfoCard auction={auction} />
+      <UserBidInfoCard />
     </div>
   );
 }

@@ -5,7 +5,7 @@ import { formatUnits, parseUnits } from "viem";
 
 const useGetUsdAmount = (
   token: Token | undefined,
-  timestamp: number | undefined,
+  timestamp: Date | undefined,
 ) => {
   if (token === undefined) throw new Error("token cannot be undefined");
   const price = useTokenPrice(token, timestamp);

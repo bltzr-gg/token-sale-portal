@@ -1,5 +1,5 @@
-import React, { useMemo } from "react";
-import { type PropsWithAuction, type AuctionStatus } from "@axis-finance/types";
+import React from "react";
+import { type AuctionStatus } from "@axis-finance/types";
 import {
   EncryptedMarginalPriceAuctionConcluded,
   AuctionCreated,
@@ -17,10 +17,7 @@ import { ArrowBigDown } from "lucide-react";
 import { AUCTION_CHAIN_ID } from "../../../../../app-config";
 import { useAuction } from "@/hooks/use-auction";
 
-const statuses: Record<
-  AuctionStatus,
-  (props: PropsWithAuction) => React.ReactNode
-> = {
+const statuses: Record<AuctionStatus, () => React.ReactNode> = {
   created: AuctionCreated,
   live: AuctionLive,
   concluded: EncryptedMarginalPriceAuctionConcluded,
@@ -110,8 +107,8 @@ export default function AuctionPage() {
           <AuctionCountdown />
         </div>
       </Hero>
-      {/* <AuctionElement />
-      <BidList auction={auction} /> */}
+      <AuctionElement />
+      <BidList />
     </>
   );
 }

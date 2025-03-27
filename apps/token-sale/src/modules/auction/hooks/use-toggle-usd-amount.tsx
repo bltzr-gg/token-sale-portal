@@ -7,7 +7,7 @@ import { parseUnits } from "viem";
 type ToggleUsdAmountProps = {
   token: Token;
   amount: number;
-  timestamp?: number | undefined;
+  timestamp?: Date | undefined;
 };
 
 const useToggleUsdAmount = ({

@@ -4,12 +4,7 @@ import { shorten } from "utils/number";
 import { useGetUsdAmount } from "./use-get-usd-amount";
 import { parseUnits } from "viem";
 
-const useGetToggledUsdAmount = (
-  token: Token | undefined,
-  timestamp: number | undefined,
-) => {
-  if (token === undefined) throw new Error("token cannot be undefined");
-
+const useGetToggledUsdAmount = (token: Token, timestamp: Date | undefined) => {
   const { isToggled: isUsdToggled } = useToggle();
   const { getUsdAmount } = useGetUsdAmount(token, timestamp);
 

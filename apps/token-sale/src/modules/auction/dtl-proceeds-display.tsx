@@ -1,8 +1,9 @@
-import type { Auction } from "@/hooks/use-auction";
+import { useAuctionSuspense } from "@/hooks/use-auction";
 import { useBaseDTLCallback } from "./hooks/use-base-dtl-callback";
 import { useBaselineDTLCallback } from "./hooks/use-baseline-dtl-callback";
 
-export function DtlProceedsDisplay({ auction }: { auction: Auction }) {
+export function DtlProceedsDisplay() {
+  const { data: auction } = useAuctionSuspense();
   const { data: dtlCallbackConfiguration } = useBaseDTLCallback({
     chainId: auction.chainId,
     lotId: auction.lotId.toString(),

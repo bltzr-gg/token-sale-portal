@@ -1,9 +1,13 @@
 import { useSdkQuery } from "@axis-finance/sdk/react";
 import type { Token } from "@axis-finance/types";
 
-const useTokenPrice = (token: Token, timestamp: number | undefined) => {
+const useTokenPrice = (token: Token, timestamp: Date | undefined) => {
   const { data, status, error } = useSdkQuery(
-    async (sdk) => (await sdk.getTokenPrice({ token, timestamp })) || null, // react-query rejects undefined
+    async (sdk) =>
+      (await sdk.getTokenPrice({
+        token,
+        timestamp: (timestamp?.getTime() ?? 0) / 1000,
+      })) || null, // react-query rejects undefined
     {
       queryKey: ["get-token-price", token.address, timestamp],
       enabled: !!token?.address,

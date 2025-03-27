@@ -1,23 +1,24 @@
-import type { Auction, BatchAuctionBid } from "@axis-finance/types";
 import { Tooltip } from "@bltzr-gg/ui";
 import { useToggle } from "../hooks/use-toggle";
 import { trimCurrency } from "utils/currency";
 import { ToggledUsdAmount } from "../toggled-usd-amount";
 import { LockClosedIcon, LockOpen1Icon } from "@radix-ui/react-icons";
+import { AuctionBid } from "@/hooks/use-auction/transform";
+import { useAuctionSuspense } from "@/hooks/use-auction";
 
 type PriceCellProps = {
   value: number;
-  bid: BatchAuctionBid & { auction: Auction };
+  bid: AuctionBid;
 };
 
 export function PriceCell({ value, bid }: PriceCellProps) {
-  const auction = bid.auction;
-  //@ts-expect-error update type
-  const amountOut = bid.amountOut;
+  const { data: auction } = useAuctionSuspense();
+
+  const amountOut = parseFloat(bid.settledAmountOut);
 
   const toggle = useToggle();
 
-  const isUserBid = amountOut && ["live", "concluded"].includes(auction.status); //Only show on live and concluded states
+  const isUserBid = amountOut && ["live", "concluded"].includes(auction.status);
 
   if (isUserBid) {
     value = Number(bid.amountIn) / amountOut;
@@ -26,7 +27,7 @@ export function PriceCell({ value, bid }: PriceCellProps) {
   let display = value ? (
     <>
       <ToggledUsdAmount token={auction.quoteToken} amount={value} format />
-      {!toggle.isToggled && " " + bid.auction.quoteToken.symbol}
+      {!toggle.isToggled && " " + auction.quoteToken.symbol}
       <LockOpen1Icon />
     </>
   ) : (
@@ -45,7 +46,7 @@ export function PriceCell({ value, bid }: PriceCellProps) {
         isUserBid ? (
           <>
             Your estimate payout out at this price is {trimCurrency(amountOut)}{" "}
-            {bid.auction.quoteToken.symbol}.<br />
+            {auction.quoteToken.symbol}.<br />
             Only you can see your bid price until the auction concludes and
             settles.
           </>

@@ -1,29 +1,19 @@
-import { formatUnits, type Address } from "viem";
-import { useReadContract } from "wagmi";
-import { getAuctionHouse } from "utils/contracts";
-import type { Auction } from "@axis-finance/types";
-import { abis } from "@axis-finance/abis";
+import { formatUnits } from "viem";
+import { useAccount, useReadContract } from "wagmi";
+import { useAuctionSuspense } from "@/hooks/use-auction";
+import { auctionHouse } from "@/constants/contracts";
 
-export function useReferralRewards({
-  address,
-  auction,
-}: {
-  address?: Address;
-  auction: Auction;
-}): number | undefined {
-  const chainId = auction.chainId;
-  const rewardTokenAddress = auction.quoteToken.address;
-  const auctionType = auction.auctionType;
-
-  const auctionHouseAddress = getAuctionHouse({ chainId, auctionType }).address;
+export function useReferralRewards(): number | undefined {
+  const { data: auction } = useAuctionSuspense();
+  const { address } = useAccount();
 
   const rewardsBigInt = useReadContract({
-    abi: abis.batchAuctionHouse,
-    address: auctionHouseAddress,
-    chainId,
+    abi: auctionHouse.abi,
+    address: auctionHouse.address,
+    chainId: auction.chainId,
     functionName: "getRewards",
-    args: [address!, rewardTokenAddress!],
-    query: { enabled: address != null && rewardTokenAddress != null },
+    args: [address!, auction.quoteToken.address],
+    query: { enabled: address != null },
   });
 
   const rewards = rewardsBigInt.isSuccess

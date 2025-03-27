@@ -1,49 +1,30 @@
 import { useEffect, useMemo, useState } from "react";
-import type { PropsWithAuction } from "@axis-finance/types";
 import { Badge, Metric } from "@bltzr-gg/ui";
 import { getCountdown } from "utils";
+import { useAuctionSuspense } from "@/hooks/use-auction";
 
-export function CountdownChip({ auction }: PropsWithAuction) {
-  const [timeRemaining, setTimeRemaining] = useState<string | null>(null);
-
-  const startDate = useMemo(
-    () => new Date(Number(auction.start) * 1000),
-    [auction.start],
+export function CountdownChip() {
+  const { data: auction } = useAuctionSuspense();
+  const [now, setNow] = useState(new Date());
+  const auctionStarted = useMemo(
+    () => auction.start > now,
+    [auction.start, now],
+  );
+  const inProgress = useMemo(() => now < auction.end, [auction.end, now]);
+  const target = useMemo(
+    () => (auctionStarted ? auction.end : auction.start),
+    [auction.start, auction.end, auctionStarted],
   );
 
-  const endDate = useMemo(
-    () => new Date(Number(auction.conclusion) * 1000),
-    [auction.conclusion],
-  );
-
-  const now = new Date();
-
-  const isOngoing = startDate <= now && endDate > now;
-
-  const hasntStarted = startDate > now;
-
-  const inProgress = hasntStarted || isOngoing;
-
-  const targetDate = hasntStarted ? startDate : endDate;
-
-  // Immediately set the countdown if the auction is ongoing
-  useEffect(() => {
-    if (inProgress) {
-      setTimeRemaining(getCountdown(targetDate));
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  // Refresh the countdown every second
   useEffect(() => {
     const interval = setInterval(() => {
       if (inProgress) {
-        setTimeRemaining(getCountdown(targetDate));
+        setNow(new Date());
       }
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [startDate, endDate, isOngoing, inProgress, targetDate]);
+  }, [inProgress]);
 
   if (!inProgress) return null;
 
@@ -53,10 +34,10 @@ export function CountdownChip({ auction }: PropsWithAuction) {
         size={"s"}
         className="text-center"
         isLabelSpaced
-        label={hasntStarted ? "Upcoming in" : "Remaining"}
+        label={auctionStarted ? "Remaining" : "Upcoming in"}
         childrenClassName="min-w-[120px]"
       >
-        {timeRemaining}
+        {getCountdown(target)}
       </Metric>
     </Badge>
   );

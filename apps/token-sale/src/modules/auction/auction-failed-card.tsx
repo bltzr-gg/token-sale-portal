@@ -34,7 +34,11 @@ export function AuctionFailedCard() {
   const { data: auction } = useAuctionSuspense();
   const [isTxnDialogOpen, setTxnDialogOpen] = useState(false);
   const claimBidsTxn = useClaimBids();
-  const { totalAmount, claimedFullRefund, refundTotal } = useUserBids();
+  const {
+    totalAmount,
+    hasFullyClaimed: claimedFullRefund,
+    refundTotal,
+  } = useUserBids();
   const failReason = useMemo(() => getFailReason(auction), [auction]);
 
   return (

@@ -1,19 +1,15 @@
 import { useState } from "react";
-import { useAccount } from "wagmi";
-import type { PropsWithAuction } from "@axis-finance/types";
 import { Button, Card, Metric } from "@bltzr-gg/ui";
 import { useReferralRewards } from "./hooks/use-referral-rewards";
 import { RequiresChain } from "components/requires-chain";
 import { ClaimReferralRewardsTxn } from "./claim-referral-rewards-txn";
+import { useAuctionSuspense } from "@/hooks/use-auction";
 
-export function ReferralRewards({ auction }: PropsWithAuction) {
-  const { address } = useAccount();
+export function ReferralRewards() {
+  const { data: auction } = useAuctionSuspense();
   const [isTxnDialogOpen, setIsTxnDialogOpen] = useState(false);
 
-  const rewards = useReferralRewards({
-    address,
-    auction,
-  });
+  const rewards = useReferralRewards();
 
   const hasRewards = rewards != null && rewards > 0;
 
@@ -45,10 +41,7 @@ export function ReferralRewards({ auction }: PropsWithAuction) {
       </div>
 
       {isTxnDialogOpen && (
-        <ClaimReferralRewardsTxn
-          auction={auction}
-          onClose={() => setIsTxnDialogOpen(false)}
-        />
+        <ClaimReferralRewardsTxn onClose={() => setIsTxnDialogOpen(false)} />
       )}
     </Card>
   );

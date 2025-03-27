@@ -1,17 +1,16 @@
-import type { PropsWithAuction } from "@axis-finance/types";
 import { TransactionDialog } from "modules/transaction/transaction-dialog";
 import { useClaimReferralRewards } from "./hooks/use-claim-referral-rewards";
+import { AUCTION_CHAIN_ID } from "../../../../../app-config";
 
-type ClaimReferralRewardsTxnProps = PropsWithAuction & {
+type ClaimReferralRewardsTxnProps = {
   onClose: () => void;
 };
 
 export function ClaimReferralRewardsTxn({
-  auction,
   onClose,
 }: ClaimReferralRewardsTxnProps) {
   const { transact, transaction, receipt, error, isWaiting } =
-    useClaimReferralRewards({ auction });
+    useClaimReferralRewards();
 
   return (
     <TransactionDialog
@@ -20,7 +19,7 @@ export function ClaimReferralRewardsTxn({
       error={error}
       onConfirm={transact}
       mutation={receipt}
-      chainId={auction.chainId}
+      chainId={AUCTION_CHAIN_ID}
       onOpenChange={(open: boolean) => {
         if (!open) {
           onClose();
