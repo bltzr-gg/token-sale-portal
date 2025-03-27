@@ -12,7 +12,7 @@ const CardRoot = React.forwardRef<
   <div
     ref={ref}
     className={cn(
-      'bg-surface border-surface-outline rounded-lg border p-4 text-foreground',
+      'border-surface-outline rounded-lg border bg-light p-4 text-foreground',
       className,
     )}
     {...props}

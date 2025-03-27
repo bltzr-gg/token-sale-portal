@@ -35,7 +35,7 @@ export function Metric({
           mono
           size="sm"
           color="secondary"
-          className="leading-none"
+          className="inline-block bg-primary px-1 py-0.5 leading-none text-primary-foreground"
         >
           {label}
         </Text>
@@ -46,7 +46,7 @@ export function Metric({
         weight={metricWeight}
         spaced={isLabelSpaced}
         className={cn(
-          'tracking-wide',
+          ' tracking-wide',
           size === 'l' && 'mt-sm',
           childrenClassName,
         )}

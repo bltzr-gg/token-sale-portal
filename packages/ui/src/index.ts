@@ -2,7 +2,6 @@ import './styles/index.css';
 
 export * from './lib/cn';
 export * from './lib/trim';
-export * from './components/animated-number';
 export * from './components/avatar';
 export * from './components/badge';
 export * from './components/burger';
@@ -36,3 +35,4 @@ export * from './components/toggle-group';
 export * from './components/chip';
 export * from './components/label-wrapper';
 export * from './components/iconed-label';
+export * from './components/switch';

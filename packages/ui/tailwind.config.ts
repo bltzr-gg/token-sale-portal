@@ -2,6 +2,7 @@ import { type Config } from 'tailwindcss';
 import { fontFamily } from 'tailwindcss/defaultTheme';
 import tailwindcssAnimate from 'tailwindcss-animate';
 
+
 export default {
   darkMode: ['class'],
   content: ['./src/**/*.tsx'],
