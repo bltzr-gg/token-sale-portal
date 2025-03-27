@@ -54,3 +54,5 @@ export const useAuctionSuspense = () => {
     data,
   };
 };
+
+export type { Auction } from "./transform";

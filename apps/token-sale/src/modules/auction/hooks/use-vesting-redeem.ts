@@ -4,20 +4,20 @@ import {
   useWaitForTransactionReceipt,
   useWriteContract,
 } from "wagmi";
-import type { Address, Auction } from "@axis-finance/types";
+import type { Address } from "@axis-finance/types";
 import { abis } from "@axis-finance/abis";
+import { useAuctionSuspense } from "@/hooks/use-auction";
 
 export function useVestingRedeem({
   vestingTokenId,
   derivativeModuleAddress,
-  auction,
   onSuccess,
 }: {
   vestingTokenId?: bigint;
-  auction: Auction;
   derivativeModuleAddress?: Address;
   onSuccess?: () => void;
 }) {
+  const { data: auction } = useAuctionSuspense();
   const redeemCall = useSimulateContract({
     abi: abis.batchLinearVesting,
     address: derivativeModuleAddress,
@@ -40,7 +40,7 @@ export function useVestingRedeem({
       redeemTx.reset();
       onSuccess();
     }
-  }, [redeemReceipt.isSuccess, onSuccess]);
+  }, [redeemReceipt.isSuccess, onSuccess, redeemTx]);
 
   const handleRedeem = () => {
     if (redeemCall.data) {

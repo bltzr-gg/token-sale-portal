@@ -1,22 +1,21 @@
-import { Address, Auction, CallbacksType } from "@axis-finance/types";
-import { getCallbacksType } from "../utils/get-callbacks-type";
+import { Address, CallbacksType } from "@axis-finance/types";
 import { useBaseDTLCallback } from "../hooks/use-base-dtl-callback";
 import useERC20Balance from "loaders/use-erc20-balance";
 import { formatUnits } from "viem";
 import { trimCurrency } from "utils/currency";
 import { Text } from "@bltzr-gg/ui";
 import { useEffect } from "react";
+import { useAuctionSuspense } from "@/hooks/use-auction";
 
 export function SettleAuctionDtlCallbackBalance({
-  auction,
   setHasSufficientBalanceForCallbacks,
 }: {
-  auction: Auction;
   setHasSufficientBalanceForCallbacks: (hasSufficientBalance: boolean) => void;
 }) {
+  const { data: auction } = useAuctionSuspense();
   const { data: dtlCallbackConfiguration } = useBaseDTLCallback({
     chainId: auction.chainId,
-    lotId: auction.lotId,
+    lotId: auction.lotId.toString(),
     baseTokenDecimals: auction.baseToken.decimals,
     callback: auction.callbacks,
   });
@@ -33,13 +32,12 @@ export function SettleAuctionDtlCallbackBalance({
     sellerBaseTokenBalance && baseTokenDecimals
       ? Number(formatUnits(sellerBaseTokenBalance, baseTokenDecimals))
       : 0;
-  const callbacksType = getCallbacksType(auction);
   const hasSufficientBalanceForCallbacks: boolean =
     // No callback
-    callbacksType == CallbacksType.NONE ||
+    auction.callbacksType == CallbacksType.NONE ||
     // Not a DTL callback
-    (callbacksType != CallbacksType.UNIV2_DTL &&
-      callbacksType != CallbacksType.UNIV3_DTL) ||
+    (auction.callbacksType != CallbacksType.UNIV2_DTL &&
+      auction.callbacksType != CallbacksType.UNIV3_DTL) ||
     // Sufficient balance for the DTL callback
     (sellerBaseTokenBalanceDecimal > 0 &&
       dtlCallbackConfiguration !== undefined &&
@@ -50,7 +48,7 @@ export function SettleAuctionDtlCallbackBalance({
   // Pass the result to the parent component
   useEffect(() => {
     setHasSufficientBalanceForCallbacks(hasSufficientBalanceForCallbacks);
-  }, [hasSufficientBalanceForCallbacks]);
+  }, [hasSufficientBalanceForCallbacks, setHasSufficientBalanceForCallbacks]);
 
   return (
     !hasSufficientBalanceForCallbacks && (

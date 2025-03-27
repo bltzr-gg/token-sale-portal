@@ -14,7 +14,7 @@ import { shorten } from "@/utils/number";
 export function UserBidsCard({ auction }: PropsWithAuction) {
   const { address } = useAccount();
   const [isTxnDialogOpen, setTxnDialogOpen] = useState(false);
-  const claimBidsTxn = useClaimBids(auction);
+  const claimBidsTxn = useClaimBids();
 
   const userBids = auction.bids.filter(
     (bid) => bid.bidder.toLowerCase() === address?.toLowerCase(),

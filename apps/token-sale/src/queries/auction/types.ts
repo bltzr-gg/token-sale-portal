@@ -16,7 +16,7 @@ export type BatchAuctionLot = {
   seller: string;
   derivativeType: string;
   wrapDerivative: boolean;
-  callbacks: string[];
+  callbacks: string;
   curator: string;
   curatorApproved: boolean;
   curatorFee: string;

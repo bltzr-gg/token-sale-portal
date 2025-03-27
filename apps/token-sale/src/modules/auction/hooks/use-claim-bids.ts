@@ -1,31 +1,34 @@
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import {
   useAccount,
   useSimulateContract,
   useWaitForTransactionReceipt,
   useWriteContract,
 } from "wagmi";
-import { useAuction } from "./use-auction";
 import { useSdk } from "@axis-finance/sdk/react";
-import { Auction } from "@axis-finance/types";
+import { useAuctionSuspense } from "@/hooks/use-auction";
 
-export function useClaimBids(auction: Auction) {
+export function useClaimBids() {
+  const { data: auction, refetch } = useAuctionSuspense();
   const { address: userAddress } = useAccount();
   const sdk = useSdk();
 
-  const bids = auction.bids
-    .filter(
-      (b) =>
-        b.bidder.toLowerCase() === userAddress?.toLowerCase() &&
-        b.status !== "claimed" &&
-        b.status !== "refunded",
-    )
-    .map((b) => Number(b.bidId));
-
+  const bids = useMemo(
+    () =>
+      auction.bids
+        .filter(
+          (b) =>
+            b.bidder.toLowerCase() === userAddress?.toLowerCase() &&
+            b.status !== "claimed" &&
+            b.status !== "refunded",
+        )
+        .map((b) => Number(b.bidId)) ?? [],
+    [auction.bids, userAddress],
+  );
   const { abi, address, functionName, args } = sdk.claimBids({
     lotId: Number(auction.lotId),
     bids,
-    auctionType: auction.auctionType,
+    auctionType: auction.type,
     chainId: auction.chainId,
   });
 
@@ -39,18 +42,14 @@ export function useClaimBids(auction: Auction) {
 
   const claimTx = useWriteContract();
   const claimReceipt = useWaitForTransactionReceipt({ hash: claimTx.data });
-  const { refetch: refetchAuction } = useAuction(
-    auction.chainId,
-    auction.lotId,
-  );
 
   // When someone claims their bids, refetch the auction from the subgraph so the dapp has the latest data
   // TODO: we should optimistically update the auction bids here instead
   useEffect(() => {
     if (claimReceipt.isSuccess) {
-      setTimeout(() => refetchAuction(), 2500);
+      setTimeout(() => refetch(), 2500);
     }
-  }, [claimReceipt.isSuccess, refetchAuction]);
+  }, [claimReceipt.isSuccess, refetch]);
 
   const handleClaim = () => {
     if (claimCall.data) {
@@ -70,10 +69,10 @@ export function useClaimBids(auction: Auction) {
 
   return {
     handleClaim,
-    claimCall,
+    claimCall: claimCall as ReturnType<typeof useSimulateContract>,
     claimReceipt,
     claimTx,
     isWaiting,
-    error,
+    error: error as Error | undefined,
   };
 }

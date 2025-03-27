@@ -1,5 +1,4 @@
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
-import type { Auction } from "@axis-finance/types";
 import {
   useSimulateContract,
   useWaitForTransactionReceipt,
@@ -10,10 +9,8 @@ import { cloakClient } from "utils/cloak-client";
 import { contracts } from "@/constants";
 import { useAuctionSuspense } from "@/hooks/use-auction";
 
-/** Used to manage decrypting the next set of bids */
 export const useDecryptedBids = () => {
   const { data: auction } = useAuctionSuspense();
-  //Fixed priced auctions dont require decryption
 
   const params = {
     xChainId: auction.chainId,

@@ -1,11 +1,11 @@
-import { Auction, CallbacksType } from "@axis-finance/types";
-import { getCallbacksType } from "../utils/get-callbacks-type";
+import { CallbacksType } from "@axis-finance/types";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Form, FormField, Input } from "@bltzr-gg/ui";
 import { encodeAbiParameters } from "viem";
 import { useCallback, useEffect } from "react";
+import { useAuctionSuspense } from "@/hooks/use-auction";
 
 const uniswapSchema = z
   .object({
@@ -24,16 +24,14 @@ const uniswapSchema = z
 type UniswapForm = z.infer<typeof uniswapSchema>;
 
 export function SettleAuctionCallbackInput({
-  auction,
   setCallbackData,
   setCallbackDataIsValid,
 }: {
-  auction: Auction;
   setCallbackData: (data: `0x${string}` | undefined) => void;
   setCallbackDataIsValid: (isValid: boolean) => void;
 }) {
+  const { data: auction } = useAuctionSuspense();
   // Determine the callback type
-  const callbackType = getCallbacksType(auction);
   const DEFAULT_MAX_SLIPPAGE = "0.5";
 
   const form = useForm<UniswapForm>({
@@ -83,8 +81,8 @@ export function SettleAuctionCallbackInput({
   // Update callback data on mount
   useEffect(() => {
     if (
-      callbackType === CallbacksType.UNIV2_DTL ||
-      callbackType === CallbacksType.UNIV3_DTL
+      auction.callbacksType === CallbacksType.UNIV2_DTL ||
+      auction.callbacksType === CallbacksType.UNIV3_DTL
     ) {
       updateUniswapDtlCallbackData(Number(DEFAULT_MAX_SLIPPAGE));
       return;
@@ -94,15 +92,15 @@ export function SettleAuctionCallbackInput({
     setCallbackData(undefined);
     setCallbackDataIsValid(true);
   }, [
-    callbackType,
+    auction.callbacksType,
     setCallbackData,
     setCallbackDataIsValid,
     updateUniswapDtlCallbackData,
   ]);
 
   if (
-    callbackType === CallbacksType.UNIV2_DTL ||
-    callbackType === CallbacksType.UNIV3_DTL
+    auction.callbacksType === CallbacksType.UNIV2_DTL ||
+    auction.callbacksType === CallbacksType.UNIV3_DTL
   ) {
     // Monitor changes to the form
     form.watch((data) => {

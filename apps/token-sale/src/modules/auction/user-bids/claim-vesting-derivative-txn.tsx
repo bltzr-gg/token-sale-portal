@@ -1,16 +1,16 @@
-import type { PropsWithAuction } from "@axis-finance/types";
 import { TransactionDialog } from "modules/transaction/transaction-dialog";
 import { useClaimBids } from "modules/auction/hooks/use-claim-bids";
+import { useAuctionSuspense } from "@/hooks/use-auction";
 
 type ClaimVestingDervivativeTxnProps = {
   onClose: () => void;
-} & PropsWithAuction;
+};
 
 export function ClaimVestingDervivativeTxn({
-  auction,
   onClose,
 }: ClaimVestingDervivativeTxnProps) {
-  const claimBidsTxn = useClaimBids(auction);
+  const { data: auction } = useAuctionSuspense();
+  const claimBidsTxn = useClaimBids();
 
   return (
     <TransactionDialog

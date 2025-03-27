@@ -1,17 +1,18 @@
-import { PropsWithAuction } from "@axis-finance/types";
+import type { Auction } from "@/hooks/use-auction";
 import { useBaseDTLCallback } from "./hooks/use-base-dtl-callback";
 import { useBaselineDTLCallback } from "./hooks/use-baseline-dtl-callback";
 
-export function DtlProceedsDisplay({ auction }: PropsWithAuction) {
+export function DtlProceedsDisplay({ auction }: { auction: Auction }) {
   const { data: dtlCallbackConfiguration } = useBaseDTLCallback({
     chainId: auction.chainId,
-    lotId: auction.lotId,
+    lotId: auction.lotId.toString(),
     baseTokenDecimals: auction.baseToken.decimals,
     callback: auction.callbacks,
   });
+
   const { data: baselineCallbackConfiguration } = useBaselineDTLCallback({
     chainId: auction.chainId,
-    lotId: auction.lotId,
+    lotId: auction.lotId.toString(),
     callback: auction.callbacks,
   });
 

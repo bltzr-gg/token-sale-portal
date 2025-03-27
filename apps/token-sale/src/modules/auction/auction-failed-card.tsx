@@ -1,15 +1,14 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import { useAccount } from "wagmi";
 import { ArrowRightIcon } from "lucide-react";
 
 import { Badge, Button, Card, Metric, Text } from "@bltzr-gg/ui";
-import type { Auction, PropsWithAuction } from "@axis-finance/types";
+import { useAuctionSuspense, type Auction } from "@/hooks/use-auction";
 import { RequiresChain } from "components/requires-chain";
 import { TransactionDialog } from "modules/transaction/transaction-dialog";
 import { shorten } from "utils/number";
 import { useClaimBids } from "modules/auction/hooks/use-claim-bids";
-import { getMinFilled } from "./utils/auction-details";
+import { useUserBids } from "@/hooks/use-user-bids";
 
 const getFailReason = (auction: Auction) => {
   // Auction was cancelled by the auction creator
@@ -23,8 +22,7 @@ const getFailReason = (auction: Auction) => {
   }
 
   // The raised amount was below the minimum fill
-  const minFilled = getMinFilled(auction) ?? 0;
-  if (Number(auction.sold) < minFilled) {
+  if (Number(auction.sold) < auction.minFilled) {
     return "The auction did not raise the minimum amount";
   }
 
@@ -32,30 +30,12 @@ const getFailReason = (auction: Auction) => {
   return "The auction did not settle successfully";
 };
 
-export function AuctionFailedCard({ auction }: PropsWithAuction) {
-  const { address } = useAccount();
+export function AuctionFailedCard() {
+  const { data: auction } = useAuctionSuspense();
   const [isTxnDialogOpen, setTxnDialogOpen] = useState(false);
-  const claimBidsTxn = useClaimBids(auction);
-
-  const userBids = auction.bids.filter(
-    (bid) => bid.bidder.toLowerCase() === address?.toLowerCase(),
-  );
-
-  const userTotalBidAmount = userBids.reduce(
-    (acc, bid) => acc + Number(bid.amountIn ?? 0),
-    0,
-  );
-
-  const userHasClaimedFullRefund = userBids.every(
-    (bid) => bid.status === "refunded" || bid.status === "claimed",
-  );
-
-  const userTotalRefundClaimed = userBids.reduce(
-    (acc, bid) => acc + Number(bid.settledAmountInRefunded ?? 0),
-    0,
-  );
-
-  const failReason = getFailReason(auction);
+  const claimBidsTxn = useClaimBids();
+  const { totalAmount, claimedFullRefund, refundTotal } = useUserBids();
+  const failReason = useMemo(() => getFailReason(auction), [auction]);
 
   return (
     <div className="gap-y-md flex flex-col">
@@ -68,14 +48,14 @@ export function AuctionFailedCard({ auction }: PropsWithAuction) {
           <div className="gap-y-md flex flex-col">
             <div className="bg-light-tertiary p-sm rounded">
               <Metric size="l" label="You Bid">
-                {shorten(userTotalBidAmount)} {auction.quoteToken.symbol}
+                {shorten(totalAmount)} {auction.quoteToken.symbol}
               </Metric>
             </div>
 
-            {userTotalRefundClaimed > 0 && (
+            {refundTotal > 0 && (
               <div className="bg-light-tertiary p-sm rounded">
                 <Metric size="l" label="You Refunded">
-                  {shorten(userTotalRefundClaimed)} {auction.quoteToken.symbol}
+                  {shorten(refundTotal)} {auction.quoteToken.symbol}
                 </Metric>
               </div>
             )}
@@ -89,7 +69,7 @@ export function AuctionFailedCard({ auction }: PropsWithAuction) {
               </Text>
             </div>
 
-            {!userHasClaimedFullRefund && (
+            {!claimedFullRefund && (
               <Button
                 size="lg"
                 className="w-full"
@@ -98,7 +78,7 @@ export function AuctionFailedCard({ auction }: PropsWithAuction) {
                 Claim refund
               </Button>
             )}
-            {userHasClaimedFullRefund && (
+            {claimedFullRefund && (
               <Link to="/auctions">
                 <Button size="lg" variant="secondary" className="w-full">
                   View live auctions <ArrowRightIcon className="size-6" />

@@ -1,40 +1,19 @@
 import {
   AuctionDerivativeTypes,
-  AuctionType,
-  CallbacksType,
-  type Auction,
   type PropsWithAuction,
 } from "@axis-finance/types";
 import { Metric, MetricProps } from "@bltzr-gg/ui";
 import { useToggle } from "./hooks/use-toggle";
 import { trimCurrency } from "utils/currency";
 import { shorten, formatPercentage } from "utils/number";
-import { getCallbacksType } from "./utils/get-callbacks-type";
-import { getMinFilled, getPrice, hasDerivative } from "./utils/auction-details";
+import { hasDerivative } from "./utils/auction-details";
 import { formatDate, getDaysBetweenDates } from "utils/date";
 import { Format } from "components/format";
 import { UsdAmount } from "./usd-amount";
 import { ToggledUsdAmount } from "./toggled-usd-amount";
 import { DtlProceedsDisplay } from "./dtl-proceeds-display";
-import { useAuction } from "./hooks/use-auction";
-
-export const getTargetRaise = (
-  auction: Pick<Auction, "capacityInitial">,
-  price?: number,
-): number | undefined => {
-  if (price === undefined) return undefined;
-
-  return Number(auction.capacityInitial) * price;
-};
-
-export const getMinRaise = (
-  price?: number,
-  minFilled?: number,
-): number | undefined => {
-  if (price === undefined || minFilled === undefined) return undefined;
-
-  return minFilled * price;
-};
+import { useAuction, Auction } from "@/hooks/use-auction";
+import { formatDistanceToNow } from "date-fns";
 
 export const getMaxTokensLaunched = (
   totalBidAmount?: number,
@@ -53,27 +32,6 @@ export const getMaxTokensLaunched = (
   const bidAmount = Math.min(totalBidAmount, targetRaise);
 
   return bidAmount / price;
-};
-
-const getClearingPrice = (auction: Auction): number | undefined => {
-  if (auction.auctionType !== AuctionType.SEALED_BID) return getPrice(auction);
-
-  // Check that the auction cleared
-  if (!auction.formatted?.cleared) return undefined;
-
-  const marginalPrice = auction.formatted?.marginalPriceDecimal;
-  if (marginalPrice === undefined) return undefined;
-
-  return marginalPrice;
-};
-
-export const getMinRaiseForAuction = (
-  auction: Pick<Auction, "encryptedMarginalPrice">,
-) => {
-  const price = getPrice(auction);
-  const minFilled = getMinFilled(auction);
-
-  return getMinRaise(price, minFilled);
 };
 
 type MetricHandlers = Record<
@@ -99,10 +57,7 @@ const handlers: MetricHandlers = {
   minFill: {
     label: "Min Fill",
     handler: (auction) => {
-      const minFilled = getMinFilled(auction);
-      if (!minFilled) return undefined;
-
-      return `${trimCurrency(minFilled)} ${auction.baseToken.symbol}`;
+      return `${trimCurrency(auction.minFilled)} ${auction.baseToken.symbol}`;
     },
   },
   protocolFee: {
@@ -121,7 +76,7 @@ const handlers: MetricHandlers = {
     label: "Duration",
     handler: (auction) => {
       const days = getDaysBetweenDates(
-        new Date(+auction.conclusion * 1000),
+        new Date(+auction.end * 1000),
         new Date(+auction.start * 1000),
       );
 
@@ -138,7 +93,7 @@ const handlers: MetricHandlers = {
   totalRaised: {
     label: "Total Raised",
     handler: (auction) => {
-      return `${auction.formatted?.purchased} ${auction.quoteToken.symbol}`;
+      return `${auction.purchased} ${auction.quoteToken.symbol}`;
     },
   },
   targetRaise: {
@@ -147,15 +102,12 @@ const handlers: MetricHandlers = {
       // eslint-disable-next-line react-hooks/rules-of-hooks
       const { isToggled: isUsdToggled } = useToggle();
 
-      const price = getPrice(auction);
-      const targetRaise = getTargetRaise(auction, price);
-
-      if (targetRaise === undefined) return undefined;
-
       if (isUsdToggled) {
-        return <UsdAmount token={auction.quoteToken} amount={targetRaise} />;
+        return (
+          <UsdAmount token={auction.quoteToken} amount={auction.targetRaise} />
+        );
       }
-      return `${trimCurrency(targetRaise)} ${auction.quoteToken.symbol}`;
+      return `${trimCurrency(auction.targetRaise)} ${auction.quoteToken.symbol}`;
     },
   },
   minRaise: {
@@ -164,15 +116,13 @@ const handlers: MetricHandlers = {
       // eslint-disable-next-line react-hooks/rules-of-hooks
       const { isToggled: isUsdToggled } = useToggle();
 
-      const minRaise = getMinRaiseForAuction(auction);
-
-      if (minRaise === undefined) return undefined;
-
       if (isUsdToggled) {
-        return <UsdAmount token={auction.quoteToken} amount={minRaise} />;
+        return (
+          <UsdAmount token={auction.quoteToken} amount={auction.minRaise} />
+        );
       }
 
-      return `${trimCurrency(minRaise)} ${auction.quoteToken.symbol}`;
+      return `${trimCurrency(auction.minRaise)} ${auction.quoteToken.symbol}`;
     },
   },
 
@@ -182,16 +132,15 @@ const handlers: MetricHandlers = {
       // eslint-disable-next-line react-hooks/rules-of-hooks
       const { isToggled: isUsdToggled } = useToggle();
 
-      const price = getPrice(auction);
-      if (!price) return undefined;
-
       if (isUsdToggled) {
-        return <UsdAmount token={auction.quoteToken} amount={price} />;
+        return (
+          <UsdAmount token={auction.quoteToken} amount={auction.minPrice} />
+        );
       }
 
       return (
         <>
-          <Format value={price} /> {auction.quoteToken.symbol}
+          <Format value={auction.minPrice} /> {auction.quoteToken.symbol}
         </>
       );
     },
@@ -199,19 +148,19 @@ const handlers: MetricHandlers = {
   totalBids: {
     label: "Total Bids",
     handler: (auction) => {
-      return `${auction.formatted?.totalBids}`;
+      return `${auction.bidStats.total}`;
     },
   },
   totalBidAmount: {
     label: "Total Bid Amount",
     handler: (auction) =>
-      `${auction.formatted?.totalBidAmountFormatted} ${auction.quoteToken.symbol}`,
+      `${auction.bidStats.totalAmount} ${auction.quoteToken.symbol}`,
   },
 
   capacity: {
     label: "Tokens Available",
     handler: (auction) =>
-      `${shorten(Number(auction.capacity))} ${auction.baseToken.symbol}`,
+      `${shorten(auction.capacity)} ${auction.baseToken.symbol}`,
   },
 
   totalSupply: {
@@ -225,16 +174,15 @@ const handlers: MetricHandlers = {
       // eslint-disable-next-line react-hooks/rules-of-hooks
       const { isToggled: isUsdToggled } = useToggle();
 
-      const price = getPrice(auction);
-      if (!price) return undefined;
-
       if (isUsdToggled) {
-        return <UsdAmount token={auction.quoteToken} amount={price} />;
+        return (
+          <UsdAmount token={auction.quoteToken} amount={auction.minPrice} />
+        );
       }
 
       return (
         <>
-          <Format value={getPrice(auction) ?? 0} /> {auction.quoteToken.symbol}
+          <Format value={auction.minPrice ?? 0} /> {auction.quoteToken.symbol}
         </>
       );
     },
@@ -246,16 +194,15 @@ const handlers: MetricHandlers = {
       // eslint-disable-next-line react-hooks/rules-of-hooks
       const { isToggled: isUsdToggled } = useToggle();
 
-      const price = getPrice(auction);
-      if (!price) return undefined;
-
       if (isUsdToggled) {
-        return <UsdAmount token={auction.quoteToken} amount={price} />;
+        return (
+          <UsdAmount token={auction.quoteToken} amount={auction.minPrice} />
+        );
       }
 
       return (
         <>
-          <Format value={getPrice(auction) ?? 0} /> {auction.quoteToken.symbol}
+          <Format value={auction.minPrice ?? 0} /> {auction.quoteToken.symbol}
         </>
       );
     },
@@ -263,8 +210,7 @@ const handlers: MetricHandlers = {
 
   sold: {
     label: "Sold",
-    handler: (auction) =>
-      `${auction.formatted?.sold} ${auction.baseToken.symbol}`,
+    handler: (auction) => `${auction.sold} ${auction.baseToken.symbol}`,
   },
 
   tokensAvailable: {
@@ -298,10 +244,7 @@ const handlers: MetricHandlers = {
   minPriceFDV: {
     label: "Min Price FDV",
     handler: (auction) => {
-      const price = getPrice(auction);
-      if (!price) return undefined;
-
-      const fdv = Number(auction.baseToken.totalSupply) * price;
+      const fdv = Number(auction.baseToken.totalSupply) * auction.minPrice;
 
       return (
         <ToggledUsdAmount
@@ -317,10 +260,7 @@ const handlers: MetricHandlers = {
   fixedPriceFDV: {
     label: "Fixed Price FDV",
     handler: (auction) => {
-      const price = getPrice(auction);
-      if (!price) return undefined;
-
-      const fdv = Number(auction.baseToken.totalSupply) * price;
+      const fdv = Number(auction.baseToken.totalSupply) * auction.minPrice;
 
       return (
         <ToggledUsdAmount
@@ -336,60 +276,32 @@ const handlers: MetricHandlers = {
   rate: {
     label: "Rate",
     handler: (auction) => {
-      return `${auction.formatted?.rate} ${auction.formatted?.tokenPairSymbols}`;
+      return `${trimCurrency(auction?.marginalPrice)} ${auction.symbol}`;
     },
   },
   started: {
     label: "Started",
     handler: (auction) => {
-      return `${auction.formatted?.startDistance} ago`;
+      return `${formatDistanceToNow(auction.start)} ago`;
     },
   },
   ended: {
     label: "Ended",
     handler: (auction) => {
-      return `${auction.formatted?.endDistance} ago`;
+      return `${formatDistanceToNow(auction.end)} ago`;
     },
   },
   saleType: {
     label: "Sale Type",
-    handler: (auction) => {
-      const callbacksType = getCallbacksType(auction);
-
-      switch (callbacksType) {
-        case CallbacksType.MERKLE_ALLOWLIST:
-          return "Private";
-        case CallbacksType.CAPPED_MERKLE_ALLOWLIST:
-          return "Private (Capped)";
-        case CallbacksType.UNIV3_DTL_WITH_ALLOCATED_ALLOWLIST:
-        case CallbacksType.ALLOCATED_MERKLE_ALLOWLIST:
-          return "Private (Allocated)";
-        case CallbacksType.TOKEN_ALLOWLIST:
-          return "Private (Token-Gated)";
-        default:
-          return "Public";
-      }
-    },
+    handler: () => "Public",
   },
   result: {
     label: "Result",
     handler: (auction) => {
-      const price = getPrice(auction);
-      const minFilled = getMinFilled(auction);
-
-      const targetRaise = getTargetRaise(auction, price);
-      if (targetRaise === undefined) return undefined;
-
-      const minRaise = getMinRaise(price, minFilled);
-      if (minRaise === undefined) return undefined;
-
-      // Total bid amount will be undefined if the data hasn't been loaded yet, but 0 if there are no bids.
-      const totalBidAmount = auction.formatted?.totalBidAmountDecimal;
-      if (totalBidAmount === undefined) return undefined;
-
-      if (totalBidAmount >= targetRaise) return "Target Met";
-
-      if (totalBidAmount >= minRaise) return "Min Raise Met";
+      if (auction.bidStats.totalAmount >= auction.targetRaise)
+        return "Target Met";
+      if (auction.bidStats.totalAmount >= auction.minRaise)
+        return "Min Raise Met";
 
       return "Failed";
     },
@@ -397,14 +309,10 @@ const handlers: MetricHandlers = {
   maxTokensLaunched: {
     label: "Max Tokens Launched",
     handler: (auction) => {
-      const price = getPrice(auction);
-      const targetRaise = getTargetRaise(auction, price);
-      const totalBidAmount = auction.formatted?.totalBidAmountDecimal;
-
       const maxTokensLaunched = getMaxTokensLaunched(
-        totalBidAmount,
-        targetRaise,
-        price,
+        auction.bidStats.totalAmount,
+        auction.targetRaise,
+        auction.minPrice,
       );
       if (maxTokensLaunched === undefined) return undefined;
 
@@ -414,22 +322,13 @@ const handlers: MetricHandlers = {
   clearingPrice: {
     label: "Clearing Price",
     handler: (auction) => {
-      const clearingPrice = getClearingPrice(auction);
-      if (clearingPrice === undefined) return undefined;
-
-      return `${trimCurrency(clearingPrice)} ${auction.quoteToken.symbol}`;
+      return `${trimCurrency(auction.marginalPrice)} ${auction.quoteToken.symbol}`;
     },
   },
   tokensLaunched: {
     label: "Tokens Launched",
     handler: (auction) => {
-      const clearingPrice = getClearingPrice(auction);
-      if (clearingPrice === undefined || clearingPrice === 0) return undefined;
-
-      const purchased = auction.formatted?.purchasedDecimal;
-      if (purchased === undefined) return undefined;
-
-      const tokensLaunched = purchased / clearingPrice;
+      const tokensLaunched = auction.purchased / auction.marginalPrice;
 
       return `${trimCurrency(tokensLaunched)} ${auction.baseToken.symbol}`;
     },

@@ -10,7 +10,6 @@ import {
 } from "@bltzr-gg/ui";
 import { formatUnits, parseUnits } from "viem";
 import { AuctionBidInput } from "./auction-bid-input";
-import { Auction, AuctionType } from "@axis-finance/types";
 import { TransactionDialog } from "modules/transaction/transaction-dialog";
 import { LoadingIndicator } from "modules/app/loading-indicator";
 import { LockIcon } from "lucide-react";
@@ -20,7 +19,7 @@ import { useForm, FormProvider } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { RequiresChain } from "components/requires-chain";
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useMemo } from "react";
 import { UseWriteContractReturnType, useAccount, useChainId } from "wagmi";
 import useERC20Balance from "loaders/use-erc20-balance";
 import { getDeployment } from "@axis-finance/deployments";
@@ -29,7 +28,7 @@ import {
   isQuoteAWrappedGasToken,
 } from "modules/token/popup-token-wrapper";
 import { QuestionMarkCircledIcon } from "@radix-ui/react-icons";
-import { useAuction } from "./hooks/use-auction";
+import { useAuctionSuspense } from "@/hooks/use-auction";
 
 const schema = z.object({
   baseTokenAmount: z.string(),
@@ -40,18 +39,34 @@ const schema = z.object({
 export type BidForm = z.infer<typeof schema>;
 
 export function AuctionPurchase() {
-  const { data: auction } = useAuction();
+  const { data: auction } = useAuctionSuspense();
   const [open, setOpen] = React.useState(false);
   const currentChainId = useChainId();
   const walletAccount = useAccount();
 
-  const auctionFormatted = auction?.formatted || undefined;
-
-  const [maxBidAmount, setMaxBidAmount] = useState<bigint | undefined>();
   const deployment = useMemo(
     () => auction && getDeployment(auction.chainId),
     [auction],
   );
+
+  const maxBidAmount = useMemo(() => {
+    const capacityInQuoteTokens =
+      (parseUnits(auction.capacityInitial, auction.baseToken.decimals) *
+        parseUnits(
+          auction.minPrice.toString(),
+          Number(auction.quoteToken.decimals),
+        )) /
+      parseUnits("1", auction.baseToken.decimals);
+
+    const remainingQuoteTokens =
+      capacityInQuoteTokens -
+      parseUnits(
+        auction.bidStats.totalAmount.toString(),
+        auction.quoteToken.decimals,
+      );
+
+    return remainingQuoteTokens;
+  }, [auction]);
 
   const totalUserBidAmount =
     auction?.bids
@@ -70,43 +85,6 @@ export function AuctionPurchase() {
     [auction, totalUserBidAmount],
   );
 
-  // Cache the max bid amount
-  useEffect(() => {
-    if (!auction) {
-      return;
-    }
-    // Only for FPB, since we don't know the amount out for each bid in EMP
-    if (!auctionFormatted) {
-      setMaxBidAmount(undefined);
-      return;
-    }
-
-    // Calculate the remaining capacity in terms of quote tokens
-    const capacityInQuoteTokens =
-      (parseUnits(auction.capacityInitial, auction.baseToken.decimals) *
-        parseUnits(
-          (auctionFormatted.price ?? "0").replace(/,/g, ""),
-          Number(auction.quoteToken.decimals),
-        )) /
-      parseUnits("1", auction.baseToken.decimals);
-
-    const remainingQuoteTokens =
-      capacityInQuoteTokens -
-      parseUnits(
-        (auctionFormatted.totalBidAmountFormatted ?? "0").replace(/,/g, ""),
-        auction.quoteToken.decimals,
-      );
-
-    setMaxBidAmount(remainingQuoteTokens);
-  }, [
-    auction?.capacityInitial,
-    auctionFormatted,
-    auctionFormatted?.totalBidAmountFormatted,
-    auction?.baseToken.decimals,
-    auction?.quoteToken.decimals,
-    auction,
-  ]);
-
   const form = useForm<BidForm>({
     mode: "onChange",
     delayError: 600,
@@ -123,9 +101,8 @@ export function AuctionPurchase() {
         )
         .refine(
           (data) =>
-            isFixedPriceBatch ||
             parseUnits(data.bidPrice ?? "0", auction.quoteToken.decimals) >
-              BigInt(0),
+            BigInt(0),
           {
             message: "Bid price must be greater than 0",
             path: ["bidPrice"],
@@ -133,27 +110,25 @@ export function AuctionPurchase() {
         )
         .refine(
           (data) =>
-            isFixedPriceBatch ||
             parseUnits(data.quoteTokenAmount, auction.quoteToken.decimals) >=
-              parseUnits(
-                auction.encryptedMarginalPrice?.minBidSize ?? "0",
-                auction.quoteToken.decimals,
-              ),
+            parseUnits(
+              auction.minBidSize.toString(),
+              auction.quoteToken.decimals,
+            ),
           {
-            message: `Minimum bid is ${auction.formatted?.minBidSize}`,
+            message: `Minimum bid is ${auction.minBidSize}`,
             path: ["quoteTokenAmount"],
           },
         )
         .refine(
           (data) =>
-            isFixedPriceBatch ||
             parseUnits(data.bidPrice ?? "0", auction.quoteToken.decimals) >=
-              parseUnits(
-                auction.encryptedMarginalPrice?.minPrice ?? "0",
-                auction.quoteToken.decimals,
-              ),
+            parseUnits(
+              auction.minPrice.toString(),
+              auction.quoteToken.decimals,
+            ),
           {
-            message: `Min rate is ${auction.formatted?.minPrice} ${auction.quoteToken.symbol}/${auction.baseToken.symbol}`,
+            message: `Min rate is ${auction.minPrice} ${auction.quoteToken.symbol}/${auction.baseToken.symbol}`,
             path: ["bidPrice"],
           },
         )
@@ -169,7 +144,7 @@ export function AuctionPurchase() {
         .refine(
           (data) =>
             parseUnits(data.baseTokenAmount, auction.baseToken.decimals) <=
-            parseUnits(auction.capacity, auction.baseToken.decimals),
+            parseUnits(auction.capacity.toString(), auction.baseToken.decimals),
           {
             message: "Amount out exceeds capacity",
             path: ["baseTokenAmount"],
@@ -177,7 +152,6 @@ export function AuctionPurchase() {
         )
         .refine(
           (data) =>
-            !isFixedPriceBatch ||
             maxBidAmount === undefined ||
             parseUnits(data.quoteTokenAmount, auction.quoteToken.decimals) <=
               maxBidAmount,
@@ -251,14 +225,10 @@ export function AuctionPurchase() {
     minAmountOut === undefined ||
     parsedMinAmountOut === BigInt(0) || // zero or empty
     parsedMinAmountOut >
-      parseUnits(auction.capacity, auction.baseToken.decimals) || // exceeds capacity
-    (isEMP &&
-      (parsedAmountIn * parseUnits("1", auction.baseToken.decimals)) /
-        parsedMinAmountOut <
-        parseUnits(
-          auction.encryptedMarginalPrice?.minPrice ?? "0",
-          auction.quoteToken.decimals,
-        )); // less than min price
+      parseUnits(auction.capacity.toString(), auction.baseToken.decimals) || // exceeds capacity
+    (parsedAmountIn * parseUnits("1", auction.baseToken.decimals)) /
+      parsedMinAmountOut <
+      parseUnits(auction.minPrice.toString(), auction.quoteToken.decimals); // less than min price
 
   const isWalletChainIncorrect =
     auction.chainId !== currentChainId || !walletAccount.isConnected;
@@ -304,22 +274,18 @@ export function AuctionPurchase() {
                 <Tooltip
                   content={`Wrap ${deployment?.chain.nativeCurrency.symbol} into ${auction.quoteToken.symbol}`}
                 >
-                  <PopupTokenWrapper auction={auction} />
+                  <PopupTokenWrapper />
                 </Tooltip>
               )
             }
           >
             <AuctionBidInput
               balance={quoteTokenBalance}
-              auction={auction}
               disabled={isWalletChainIncorrect}
             />
             <div className={"gap-x-xl mx-auto mt-4 flex w-full"}>
               {totalUserBidAmount > 0n && (
-                <Metric
-                  childrenClassName={"text-tertiary-300"}
-                  label={`You ${isEMP ? "bid" : "spent"}`}
-                >
+                <Metric childrenClassName={"text-tertiary-300"} label="You bid">
                   {trimCurrency(formattedUserBidAmount)}{" "}
                   {auction.quoteToken.symbol}
                 </Metric>
@@ -363,7 +329,9 @@ export function AuctionPurchase() {
               idle: {
                 Component: () => (
                   <div className="text-center">
-                    {getConfirmCardText(auction, amountIn, minAmountOut)}
+                    {`You're about to place a bid of ${trimCurrency(amountIn)} ${
+                      auction.quoteToken.symbol
+                    }`}
                   </div>
                 ),
                 title: `Confirm ${actionKeyword}`,
@@ -371,14 +339,8 @@ export function AuctionPurchase() {
               success: {
                 Component: () => (
                   <div className="flex justify-center text-center">
-                    {isEMP ? (
-                      <>
-                        <LockIcon className="mr-1" />
-                        Bid encrypted and stored successfully!
-                      </>
-                    ) : (
-                      <p>Bid stored successfully!</p>
-                    )}
+                    <LockIcon className="mr-1" />
+                    Bid encrypted and stored successfully!
                   </div>
                 ),
                 title: "Transaction Confirmed",
@@ -389,19 +351,4 @@ export function AuctionPurchase() {
       </FormProvider>
     </div>
   );
-}
-
-function getConfirmCardText(
-  auction: Auction,
-  amountIn: string,
-  amountOut: string,
-) {
-  const isEMP = auction.auctionType === AuctionType.SEALED_BID;
-  const empText = `You're about to place a bid of ${trimCurrency(amountIn)} ${
-    auction.quoteToken.symbol
-  }`;
-  const fpText = `You're about to place a bid of ${trimCurrency(amountOut)} ${
-    auction.baseToken.symbol
-  } for ${trimCurrency(amountIn)} ${auction.quoteToken.symbol}`;
-  return isEMP ? empText : fpText;
 }

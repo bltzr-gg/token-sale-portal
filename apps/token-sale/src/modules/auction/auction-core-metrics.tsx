@@ -1,14 +1,12 @@
 import { Card, Metric } from "@bltzr-gg/ui";
 import { BlockExplorerLink } from "components/blockexplorer-link";
 import { AuctionMetric } from "./auction-metric";
-import { useAuction } from "./hooks/use-auction";
+import { useAuctionSuspense } from "@/hooks/use-auction";
 
 export function AuctionCoreMetrics({ className }: { className?: string } = {}) {
-  const { data: auction, isLoading } = useAuction();
-  const isSuccessful = auction?.encryptedMarginalPrice?.settlementSuccessful;
-  const isVested = !!auction?.linearVesting;
-
-  if (isLoading || !auction) return null;
+  const { data: auction } = useAuctionSuspense();
+  const isSuccessful = auction.settled;
+  const isVested = !!auction.linearVesting;
 
   return (
     <Card

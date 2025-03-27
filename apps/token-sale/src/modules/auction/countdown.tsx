@@ -57,8 +57,8 @@ export function AuctionCountdown({ className }: { className?: string }) {
   );
 
   const endDate = useMemo(
-    () => new Date(Number(auction.conclusion) * 1000),
-    [auction.conclusion],
+    () => new Date(Number(auction.end) * 1000),
+    [auction.end],
   );
 
   const now = new Date();
@@ -100,7 +100,7 @@ export function AuctionCountdown({ className }: { className?: string }) {
       <CountdownStatus status={auction.status} />
       {isFinished ? (
         <Text size="lg">
-          {formatDate.simple(new Date(+auction.conclusion * 1000))}
+          {formatDate.simple(new Date(+auction.end * 1000))}
         </Text>
       ) : (
         <CountdownDisplay time={isFinished ? "00:00:00:00" : timeDistance!} />

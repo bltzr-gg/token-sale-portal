@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { useAccount } from "wagmi";
 import { formatUnits } from "viem";
-import type { PropsWithAuction } from "@axis-finance/types";
 import { Button, Card, Metric, Progress } from "@bltzr-gg/ui";
 import { formatDate } from "utils/date";
 import { RequiresChain } from "components/requires-chain";
@@ -9,10 +8,10 @@ import { trimCurrency } from "utils/currency";
 import { useVestingTokenId } from "modules/auction/hooks/use-vesting-tokenid";
 import { useVestingRedeemable } from "modules/auction/hooks/use-vesting-redeemable";
 import { useDerivativeModule } from "modules/auction/hooks/use-derivative-module";
-import { useAuction } from "modules/auction/hooks/use-auction";
 import { ClaimVestingDervivativeTxn } from "./claim-vesting-derivative-txn";
 import { RedeemVestedTokensTxn } from "./redeem-vested-tokens-txn";
 import { shorten } from "@/utils/number";
+import { useAuctionSuspense } from "@/hooks/use-auction";
 
 const calculateVestingProgress = (start?: number, end?: number): number => {
   if (start == null || end == null) return 0;
@@ -40,14 +39,15 @@ const calculateVestingTerm = (start?: number, end?: number): string => {
   return `${Math.floor(termDays / 30)}M`;
 };
 
-export function VestingCard({ auction }: PropsWithAuction) {
+export function VestingCard() {
+  const { data: auction, refetch } = useAuctionSuspense();
   const { address } = useAccount();
   const [isTxnDialogOpen, setIsTxnDialogOpen] = useState(false);
 
   const { data: vestingModuleAddress } = useDerivativeModule({
-    lotId: auction.lotId,
+    lotId: auction.lotId.toString(),
     chainId: auction.chainId,
-    auctionType: auction.auctionType,
+    auctionType: auction.type,
   });
 
   const { data: vestingTokenId } = useVestingTokenId({
@@ -70,11 +70,6 @@ export function VestingCard({ auction }: PropsWithAuction) {
       chainId: auction.chainId,
       derivativeModuleAddress: vestingModuleAddress,
     });
-
-  const { refetch: refetchAuction } = useAuction(
-    auction.chainId,
-    auction.lotId,
-  );
 
   const redeemedAmount =
     auction.linearVesting?.redemptions
@@ -211,18 +206,14 @@ export function VestingCard({ auction }: PropsWithAuction) {
       </RequiresChain>
 
       {shouldShowClaimVesting && isTxnDialogOpen && (
-        <ClaimVestingDervivativeTxn
-          auction={auction}
-          onClose={() => setIsTxnDialogOpen(false)}
-        />
+        <ClaimVestingDervivativeTxn onClose={() => setIsTxnDialogOpen(false)} />
       )}
       {shouldShowRedeem && isTxnDialogOpen && (
         <RedeemVestedTokensTxn
-          auction={auction}
           onClose={() => setIsTxnDialogOpen(false)}
           onSuccess={() => {
             refetchRedeemable();
-            refetchAuction();
+            refetch();
           }}
         />
       )}

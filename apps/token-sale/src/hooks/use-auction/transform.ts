@@ -1,8 +1,9 @@
-import { AuctionType, Token } from "@axis-finance/types";
+import { AuctionType, CallbacksType, Token } from "@axis-finance/types";
 import type { BatchAuctionLot } from "../../queries/auction/types";
 import { AUCTION_CHAIN_ID } from "../../../../../app-config";
 import { z } from "zod";
-import { formatUnits } from "viem";
+import { formatUnits, zeroAddress } from "viem";
+import { axisContracts } from "@axis-finance/deployments";
 
 const AuctionStatus = z.enum([
   "created",
@@ -13,6 +14,46 @@ const AuctionStatus = z.enum([
   "aborted",
   "cancelled",
 ]);
+
+export function getCallbacksType(callbacks?: `0x${string}`): CallbacksType {
+  if (!callbacks || callbacks === zeroAddress) {
+    return CallbacksType.NONE;
+  }
+
+  const callbacksLower = callbacks.toLowerCase();
+  const chainAddresses = axisContracts.addresses[AUCTION_CHAIN_ID];
+
+  const callbackMapping: Partial<
+    Record<keyof typeof chainAddresses, CallbacksType>
+  > = {
+    merkleAllowlist: CallbacksType.MERKLE_ALLOWLIST,
+    cappedMerkleAllowlist: CallbacksType.CAPPED_MERKLE_ALLOWLIST,
+    allocatedMerkleAllowlist: CallbacksType.ALLOCATED_MERKLE_ALLOWLIST,
+    tokenAllowlist: CallbacksType.TOKEN_ALLOWLIST,
+    uniV2Dtl: CallbacksType.UNIV2_DTL,
+    uniV3Dtl: CallbacksType.UNIV3_DTL,
+    uniswapV3DtlWithAllocatedMerkleAllowlist:
+      CallbacksType.UNIV3_DTL_WITH_ALLOCATED_ALLOWLIST,
+    baseline: CallbacksType.BASELINE,
+    baselineAllowlist: CallbacksType.BASELINE_ALLOWLIST,
+    baselineAllocatedAllowlist: CallbacksType.BASELINE_ALLOCATED_ALLOWLIST,
+    baselineCappedAllowlist: CallbacksType.BASELINE_CAPPED_ALLOWLIST,
+    baselineTokenAllowlist: CallbacksType.BASELINE_TOKEN_ALLOWLIST,
+  };
+
+  for (const [key, type] of Object.entries(callbackMapping)) {
+    const addressList = chainAddresses[key as keyof typeof chainAddresses];
+    const isMatch = Array.isArray(addressList)
+      ? addressList.some((addr) => addr.toLowerCase() === callbacksLower)
+      : addressList.toLowerCase() === callbacksLower;
+
+    if (isMatch) {
+      return type;
+    }
+  }
+
+  return CallbacksType.CUSTOM;
+}
 
 function calculateAuctionProgress(
   auction: Pick<
@@ -102,40 +143,69 @@ export const transform = (auction: BatchAuctionLot, tokens: Token[] = []) => {
     );
   }
 
+  const price = parseFloat(auction.encryptedMarginalPrice?.minPrice ?? "0");
+  const minFilled = parseFloat(
+    auction.encryptedMarginalPrice?.minFilled ?? "0",
+  );
+
+  if (!auction.callbacks?.startsWith("0x")) {
+    throw new Error(
+      `Unable to find callback ${auction.callbacks} for auction ${auction.id}`,
+    );
+  }
+
+  const callbacks = auction.callbacks as `0x${string}`;
+
   return {
-    id: auction.id,
-    bids: auction.bids,
-    lotId: Number(auction.lotId),
-    type: AuctionType.SEALED_BID,
-    sold: parseFloat(auction.sold ?? "0"),
-    purchased: parseFloat(auction.purchased ?? "0"),
-    minPrice: parseFloat(auction.encryptedMarginalPrice?.minPrice ?? "0"),
-    minBidSize: parseFloat(auction.encryptedMarginalPrice?.minBidSize ?? "0"),
-    marginalPrice: parseFloat(
-      auction.encryptedMarginalPrice?.marginalPrice ?? "0",
-    ),
-    capacity: parseFloat(auction.capacity ?? "0"),
-    totalSupply: parseFloat(auction.baseToken.totalSupply ?? "0"),
-    symbol: `${auction.quoteToken.symbol}/${auction.baseToken.symbol}`,
+    amount: auction.bids.reduce((total, b) => total + Number(b.amountIn), 0),
+    baseToken,
     bidStats: {
-      refunded: auction.bidsRefunded.length,
-      amount: auction.bids.reduce((total, b) => total + Number(b.amountIn), 0),
+      totalAmount: auction.bids.reduce(
+        (total, b) => total + Number(b.amountIn),
+        0,
+      ),
       claimed: auction.bids.filter((b) => b.status === "claimed").length,
-      total: auction.bids.length,
       decrypted: auction.bids.filter((b) => b.status === "decrypted").length,
+      refunded: auction.bidsRefunded.length,
+      total: auction.bids.length,
       unique: auction.bids
         .map((b) => b.bidder)
         .filter((b, i, a) => a.lastIndexOf(b) === i).length,
     },
-    settled: !!auction.encryptedMarginalPrice?.settlementSuccessful,
-    symbols: `${auction.quoteToken.symbol}/${auction.baseToken.symbol}`,
-    baseToken,
-    quoteToken,
-    status,
-    progress,
+    bids: auction.bids,
+    callbacks,
+    callbacksType: getCallbacksType(callbacks),
+    capacity: parseFloat(auction.capacity ?? "0"),
+    capacityInitial: auction.capacityInitial,
     chainId: AUCTION_CHAIN_ID,
+    end: auction.conclusion,
+    derivativeType: auction.derivativeType,
+    id: auction.id,
+    linearVesting: auction.linearVesting,
+    lotId: Number(auction.lotId),
+    marginalPrice: parseFloat(
+      auction.encryptedMarginalPrice?.marginalPrice ?? "0",
+    ),
+    minBidSize: parseFloat(auction.encryptedMarginalPrice?.minBidSize ?? "0"),
+    minFilled: parseFloat(auction.encryptedMarginalPrice?.minFilled ?? "0"),
+    minPrice: price,
+    minRaise: minFilled * price,
+    progress,
+    protocolFee: auction.protocolFee,
+    purchased: parseFloat(auction.purchased ?? "0"),
+    quoteToken,
+    referrerFee: auction.referrerFee,
     seller: auction.seller as `0x${string}`,
+    settled: !!auction.encryptedMarginalPrice?.settlementSuccessful,
+    sold: parseFloat(auction.sold ?? "0"),
     start: auction.start,
-    conclusion: auction.conclusion,
+    status,
+    symbol: `${auction.quoteToken.symbol}/${auction.baseToken.symbol}`,
+    symbols: `${auction.quoteToken.symbol}/${auction.baseToken.symbol}`,
+    targetRaise: Number(auction.capacityInitial) * price,
+    totalSupply: parseFloat(auction.baseToken.totalSupply ?? "0"),
+    type: AuctionType.SEALED_BID,
   };
 };
+
+export type Auction = ReturnType<typeof transform>;

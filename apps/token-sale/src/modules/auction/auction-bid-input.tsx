@@ -1,14 +1,13 @@
 import { FormField } from "@bltzr-gg/ui";
 import { useFormContext } from "react-hook-form";
-import { PropsWithAuction } from "@axis-finance/types";
 import { TokenAmountInput } from "components/token-amount-input";
 import { trimCurrency } from "utils/currency";
 import { useState } from "react";
 import { formatUnits, parseUnits } from "viem";
 import { BidForm } from "./auction-purchase";
+import { useAuctionSuspense } from "@/hooks/use-auction";
 
 export function AuctionBidInput({
-  auction,
   balance = BigInt(0),
   limit,
   disabled,
@@ -16,7 +15,8 @@ export function AuctionBidInput({
   balance?: bigint;
   limit?: bigint;
   disabled?: boolean;
-} & PropsWithAuction) {
+}) {
+  const { data: auction } = useAuctionSuspense();
   const form = useFormContext<BidForm>();
 
   const [formAmount] = form.watch(["quoteTokenAmount"]);
