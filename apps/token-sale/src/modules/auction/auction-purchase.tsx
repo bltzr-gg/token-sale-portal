@@ -6,7 +6,6 @@ import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-  Tooltip,
 } from "@bltzr-gg/ui";
 import { formatUnits, parseUnits } from "viem";
 import { AuctionBidInput } from "./auction-bid-input";
@@ -22,11 +21,6 @@ import { RequiresChain } from "components/requires-chain";
 import React, { useMemo } from "react";
 import { UseWriteContractReturnType, useAccount, useChainId } from "wagmi";
 import useERC20Balance from "loaders/use-erc20-balance";
-import { getDeployment } from "@axis-finance/deployments";
-import {
-  PopupTokenWrapper,
-  isQuoteAWrappedGasToken,
-} from "modules/token/popup-token-wrapper";
 import { QuestionMarkCircledIcon } from "@radix-ui/react-icons";
 import { useAuctionSuspense } from "@/hooks/use-auction";
 
@@ -44,28 +38,12 @@ export function AuctionPurchase() {
   const currentChainId = useChainId();
   const walletAccount = useAccount();
 
-  const deployment = useMemo(
-    () => auction && getDeployment(auction.chainId),
-    [auction],
-  );
-
   const maxBidAmount = useMemo(() => {
-    const capacityInQuoteTokens =
-      (parseUnits(auction.capacityInitial, auction.baseToken.decimals) *
-        parseUnits(
-          auction.minPrice.toString(),
-          Number(auction.quoteToken.decimals),
-        )) /
-      parseUnits("1", auction.baseToken.decimals);
-
-    const remainingQuoteTokens =
-      capacityInQuoteTokens -
-      parseUnits(
-        auction.bidStats.totalAmount.toString(),
-        auction.quoteToken.decimals,
-      );
-
-    return remainingQuoteTokens;
+    const remaining = auction.initialCapacity - auction.bidStats.totalAmount;
+    return (
+      +formatUnits(remaining, auction.baseToken.decimals) *
+      +formatUnits(auction.minPrice, auction.quoteToken.decimals)
+    );
   }, [auction]);
 
   const totalUserBidAmount =
@@ -80,8 +58,7 @@ export function AuctionPurchase() {
 
   const formattedUserBidAmount = useMemo(
     () =>
-      auction &&
-      formatUnits(totalUserBidAmount, Number(auction.quoteToken.decimals)),
+      auction && formatUnits(totalUserBidAmount, auction.quoteToken.decimals),
     [auction, totalUserBidAmount],
   );
 
@@ -156,10 +133,7 @@ export function AuctionPurchase() {
             parseUnits(data.quoteTokenAmount, auction.quoteToken.decimals) <=
               maxBidAmount,
           {
-            message: `Exceeds remaining capacity of ${formatUnits(
-              maxBidAmount ?? 0n,
-              auction.quoteToken.decimals,
-            )} ${auction.quoteToken.symbol}`,
+            message: `Exceeds remaining capacity of ${maxBidAmount} ${auction.quoteToken.symbol}`,
             path: ["quoteTokenAmount"],
           },
         ),
@@ -269,21 +243,12 @@ export function AuctionPurchase() {
                 </Popover>
               </>
             }
-            headerRightElement={
-              isQuoteAWrappedGasToken(auction) && (
-                <Tooltip
-                  content={`Wrap ${deployment?.chain.nativeCurrency.symbol} into ${auction.quoteToken.symbol}`}
-                >
-                  <PopupTokenWrapper />
-                </Tooltip>
-              )
-            }
           >
             <AuctionBidInput
               balance={quoteTokenBalance}
               disabled={isWalletChainIncorrect}
             />
-            <div className={"gap-x-xl mx-auto mt-4 flex w-full"}>
+            <div className="gap-x-xl mx-auto mt-4 flex w-full empty:hidden">
               {totalUserBidAmount > 0n && (
                 <Metric childrenClassName={"text-tertiary-300"} label="You bid">
                   {trimCurrency(formattedUserBidAmount)}{" "}
@@ -291,13 +256,17 @@ export function AuctionPurchase() {
                 </Metric>
               )}
             </div>
-
-            <RequiresChain chainId={auction.chainId} className="mt-4">
+            <RequiresChain
+              buttonClass="w-full"
+              chainId={auction.chainId}
+              className="mt-4 "
+            >
               <div className="mt-4 w-full">
                 <Button
                   className="w-full"
                   disabled={isWaiting || amountInInvalid || amountOutInvalid}
                 >
+                  {!isWaiting && actionKeyword.toUpperCase()}
                   {isWaiting && (
                     <div className="flex">
                       Waiting for confirmation...

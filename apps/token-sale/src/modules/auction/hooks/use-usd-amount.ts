@@ -25,9 +25,12 @@ const useUsdAmount = ({
   )
     return {};
 
-  // Multiply the price and amount by the token decimals to get a bigint, so we get a precise number at the end
-  const priceBigInt = parseUnits(price.toString(), decimals);
-  const amountBigInt = parseUnits(amount.toString(), decimals);
+  console.log(price, amount, decimals);
+  const priceBigInt = parseUnits(price.toFixed(0), decimals);
+  const amountBigInt = parseUnits(
+    amount.toLocaleString("fullwide", { useGrouping: false }),
+    decimals,
+  );
 
   // Convert USD amount in USD decimals as a string
   const usdAmount = (amountBigInt * priceBigInt) / parseUnits("1", decimals);

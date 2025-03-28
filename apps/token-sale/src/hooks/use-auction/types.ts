@@ -1,4 +1,15 @@
 import { transform } from "./transform";
+import { z } from "zod";
+
+export const AuctionStatusSchema = z.enum([
+  "created",
+  "live",
+  "concluded",
+  "decrypted",
+  "settled",
+  "aborted",
+  "cancelled",
+]);
 
 type GetArrayElementType<ArrayType extends readonly unknown[]> =
   ArrayType extends readonly (infer ElementType)[] ? ElementType : never;

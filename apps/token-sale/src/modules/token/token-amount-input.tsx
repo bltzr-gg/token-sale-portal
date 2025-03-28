@@ -1,8 +1,6 @@
 import React from "react";
-import type { Token } from "@axis-finance/types";
+import type { Token } from "@/hooks/use-auction/types";
 import { Text, Button, cn, NumberInput, NumberInputProps } from "@bltzr-gg/ui";
-import { UsdAmount } from "modules/auction/usd-amount";
-import { Format } from "./format";
 
 type TokenAmountInputProps = React.HTMLProps<HTMLInputElement> & {
   /** the input's label */
@@ -11,12 +9,6 @@ type TokenAmountInputProps = React.HTMLProps<HTMLInputElement> & {
   tokenLabel?: string;
   /** the input's token type */
   token?: Token;
-  /** whether to show the USD price of the token */
-  showUsdPrice?: boolean;
-  /** the user's balance */
-  balance?: string | number;
-  /** limit on how much the user can spend */
-  limit?: string;
   /** an optional error message */
   error?: string;
   /** an optional status message */
@@ -43,10 +35,7 @@ export const TokenAmountInput = React.forwardRef<
     {
       label,
       token,
-      showUsdPrice = true,
       tokenLabel = token?.symbol,
-      balance,
-      limit,
       error,
       message,
       value,
@@ -85,7 +74,7 @@ export const TokenAmountInput = React.forwardRef<
               "hover:bg-light-secondary ",
               error && "text-feedback-alert",
             )}
-            style={{ padding: 0 }} //TODO: figure out why this is necessary
+            style={{ padding: 0 }}
             {...props}
             size="md"
             ref={ref}
@@ -108,33 +97,11 @@ export const TokenAmountInput = React.forwardRef<
             </Button>
           )}
         </div>
-        <div className="flex justify-between">
-          {token && showUsdPrice && (
-            <div className="flex items-start">
-              <Text size="xs" color="secondary">
-                {!value && "≈ $0"}
-                {value && "≈ "}
-                {value && <UsdAmount token={token} amount={Number(value)} />}
-              </Text>
-            </div>
-          )}
-          {balance && (
-            <div className="gap-x-sm ml-auto flex items-end">
-              <Text size="xs" color="secondary" uppercase>
-                {limit ? `Limit: ${limit}` : ""}
-              </Text>
-              <Text size="xs" color="secondary" uppercase>
-                Balance: <Format value={balance} />
-              </Text>
-            </div>
-          )}
-        </div>
         {error && (
           <div className="bg-feedback-alert mt-1.5 rounded p-2">
             <Text color="tertiary">{error}</Text>
           </div>
         )}
-
         {message && (
           <div className="mt-1.5 rounded border border-neutral-500 p-2">
             <Text color="secondary">{message}</Text>

@@ -1,19 +1,11 @@
-import { AuctionType, CallbacksType, Token } from "@axis-finance/types";
+import { AuctionType, CallbacksType } from "@axis-finance/types";
 import type { BatchAuctionLot } from "../../queries/auction/types";
 import { AUCTION_CHAIN_ID } from "../../../../../app-config";
 import { z } from "zod";
-import { formatUnits, zeroAddress } from "viem";
+import { zeroAddress } from "viem";
 import { axisContracts } from "@axis-finance/deployments";
-
-const AuctionStatus = z.enum([
-  "created",
-  "live",
-  "concluded",
-  "decrypted",
-  "settled",
-  "aborted",
-  "cancelled",
-]);
+import assert from "assert";
+import { AuctionStatusSchema } from "./types";
 
 export function getCallbacksType(callbacks?: `0x${string}`): CallbacksType {
   if (!callbacks || callbacks === zeroAddress) {
@@ -55,48 +47,6 @@ export function getCallbacksType(callbacks?: `0x${string}`): CallbacksType {
   return CallbacksType.CUSTOM;
 }
 
-function calculateAuctionProgress(
-  auction: Pick<
-    BatchAuctionLot,
-    | "capacityInitial"
-    | "encryptedMarginalPrice"
-    | "bids"
-    | "purchased"
-    | "quoteToken"
-  >,
-  status: z.infer<typeof AuctionStatus>,
-) {
-  const rawCurrentAmount = auction.bids.reduce((total, b) => {
-    return (total += BigInt(b.rawAmountIn));
-  }, 0n);
-
-  const preSettlementAmount = +formatUnits(
-    rawCurrentAmount,
-    Number(auction.quoteToken.decimals),
-  );
-
-  const isSettled = status === "settled";
-
-  const currentAmount = isSettled ? +auction.purchased : preSettlementAmount;
-  const minFilled = Number(auction.encryptedMarginalPrice?.minFilled ?? 0);
-  const minPrice = Number(auction.encryptedMarginalPrice?.minPrice ?? 0);
-  const minRaise = minFilled * minPrice;
-  const targetAmount = minPrice * Number(auction.capacityInitial);
-
-  const minTarget = Math.round((minRaise / targetAmount) * 100);
-  const currentPercent = Math.min(
-    Math.round((preSettlementAmount / targetAmount) * 100),
-    100,
-  );
-
-  return {
-    currentPercent,
-    minTarget,
-    currentAmount,
-    targetAmount,
-  };
-}
-
 function getAuctionStatus({
   start,
   conclusion,
@@ -104,7 +54,11 @@ function getAuctionStatus({
 }: Pick<
   BatchAuctionLot,
   "start" | "conclusion" | "encryptedMarginalPrice"
->): z.infer<typeof AuctionStatus> {
+>): z.infer<typeof AuctionStatusSchema> {
+  assert(
+    encryptedMarginalPrice !== null,
+    "encryptedMarginalPrice is null, are you sure this is a Sealed Auction?",
+  );
   const currentTime = Date.now();
   const startTime = new Date(Number(start) * 1000).getTime();
   const conclusionTime = new Date(Number(conclusion) * 1000).getTime();
@@ -115,54 +69,41 @@ function getAuctionStatus({
     if (currentTime > startTime) return "live";
   }
 
-  return AuctionStatus.parse(subgraphStatus);
+  return AuctionStatusSchema.parse(subgraphStatus);
 }
 
-export const transform = (auction: BatchAuctionLot, tokens: Token[] = []) => {
-  const baseToken = tokens.find(
-    (t) =>
-      t.address === auction.baseToken.address && t.chainId === AUCTION_CHAIN_ID,
+export const transform = (auction: BatchAuctionLot) => {
+  assert(
+    auction.encryptedMarginalPrice !== null,
+    "encryptedMarginalPrice is null, are you sure this is a Sealed Auction?",
   );
-  const quoteToken = tokens.find(
-    (t) =>
-      t.address === auction.quoteToken.address &&
-      t.chainId === AUCTION_CHAIN_ID,
-  );
+  assert(auction.callbacks?.startsWith("0x"));
+  assert(auction.quoteToken.address.startsWith("0x"));
+  assert(auction.baseToken.address.startsWith("0x"));
+
   const status = getAuctionStatus(auction);
-  const progress = calculateAuctionProgress(auction, status);
-
-  if (!baseToken) {
-    throw new Error(
-      `Unable to find base token ${auction.baseToken.address} for auction ${auction.id}`,
-    );
-  }
-
-  if (!quoteToken) {
-    throw new Error(
-      `Unable to find quote token ${auction.quoteToken.address} for auction ${auction.id}`,
-    );
-  }
-
-  const price = parseFloat(auction.encryptedMarginalPrice?.minPrice ?? "0");
-  const minFilled = parseFloat(
-    auction.encryptedMarginalPrice?.minFilled ?? "0",
-  );
-
-  if (!auction.callbacks?.startsWith("0x")) {
-    throw new Error(
-      `Unable to find callback ${auction.callbacks} for auction ${auction.id}`,
-    );
-  }
-
+  const price = BigInt(auction.encryptedMarginalPrice?.minPrice ?? "0");
+  const minFilled = BigInt(auction.encryptedMarginalPrice?.minFilled ?? "0");
   const callbacks = auction.callbacks as `0x${string}`;
+  // START BULLSHIT: I SHOULDNT HAVE TO DO THIS, IT SHOULD BE IN 18 DECIMAL PLACE ALREADY
+  const initialCapacity = BigInt(auction.capacityInitial) * 10n ** 18n;
+  // END BULLSHIT
+  const baseModifier = 10n ** BigInt(auction.baseToken.decimals);
+  const targetRaise = (initialCapacity * price) / baseModifier;
+
+  console.log(BigInt(auction.baseToken.totalSupply));
 
   return {
     amount: auction.bids.reduce((total, b) => total + Number(b.amountIn), 0),
-    baseToken,
+    baseToken: {
+      ...auction.baseToken,
+      totalSupply: BigInt(auction.baseToken.totalSupply),
+      address: auction.baseToken.address as `0x${string}`,
+    },
     bidStats: {
       totalAmount: auction.bids.reduce(
-        (total, b) => total + Number(b.amountIn),
-        0,
+        (total, b) => total + BigInt(b.amountIn),
+        0n,
       ),
       claimed: auction.bids.filter((b) => b.status === "claimed").length,
       decrypted: auction.bids.filter((b) => b.status === "decrypted").length,
@@ -175,36 +116,34 @@ export const transform = (auction: BatchAuctionLot, tokens: Token[] = []) => {
     bids: auction.bids,
     callbacks,
     callbacksType: getCallbacksType(callbacks),
-    capacity: parseFloat(auction.capacity ?? "0"),
-    capacityInitial: auction.capacityInitial,
+    capacity: BigInt(auction.capacity ?? "0"),
+    initialCapacity,
     chainId: AUCTION_CHAIN_ID,
     end: new Date(Number(auction.conclusion) * 1000),
     derivativeType: auction.derivativeType,
     id: auction.id,
     linearVesting: auction.linearVesting,
     lotId: Number(auction.lotId),
-    marginalPrice: parseFloat(
-      auction.encryptedMarginalPrice?.marginalPrice ?? "0",
-    ),
-    minBidSize: parseFloat(auction.encryptedMarginalPrice?.minBidSize ?? "0"),
-    minFilled: parseFloat(auction.encryptedMarginalPrice?.minFilled ?? "0"),
+    marginalPrice: BigInt(auction.encryptedMarginalPrice?.marginalPrice ?? "0"),
+    minBidSize: BigInt(auction.encryptedMarginalPrice?.minBidSize ?? "0"),
+    minFilled,
     minPrice: price,
     minRaise: minFilled * price,
-    progress,
-    protocolFee: auction.protocolFee,
-    purchased: parseFloat(auction.purchased ?? "0"),
-    quoteToken,
+
+    purchased: BigInt(auction.purchased ?? "0"),
+    quoteToken: {
+      ...auction.quoteToken,
+      address: auction.quoteToken.address as `0x${string}`,
+    },
     urlPath: `/${AUCTION_CHAIN_ID}/${auction.id}`,
-    referrerFee: auction.referrerFee,
+    referrerFee: parseFloat(auction.referrerFee) * 100,
     seller: auction.seller as `0x${string}`,
     settled: !!auction.encryptedMarginalPrice?.settlementSuccessful,
-    sold: parseFloat(auction.sold ?? "0"),
+    sold: BigInt(auction.sold ?? "0"),
     start: new Date(Number(auction.start) * 1000),
     status,
     symbol: `${auction.quoteToken.symbol}/${auction.baseToken.symbol}`,
-    symbols: `${auction.quoteToken.symbol}/${auction.baseToken.symbol}`,
-    targetRaise: Number(auction.capacityInitial) * price,
-    totalSupply: parseFloat(auction.baseToken.totalSupply ?? "0"),
+    targetRaise,
     type: AuctionType.SEALED_BID,
   };
 };

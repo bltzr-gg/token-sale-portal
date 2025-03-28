@@ -1,8 +1,8 @@
 import { gql, TypedDocumentNode } from "@apollo/client";
-import { ByIdRequest, GetSimpleAuctionByIdResponse } from "./types";
+import { ByIdRequest } from "./types";
 
 export const GET_AUCTION_BY_ID_QUERY: TypedDocumentNode<
-  GetSimpleAuctionByIdResponse,
+  { batchAuctionLot: unknown },
   ByIdRequest
 > = gql`
   fragment BatchCommonFields on BatchAuctionLot {

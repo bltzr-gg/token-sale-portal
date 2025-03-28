@@ -15,7 +15,6 @@ import {
 import { format } from "date-fns";
 import { shorten } from "utils/number";
 import { formatDate } from "utils/date";
-import { useGetToggledUsdAmount } from "./hooks/use-get-toggled-usd-amount";
 import { SettledAuctionChartOverlay } from "./settled-auction-chart-overlay";
 import {
   BID_OUTCOME,
@@ -52,11 +51,6 @@ const plainTextFormatter = (value: string) => (
 const BidTooltip = (props: BidTooltipProps) => {
   const { data: auction } = useAuctionSuspense();
 
-  const { getToggledUsdAmount } = useGetToggledUsdAmount(
-    auction.quoteToken,
-    auction.end,
-  );
-
   const payload = props.payload?.[0]?.payload;
 
   // Ignore data points used for drawing the corners of first & last bid
@@ -72,8 +66,8 @@ const BidTooltip = (props: BidTooltipProps) => {
 
   return (
     <div className="bg-surface border-surface-outline text-foreground rounded-sm border p-4">
-      <div>Amount: {getToggledUsdAmount(amountIn)}</div>
-      <div>Price: {getToggledUsdAmount(price)}</div>
+      <div>Amount: {amountIn}</div>
+      <div>Price: {price}</div>
       <div>
         Settled: {shorten(settledAmountOut)} {auction?.baseToken.symbol}
       </div>
@@ -99,14 +93,8 @@ export const SettledAuctionChart = () => {
   const textTertiary = `#8d8d8d`;
   const neutral400 = `hsl(var(--neutral-400))`;
 
-  const { getToggledUsdAmount } = useGetToggledUsdAmount(
-    auction.quoteToken,
-    auction.end,
-  );
-
   const bids = useSortedBids();
   const clearingPrice = auction.marginalPrice;
-  const amountRaised = Number(auction?.sold) * clearingPrice;
   const winning = filterWinningBids(bids);
 
   return (
@@ -131,7 +119,6 @@ export const SettledAuctionChart = () => {
             dataKey="price"
             type="number"
             tick={{ fill: textTertiary, fontSize: 14 }}
-            tickFormatter={(value) => getToggledUsdAmount(value, false)}
             tickLine={false}
           />
           <Area
@@ -168,23 +155,26 @@ export const SettledAuctionChart = () => {
               ),
           )}
           <ReferenceLine
-            x={amountRaised}
+            x={auction.bidStats.totalAmount.toString()}
             stroke={textSecondary}
             strokeDasharray="8 8"
             strokeWidth={2}
           />
           <ReferenceLine
             segment={[
-              { x: 0, y: clearingPrice },
-              { x: amountRaised, y: clearingPrice },
+              { x: 0, y: clearingPrice.toString() },
+              {
+                x: auction.bidStats.totalAmount.toString(),
+                y: clearingPrice.toString(),
+              },
             ]}
             stroke={red500}
             strokeDasharray="8 8"
             strokeWidth={2}
           />
           <ReferenceDot
-            x={amountRaised}
-            y={clearingPrice}
+            x={auction.bidStats.totalAmount.toString()}
+            y={clearingPrice.toString()}
             isFront={true}
             shape={(props) => <OriginIcon cx={props.cx} cy={props.cy} />}
           />

@@ -1,7 +1,5 @@
 import { Tooltip } from "@bltzr-gg/ui";
-import { useToggle } from "../hooks/use-toggle";
 import { trimCurrency } from "utils/currency";
-import { ToggledUsdAmount } from "../toggled-usd-amount";
 import { LockClosedIcon, LockOpen1Icon } from "@radix-ui/react-icons";
 import { AuctionBid } from "@/hooks/use-auction/transform";
 import { useAuctionSuspense } from "@/hooks/use-auction";
@@ -14,9 +12,7 @@ type PriceCellProps = {
 export function PriceCell({ value, bid }: PriceCellProps) {
   const { data: auction } = useAuctionSuspense();
 
-  const amountOut = parseFloat(bid.settledAmountOut);
-
-  const toggle = useToggle();
+  const amountOut = parseFloat(bid.settledAmountOut ?? "0");
 
   const isUserBid = amountOut && ["live", "concluded"].includes(auction.status);
 
@@ -26,8 +22,7 @@ export function PriceCell({ value, bid }: PriceCellProps) {
 
   let display = value ? (
     <>
-      <ToggledUsdAmount token={auction.quoteToken} amount={value} format />
-      {!toggle.isToggled && " " + auction.quoteToken.symbol}
+      {value}
       <LockOpen1Icon />
     </>
   ) : (

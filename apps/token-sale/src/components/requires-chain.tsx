@@ -9,15 +9,22 @@ const activeChains = chains.activeChains(environment.isTestnet);
 export function RequiresChain({
   chainId,
   children,
+  buttonClass,
   ...props
-}: React.HTMLAttributes<HTMLButtonElement> & { chainId: number }) {
+}: React.HTMLAttributes<HTMLButtonElement> & {
+  chainId: number;
+  buttonClass?: string;
+}) {
   const currentChainId = useChainId();
   const isCorrectChain = currentChainId === chainId;
   const chainName = activeChains.find((c) => c.id === chainId)?.name;
   const { switchChain } = useSwitchChain();
 
   return (
-    <RequiresWalletConnection className={props.className}>
+    <RequiresWalletConnection
+      className={props.className}
+      buttonClass={buttonClass}
+    >
       {isCorrectChain ? (
         <>{children}</>
       ) : (

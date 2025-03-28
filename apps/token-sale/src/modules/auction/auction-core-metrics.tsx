@@ -24,7 +24,7 @@ export function AuctionCoreMetrics({ className }: { className?: string } = {}) {
         </div>
       }
     >
-      <div className="flex flex-col justify-between ">
+      <div className="grid grid-cols-2 gap-5 gap-x-8 md:grid-cols-4 xl:grid-cols-6">
         <AuctionMetric id="targetRaise" />
         <AuctionMetric id="minRaise" />
         <AuctionMetric id="minPrice" />

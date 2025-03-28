@@ -1,8 +1,6 @@
 import React from "react";
 import type { Token } from "@axis-finance/types";
 import { Text, Button, cn, NumberInput, NumberInputProps } from "@bltzr-gg/ui";
-import { UsdAmount } from "modules/auction/usd-amount";
-import { Format } from "./format";
 
 type TokenAmountInputProps = React.HTMLProps<HTMLInputElement> & {
   /** the input's label */
@@ -15,8 +13,6 @@ type TokenAmountInputProps = React.HTMLProps<HTMLInputElement> & {
   showUsdPrice?: boolean;
   /** the user's balance */
   balance?: string | number;
-  /** limit on how much the user can spend */
-  limit?: string;
   /** an optional error message */
   error?: string;
   /** an optional status message */
@@ -43,10 +39,7 @@ export const TokenAmountInput = React.forwardRef<
     {
       label,
       token,
-      showUsdPrice = true,
       tokenLabel = token?.symbol,
-      balance,
-      limit,
       error,
       message,
       value,
@@ -108,22 +101,12 @@ export const TokenAmountInput = React.forwardRef<
           )}
         </div>
         <div className="flex justify-between">
-          {token && showUsdPrice && (
+          {token && (
             <div className="flex items-start">
               <Text size="xs" color="secondary">
                 {!value && "≈ $0"}
                 {value && "≈ "}
-                {value && <UsdAmount token={token} amount={Number(value)} />}
-              </Text>
-            </div>
-          )}
-          {balance && (
-            <div className="gap-x-sm">
-              <Text size="xs" color="secondary" uppercase>
-                {limit ? `Limit: ${limit}` : ""}
-              </Text>
-              <Text size="xs" color="secondary" uppercase>
-                Balance: <Format value={balance} />
+                {value}
               </Text>
             </div>
           )}

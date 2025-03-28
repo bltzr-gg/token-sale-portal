@@ -3,33 +3,19 @@ import {
   type PropsWithAuction,
 } from "@axis-finance/types";
 import { Metric, MetricProps } from "@bltzr-gg/ui";
-import { useToggle } from "./hooks/use-toggle";
-import { trimCurrency } from "utils/currency";
-import { shorten, formatPercentage } from "utils/number";
+import { formatCurrencyUnits } from "utils/currency";
 import { hasDerivative } from "./utils/auction-details";
 import { formatDate, getDaysBetweenDates } from "utils/date";
-import { Format } from "components/format";
-import { UsdAmount } from "./usd-amount";
-import { ToggledUsdAmount } from "./toggled-usd-amount";
 import { DtlProceedsDisplay } from "./dtl-proceeds-display";
 import { Auction, useAuctionSuspense } from "@/hooks/use-auction";
 import { formatDistanceToNow } from "date-fns";
 
-export const getMaxTokensLaunched = (
-  totalBidAmount?: number,
-  targetRaise?: number,
-  price?: number,
-): number | undefined => {
-  if (
-    totalBidAmount === undefined ||
-    price === undefined ||
-    price === 0 ||
-    targetRaise === undefined
-  )
-    return undefined;
-
-  // The total bid amount can exceed the target raise, but the number of tokens launched should be capped at the target raise.
-  const bidAmount = Math.min(totalBidAmount, targetRaise);
+const getMaxTokensLaunched = (
+  totalBidAmount: bigint,
+  targetRaise: bigint,
+  price: bigint,
+) => {
+  const bidAmount = totalBidAmount < targetRaise ? totalBidAmount : targetRaise;
 
   return bidAmount / price;
 };
@@ -56,15 +42,8 @@ const handlers: MetricHandlers = {
   },
   minFill: {
     label: "Min Fill",
-    handler: (auction) => {
-      return `${trimCurrency(auction.minFilled)} ${auction.baseToken.symbol}`;
-    },
-  },
-  protocolFee: {
-    label: "Protocol Fee",
-    handler: (auction) => {
-      return `${+auction.protocolFee}%`;
-    },
+    handler: (auction) =>
+      formatCurrencyUnits(auction.minFilled, auction.baseToken),
   },
   referrerFee: {
     label: "Referrer Fee",
@@ -92,58 +71,24 @@ const handlers: MetricHandlers = {
   },
   totalRaised: {
     label: "Total Raised",
-    handler: (auction) => {
-      return `${auction.purchased} ${auction.quoteToken.symbol}`;
-    },
+    handler: (auction) =>
+      formatCurrencyUnits(auction.purchased, auction.quoteToken),
   },
   targetRaise: {
     label: "Target Raise",
-    handler: (auction) => {
-      // eslint-disable-next-line react-hooks/rules-of-hooks
-      const { isToggled: isUsdToggled } = useToggle();
-
-      if (isUsdToggled) {
-        return (
-          <UsdAmount token={auction.quoteToken} amount={auction.targetRaise} />
-        );
-      }
-      return `${trimCurrency(auction.targetRaise)} ${auction.quoteToken.symbol}`;
-    },
+    handler: (auction) =>
+      formatCurrencyUnits(auction.targetRaise, auction.quoteToken),
   },
   minRaise: {
     label: "Min Raise",
-    handler: (auction) => {
-      // eslint-disable-next-line react-hooks/rules-of-hooks
-      const { isToggled: isUsdToggled } = useToggle();
-
-      if (isUsdToggled) {
-        return (
-          <UsdAmount token={auction.quoteToken} amount={auction.minRaise} />
-        );
-      }
-
-      return `${trimCurrency(auction.minRaise)} ${auction.quoteToken.symbol}`;
-    },
+    handler: (auction) =>
+      formatCurrencyUnits(auction.minRaise, auction.quoteToken),
   },
 
   minPrice: {
     label: "Min Price",
-    handler: (auction) => {
-      // eslint-disable-next-line react-hooks/rules-of-hooks
-      const { isToggled: isUsdToggled } = useToggle();
-
-      if (isUsdToggled) {
-        return (
-          <UsdAmount token={auction.quoteToken} amount={auction.minPrice} />
-        );
-      }
-
-      return (
-        <>
-          <Format value={auction.minPrice} /> {auction.quoteToken.symbol}
-        </>
-      );
-    },
+    handler: (auction) =>
+      formatCurrencyUnits(auction.minPrice, auction.quoteToken),
   },
   totalBids: {
     label: "Total Bids",
@@ -154,76 +99,52 @@ const handlers: MetricHandlers = {
   totalBidAmount: {
     label: "Total Bid Amount",
     handler: (auction) =>
-      `${auction.bidStats.totalAmount} ${auction.quoteToken.symbol}`,
+      formatCurrencyUnits(auction.bidStats.totalAmount, auction.quoteToken),
   },
 
   capacity: {
     label: "Tokens Available",
     handler: (auction) =>
-      `${shorten(auction.capacity)} ${auction.baseToken.symbol}`,
+      formatCurrencyUnits(auction.capacity, auction.baseToken),
   },
 
   totalSupply: {
     label: "Total Supply",
-    handler: (auction) => shorten(Number(auction.baseToken.totalSupply)),
+    handler: (auction) =>
+      formatCurrencyUnits(auction.baseToken.totalSupply, auction.baseToken),
   },
 
   price: {
     label: "Price",
-    handler: (auction) => {
-      // eslint-disable-next-line react-hooks/rules-of-hooks
-      const { isToggled: isUsdToggled } = useToggle();
-
-      if (isUsdToggled) {
-        return (
-          <UsdAmount token={auction.quoteToken} amount={auction.minPrice} />
-        );
-      }
-
-      return (
-        <>
-          <Format value={auction.minPrice ?? 0} /> {auction.quoteToken.symbol}
-        </>
-      );
-    },
+    handler: (auction) =>
+      formatCurrencyUnits(auction.minPrice, auction.quoteToken),
   },
 
   fixedPrice: {
     label: "Price",
-    handler: (auction) => {
-      // eslint-disable-next-line react-hooks/rules-of-hooks
-      const { isToggled: isUsdToggled } = useToggle();
-
-      if (isUsdToggled) {
-        return (
-          <UsdAmount token={auction.quoteToken} amount={auction.minPrice} />
-        );
-      }
-
-      return (
-        <>
-          <Format value={auction.minPrice ?? 0} /> {auction.quoteToken.symbol}
-        </>
-      );
-    },
+    handler: (auction) =>
+      formatCurrencyUnits(auction.minPrice, auction.quoteToken),
   },
 
   sold: {
     label: "Sold",
-    handler: (auction) => `${auction.sold} ${auction.baseToken.symbol}`,
+    handler: (auction) => formatCurrencyUnits(auction.sold, auction.baseToken),
   },
 
   tokensAvailable: {
     label: "Tokens Available",
     handler: (auction) => {
       const supplyPercentage =
-        (Number(auction.capacityInitial) /
-          Number(auction.baseToken.totalSupply)) *
-        100;
+        (auction.initialCapacity * 10000n) / auction.baseToken.totalSupply;
 
-      const availableTokens = shorten(+auction.capacityInitial);
+      const availableTokens = formatCurrencyUnits(
+        auction.initialCapacity,
+        auction.baseToken,
+      );
 
-      return `${availableTokens} (${formatPercentage(supplyPercentage)}%)`;
+      const formatted = (Number(supplyPercentage) / 100).toFixed(2);
+
+      return `${availableTokens} (${formatted}%)`;
     },
   },
   vestingDuration: {
@@ -244,40 +165,18 @@ const handlers: MetricHandlers = {
   minPriceFDV: {
     label: "Min Price FDV",
     handler: (auction) => {
-      const fdv = Number(auction.baseToken.totalSupply) * auction.minPrice;
+      const fdv = auction.baseToken.totalSupply * auction.minPrice;
 
-      return (
-        <ToggledUsdAmount
-          token={auction.quoteToken}
-          amount={fdv}
-          untoggledFormat={(amount) =>
-            `${shorten(amount)} ${auction.quoteToken.symbol}`
-          }
-        />
-      );
-    },
-  },
-  fixedPriceFDV: {
-    label: "Fixed Price FDV",
-    handler: (auction) => {
-      const fdv = Number(auction.baseToken.totalSupply) * auction.minPrice;
-
-      return (
-        <ToggledUsdAmount
-          token={auction.quoteToken}
-          amount={fdv}
-          untoggledFormat={(amount) =>
-            `${shorten(amount)} ${auction.quoteToken.symbol}`
-          }
-        />
-      );
+      return formatCurrencyUnits(fdv, {
+        decimals: auction.quoteToken.decimals + auction.baseToken.decimals,
+        symbol: auction.quoteToken.symbol,
+      });
     },
   },
   rate: {
     label: "Rate",
-    handler: (auction) => {
-      return `${trimCurrency(auction?.marginalPrice)} ${auction.symbol}`;
-    },
+    handler: (auction) =>
+      formatCurrencyUnits(auction?.marginalPrice, auction.quoteToken),
   },
   started: {
     label: "Started",
@@ -314,23 +213,21 @@ const handlers: MetricHandlers = {
         auction.targetRaise,
         auction.minPrice,
       );
-      if (maxTokensLaunched === undefined) return undefined;
 
-      return `${shorten(maxTokensLaunched)} ${auction.baseToken.symbol}`;
+      return formatCurrencyUnits(maxTokensLaunched, auction.baseToken);
     },
   },
   clearingPrice: {
     label: "Clearing Price",
-    handler: (auction) => {
-      return `${trimCurrency(auction.marginalPrice)} ${auction.quoteToken.symbol}`;
-    },
+    handler: (auction) =>
+      formatCurrencyUnits(auction.marginalPrice, auction.quoteToken),
   },
   tokensLaunched: {
     label: "Tokens Launched",
     handler: (auction) => {
       const tokensLaunched = auction.purchased / auction.marginalPrice;
 
-      return `${trimCurrency(tokensLaunched)} ${auction.baseToken.symbol}`;
+      return formatCurrencyUnits(tokensLaunched, auction.baseToken);
     },
   },
   dtlProceeds: {

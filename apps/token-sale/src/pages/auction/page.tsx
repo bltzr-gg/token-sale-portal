@@ -16,6 +16,7 @@ import { Button } from "@bltzr-gg/ui";
 import { ArrowBigDown } from "lucide-react";
 import { AUCTION_CHAIN_ID } from "../../../../../app-config";
 import { useAuction } from "@/hooks/use-auction";
+import { formatUnits } from "viem";
 
 const statuses: Record<AuctionStatus, () => React.ReactNode> = {
   created: AuctionCreated,
@@ -40,7 +41,10 @@ export default function AuctionPage() {
   const { switchChain } = useSwitchChain();
 
   const animatedRaised = useAnimatedNumber(
-    auction?.progress?.currentAmount ?? 0,
+    formatUnits(
+      auction?.bidStats?.totalAmount ?? 0n,
+      auction?.quoteToken.decimals ?? 0,
+    ),
     {
       delay: 1000,
       duration: 3000,
@@ -57,7 +61,9 @@ export default function AuctionPage() {
     }
   }, [connectedChainId, isConnected, switchChain]);
 
-  if (!auction)
+  if (auction === undefined) return null;
+
+  if (auction === null)
     return (
       <div className="absolute inset-0 -top-40 flex h-full flex-col items-center justify-center text-center">
         <h4>
@@ -84,7 +90,7 @@ export default function AuctionPage() {
             Public Token Sale
           </p>
           <div className="mt-16 empty:hidden">
-            {auction.progress.currentAmount > 0 && (
+            {auction.bidStats.totalAmount > 0n && (
               <p className="text-shadow-md motion-preset-blur-up motion-ease-in motion-delay-1000 motion-duration-1500 text-4xl font-bold sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl">
                 {animatedRaised}$ Raised
               </p>

@@ -1,6 +1,6 @@
 // Auction Configuration
 export const AUCTION_CHAIN_ID = 11155111;
-export const AUCTION_LOT_ID = 0;
+export const AUCTION_LOT_ID = 1;
 export const AUCTION_TOKEN_ADDRESS =
   "0xba000002400309efadeee661426f5183338e5382".toLowerCase();
 

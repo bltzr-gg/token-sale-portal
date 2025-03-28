@@ -9,15 +9,16 @@ import {
 
 export default function ConnectButton({
   className,
+  buttonClass,
   size,
 }: {
   className?: string;
+  buttonClass?: string;
   size?: ButtonProps["size"];
 }) {
   return (
     <RKConnectButton.Custom>
       {({ account, chain, openChainModal, openConnectModal, mounted }) => {
-        // Removed authentication stuff https://www.rainbowkit.com/docs/authentication
         const ready = mounted;
         const connected = ready && account && chain;
 
@@ -36,14 +37,22 @@ export default function ConnectButton({
             {(() => {
               if (!connected) {
                 return (
-                  <Button size={size} onClick={openConnectModal}>
+                  <Button
+                    className={buttonClass}
+                    size={size}
+                    onClick={openConnectModal}
+                  >
                     Connect
                   </Button>
                 );
               }
               if (chain.unsupported) {
                 return (
-                  <Button size={size} onClick={openChainModal}>
+                  <Button
+                    className={buttonClass}
+                    size={size}
+                    onClick={openChainModal}
+                  >
                     Wrong network
                   </Button>
                 );

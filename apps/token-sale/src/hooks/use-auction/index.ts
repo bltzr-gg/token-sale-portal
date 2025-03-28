@@ -4,23 +4,21 @@ import { useQuery, useSuspenseQuery } from "@apollo/client";
 import { useMemo } from "react";
 import { transform } from "./transform";
 import { AUCTION_CHAIN_ID, AUCTION_LOT_ID } from "../../../../../app-config";
-import { useTokens } from "../use-tokens";
+import { BatchAuctionLotSchema } from "@/queries/auction/types";
 
 export const useAuction = () => {
-  const tokens = useTokens();
   const query = useQuery(GET_AUCTION_BY_ID_QUERY, {
     variables: {
       id: getAuctionId(AUCTION_CHAIN_ID, AUCTION_LOT_ID),
     },
   });
 
-  const data = useMemo(
-    () =>
-      query.data &&
-      query.data.batchAuctionLot &&
-      transform(query.data.batchAuctionLot, tokens),
-    [query.data, tokens],
-  );
+  const data = useMemo(() => {
+    if (query.data) {
+      const parsed = BatchAuctionLotSchema.parse(query.data.batchAuctionLot);
+      return parsed && transform(parsed);
+    }
+  }, [query.data]);
 
   return {
     ...query,
@@ -29,19 +27,16 @@ export const useAuction = () => {
 };
 
 export const useAuctionSuspense = () => {
-  const tokens = useTokens();
   const query = useSuspenseQuery(GET_AUCTION_BY_ID_QUERY, {
     variables: {
       id: getAuctionId(AUCTION_CHAIN_ID, AUCTION_LOT_ID),
     },
   });
 
-  const data = useMemo(
-    () =>
-      query.data.batchAuctionLot &&
-      transform(query.data.batchAuctionLot, tokens),
-    [query.data, tokens],
-  );
+  const data = useMemo(() => {
+    const parsed = BatchAuctionLotSchema.parse(query.data.batchAuctionLot);
+    return parsed && transform(parsed);
+  }, [query.data]);
 
   if (data === null) {
     throw new Error(
