@@ -9,12 +9,6 @@ export const SUBGRAPH_URL =
 // export const SUBGRAPH_URL =
 //  "https://subgraph.satsuma-prod.com/44c4cc082f74/spaces-team/axis-origin-mainnet/version/v1.0.6/api";
 
-// App Configuration
-export const PRODUCTION_URL = "app.axis.finance";
-export const TESTNET_URL = "testnet.axis.finance";
-
-export const AXIS_DOCS_URL = "https://docs.axis.finance";
-
 // App Metadata
 export const APP_NAME = "$REAL Public Token Sale";
 // Socials

@@ -12,7 +12,7 @@ import {
   frameWallet,
   walletConnectWallet,
 } from "@rainbow-me/rainbowkit/wallets";
-import { APP_NAME, AXIS_DOCS_URL } from "../../../../app-config";
+import { APP_NAME } from "../../../../app-config";
 
 const projectId = import.meta.env.VITE_WALLETCONNECT_PROJECT_ID;
 
@@ -36,7 +36,7 @@ export default function WalletProvider(props: PropsWithChildren) {
     <RainbowKitProvider
       appInfo={{
         appName: APP_NAME,
-        learnMoreUrl: AXIS_DOCS_URL,
+        learnMoreUrl: "https://docs.axis.finance",
       }}
       theme={midnightTheme()}
       modalSize="compact"

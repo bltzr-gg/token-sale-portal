@@ -1,12 +1,12 @@
-# Axis Standalone UI
+# Real Token Public Sale UI
 
-Monorepo for Axis Standalone UI using [turbo](https://turbo.build/repo)
+Monorepo for Real Token Public Sale using [turbo](https://turbo.build/repo), forked from [Axis Standalone UI](https://github.com/Axis-Fi/standalone-ui)
 
 This app is designed for projects looking to host and manage their Token Generation Event (TGE) with minimal configuration. It provides seamless integration of Axis Protocol contracts through ready-to-use hooks and UI components, enabling full ownership and control over the TGE process.
 
 ## App Configuration
 
-- add your Token Address, Chain id and other optional metadata to `./app-config.ts`
+- add your Chain Id, Subgraphurl, Auction lot id and other metadata to `./app-config.ts`
 
 ## Dev Setup
 
