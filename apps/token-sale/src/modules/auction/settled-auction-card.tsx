@@ -43,7 +43,8 @@ const AuctionHeader = () => {
   const { data: auction } = useAuctionSuspense();
 
   const clearingPrice = auction.marginalPrice;
-  const fdv = auction.baseToken.totalSupply ?? 0n * clearingPrice;
+  const modifier = 10n ** BigInt(auction.baseToken.decimals);
+  const fdv = auction.baseToken.totalSupply ?? (0n * clearingPrice) / modifier;
 
   return (
     <div className="flex- flex items-end gap-x-[8px] pb-[16px]">
