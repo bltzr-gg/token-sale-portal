@@ -34,3 +34,12 @@ This Turborepo includes the following packages and applications:
 - `config/tailwind-config`: Shared TailwindCSS configs
 - `config/typescript-config`: Shared `tsconfig.json`s used throughout the Turborepo
 - `config/eslint-config`: ESLint preset
+
+0x454d504100
+0xBE2bC88bac5F1C94360AC4Df95424529511e25E2
+0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238
+0x0 //
+0x000067e8298f
+0x000000000e10
+false
+1000000000000000000000000

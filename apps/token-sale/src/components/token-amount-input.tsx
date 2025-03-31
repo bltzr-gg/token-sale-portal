@@ -1,5 +1,5 @@
 import React from "react";
-import type { Token } from "@axis-finance/types";
+import type { Token } from "@/hooks/use-auction/types";
 import { Text, Button, cn, NumberInput, NumberInputProps } from "@bltzr-gg/ui";
 
 type TokenAmountInputProps = React.HTMLProps<HTMLInputElement> & {

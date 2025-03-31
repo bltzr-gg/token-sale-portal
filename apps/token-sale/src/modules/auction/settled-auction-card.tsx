@@ -7,28 +7,26 @@ import {
   type TextWeight,
 } from "@bltzr-gg/ui";
 import { SettledAuctionChart } from "./settled-auction-chart";
-import { useToggleUsdAmount } from "./hooks/use-toggle-usd-amount";
 import { useAuctionSuspense } from "@/hooks/use-auction";
+import { formatCurrencyUnits } from "@/utils/currency";
 
-type ToggledAmountProps = {
+type FormatUnitProps = {
   label: string;
   token: Token;
-  amount: number;
+  amount: bigint;
   timestamp?: Date;
   weight?: TextWeight;
   className?: string;
 } & Pick<MetricProps, "size">;
 
-const ToggledAmount = ({
+const FormatUnits = ({
   label,
   token,
   amount,
-  timestamp,
   className,
   size,
   weight = "default",
-}: ToggledAmountProps) => {
-  const toggledAmount = useToggleUsdAmount({ token, amount, timestamp });
+}: FormatUnitProps) => {
   return (
     <Metric
       label={label}
@@ -36,7 +34,7 @@ const ToggledAmount = ({
       size={size}
       metricWeight={weight}
     >
-      {toggledAmount}
+      {formatCurrencyUnits(amount, token)}
     </Metric>
   );
 };
@@ -45,27 +43,27 @@ const AuctionHeader = () => {
   const { data: auction } = useAuctionSuspense();
 
   const clearingPrice = auction.marginalPrice;
-  const fdv = Number(auction.baseToken.totalSupply ?? 0) * clearingPrice;
+  const fdv = auction.baseToken.totalSupply ?? 0n * clearingPrice;
 
   return (
     <div className="flex- flex items-end gap-x-[8px] pb-[16px]">
       {auction.settled && (
         <>
-          <ToggledAmount
+          <FormatUnits
             label="Clearing price"
             amount={clearingPrice}
             token={auction.quoteToken}
             timestamp={auction.end}
             className="min-w-[292px]"
           />
-          <ToggledAmount
+          <FormatUnits
             label={` Raised`}
-            amount={Number(auction.purchased) ?? 0}
+            amount={auction.purchased}
             token={auction.quoteToken}
             timestamp={auction.end}
             className="min-w-[188px]"
           />
-          <ToggledAmount
+          <FormatUnits
             label="FDV"
             token={auction.quoteToken}
             amount={fdv ?? 0}

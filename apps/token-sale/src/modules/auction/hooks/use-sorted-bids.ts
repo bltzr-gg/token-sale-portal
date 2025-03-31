@@ -1,6 +1,6 @@
 import { useAuctionSuspense } from "@/hooks/use-auction";
 import { AuctionBid } from "@/hooks/use-auction/transform";
-import type { Token } from "@axis-finance/types";
+import type { Token } from "@/hooks/use-auction/types";
 import { formatUnits } from "viem";
 
 const BID_OUTCOME = {

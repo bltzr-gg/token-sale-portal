@@ -91,8 +91,6 @@ export const transform = (auction: BatchAuctionLot) => {
   const baseModifier = 10n ** BigInt(auction.baseToken.decimals);
   const targetRaise = (initialCapacity * price) / baseModifier;
 
-  console.log(BigInt(auction.baseToken.totalSupply));
-
   return {
     amount: auction.bids.reduce((total, b) => total + Number(b.amountIn), 0),
     baseToken: {

@@ -59,12 +59,6 @@ export function AuctionBidInput({
             {...field}
             disabled={disabled}
             label="Spend Amount"
-            balance={formatUnits(balance, auction.quoteToken.decimals)}
-            limit={
-              limit
-                ? trimCurrency(formatUnits(limit, auction.quoteToken.decimals))
-                : undefined
-            }
             token={auction.quoteToken}
             onChange={(e) => {
               field.onChange(e);

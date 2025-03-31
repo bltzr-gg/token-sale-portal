@@ -1,6 +1,6 @@
 import { encodeAbiParameters, isAddress } from "viem";
 import { useReadContract } from "wagmi";
-import type { Token } from "@axis-finance/types";
+import type { Token } from "@/hooks/use-auction/types";
 import { abis } from "@axis-finance/abis";
 
 export function useVestingTokenId({

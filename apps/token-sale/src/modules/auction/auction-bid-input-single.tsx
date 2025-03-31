@@ -55,14 +55,6 @@ export function AuctionBidInputSingle({
                     ? `You will receive ${trimCurrency(formAmountOut)} ${auction.baseToken.symbol}`
                     : ""
                 }
-                balance={formatUnits(balance, auction.quoteToken.decimals)}
-                limit={
-                  limit
-                    ? trimCurrency(
-                        formatUnits(limit, auction.quoteToken.decimals),
-                      )
-                    : undefined
-                }
                 token={auction.quoteToken}
                 onChange={(e) => {
                   field.onChange(e);
