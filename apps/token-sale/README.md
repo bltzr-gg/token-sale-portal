@@ -1,4 +1,4 @@
-# Axis App
+# Real Token Sale Portal App
 
 React SPA for interacting with the Axis contracts
 
