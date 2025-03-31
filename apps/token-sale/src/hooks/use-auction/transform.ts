@@ -1,6 +1,6 @@
 import { AuctionType, CallbacksType } from "@axis-finance/types";
 import type { BatchAuctionLot } from "../../queries/auction/types";
-import { AUCTION_CHAIN_ID } from "../../../../../app-config";
+import { AUCTION_CHAIN_ID } from "../../app-config";
 import { z } from "zod";
 import { zeroAddress } from "viem";
 import { axisContracts } from "@axis-finance/deployments";

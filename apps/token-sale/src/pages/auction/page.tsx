@@ -14,7 +14,7 @@ import Hero from "components/hero";
 import { useAnimatedNumber } from "@/hooks/use-animated-number";
 import { Button } from "@bltzr-gg/ui";
 import { ArrowBigDown } from "lucide-react";
-import { AUCTION_CHAIN_ID } from "../../../../../app-config";
+import { AUCTION_CHAIN_ID } from "../../app-config";
 import { useAuction } from "@/hooks/use-auction";
 import { formatUnits } from "viem";
 

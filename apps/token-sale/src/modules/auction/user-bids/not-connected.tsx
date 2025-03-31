@@ -1,6 +1,6 @@
 import { Badge, Card, Text } from "@bltzr-gg/ui";
 import { RequiresChain } from "components/requires-chain";
-import { AUCTION_CHAIN_ID } from "../../../../../../app-config";
+import { AUCTION_CHAIN_ID } from "../../../app-config";
 
 export function NotConnectedClaimCard() {
   return (

@@ -1,5 +1,5 @@
 import { axisContracts } from "@axis-finance/deployments";
-import { AUCTION_CHAIN_ID } from "../../../../../app-config";
+import { AUCTION_CHAIN_ID } from "../../app-config";
 
 if (!axisContracts.addresses[AUCTION_CHAIN_ID]) {
   throw new Error(

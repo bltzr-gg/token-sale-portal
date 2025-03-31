@@ -3,7 +3,7 @@ import { GET_AUCTION_BY_ID_QUERY } from "@/queries/auction/getById";
 import { useQuery, useSuspenseQuery } from "@apollo/client";
 import { useMemo } from "react";
 import { transform } from "./transform";
-import { AUCTION_CHAIN_ID, AUCTION_LOT_ID } from "../../../../../app-config";
+import { AUCTION_CHAIN_ID, AUCTION_LOT_ID } from "../../app-config";
 import { BatchAuctionLotSchema } from "@/queries/auction/types";
 
 export const useAuction = () => {

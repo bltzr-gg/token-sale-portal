@@ -13,7 +13,6 @@ import {
   metaMaskWallet,
   phantomWallet,
 } from "@rainbow-me/rainbowkit/wallets";
-import { APP_NAME } from "../../../../app-config";
 
 const projectId = import.meta.env.VITE_WALLETCONNECT_PROJECT_ID;
 const isProduction = import.meta.env.VITE_ENVIRONMENT === "production";
@@ -32,7 +31,7 @@ const connectors = connectorsForWallets(
       ],
     },
   ],
-  { projectId, appName: APP_NAME },
+  { projectId, appName: "$REAL Public Token Sale" },
 );
 
 const queryClient = new QueryClient({

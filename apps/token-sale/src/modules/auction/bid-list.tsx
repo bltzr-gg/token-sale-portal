@@ -20,7 +20,7 @@ import { AmountInCell } from "./cells/AmountInCell";
 import { FilterIcon } from "lucide-react";
 import { auctionHouse } from "@/constants/contracts";
 import { AuctionBid } from "@/hooks/use-auction/types";
-import { AUCTION_CHAIN_ID } from "../../../../../app-config";
+import { AUCTION_CHAIN_ID } from "../../app-config";
 
 export const bidListColumnHelper = createColumnHelper<AuctionBid>();
 

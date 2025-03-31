@@ -1,6 +1,6 @@
 import { TransactionDialog } from "modules/transaction/transaction-dialog";
 import { useClaimReferralRewards } from "./hooks/use-claim-referral-rewards";
-import { AUCTION_CHAIN_ID } from "../../../../../app-config";
+import { AUCTION_CHAIN_ID } from "../../app-config";
 
 type ClaimReferralRewardsTxnProps = {
   onClose: () => void;

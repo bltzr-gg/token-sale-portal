@@ -8,7 +8,7 @@ import { DialogProvider } from "./dialog-provider";
 import { environment } from "utils/environment";
 import ObserverProvider from "./observer";
 import { ApolloClient, InMemoryCache, ApolloProvider } from "@apollo/client";
-import { SUBGRAPH_URL } from "../../../../app-config";
+import { SUBGRAPH_URL } from "../app-config";
 
 const client = new ApolloClient({
   uri: SUBGRAPH_URL,
