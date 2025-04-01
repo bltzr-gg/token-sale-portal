@@ -54,7 +54,7 @@ export const TokenAmountInput = React.forwardRef<
     return (
       <div
         className={cn(
-          "border-light group rounded border-2 px-4 py-2",
+          "border-light group rounded border-2 py-2",
           error && "border-feedback-alert",
           disabled && "opacity-50",
         )}
