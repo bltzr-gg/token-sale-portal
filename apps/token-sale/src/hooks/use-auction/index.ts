@@ -1,15 +1,14 @@
-import { getAuctionId } from "@/modules/auction/utils/get-auction-id";
 import { GET_AUCTION_BY_ID_QUERY } from "@/queries/auction/getById";
 import { useQuery, useSuspenseQuery } from "@apollo/client";
 import { useMemo } from "react";
 import { transform } from "./transform";
-import { AUCTION_CHAIN_ID, AUCTION_LOT_ID } from "../../app-config";
+import { AUCTION_ID } from "../../app-config";
 import { BatchAuctionLotSchema } from "@/queries/auction/types";
 
 export const useAuction = () => {
   const query = useQuery(GET_AUCTION_BY_ID_QUERY, {
     variables: {
-      id: getAuctionId(AUCTION_CHAIN_ID, AUCTION_LOT_ID),
+      id: AUCTION_ID,
     },
   });
 
@@ -29,7 +28,7 @@ export const useAuction = () => {
 export const useAuctionSuspense = () => {
   const query = useSuspenseQuery(GET_AUCTION_BY_ID_QUERY, {
     variables: {
-      id: getAuctionId(AUCTION_CHAIN_ID, AUCTION_LOT_ID),
+      id: AUCTION_ID,
     },
   });
 
