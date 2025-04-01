@@ -40,7 +40,7 @@ function AuctionCardDetails(props: {
       <AuctionMetric id="targetRaise" />
       <AuctionMetric id="minRaise" />
       <AuctionMetric id="minPrice" size="s" />
-      <AuctionMetric id="tokensAvailable" size="s" />
+      {/* <AuctionMetric id="tokensAvailable" size="s" /> */}
 
       <div className={cn("mt-4 flex items-end justify-center")}>
         <Link className={"flex self-end"} to={detailsPageUrl}>

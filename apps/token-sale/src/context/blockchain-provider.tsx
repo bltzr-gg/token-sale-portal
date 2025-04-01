@@ -10,8 +10,6 @@ import {
   rainbowWallet,
   frameWallet,
   walletConnectWallet,
-  metaMaskWallet,
-  phantomWallet,
 } from "@rainbow-me/rainbowkit/wallets";
 
 const projectId = import.meta.env.VITE_WALLETCONNECT_PROJECT_ID;
@@ -22,8 +20,6 @@ const connectors = connectorsForWallets(
     {
       groupName: "Common",
       wallets: [
-        metaMaskWallet,
-        phantomWallet,
         injectedWallet,
         rainbowWallet,
         frameWallet,
@@ -53,7 +49,7 @@ const development = createConfig({
   connectors,
   transports: {
     [sepolia.id]: http(
-      `https://eth-mainnet.g.alchemy.com/v2/${import.meta.env.VITE_ALCHEMY_API_KEY}`,
+      `https://eth-sepolia.g.alchemy.com/v2/${import.meta.env.VITE_ALCHEMY_API_KEY}`,
     ),
   },
 });

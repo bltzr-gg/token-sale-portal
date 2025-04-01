@@ -94,8 +94,9 @@ export const transform = (auction: BatchAuctionLot) => {
   return {
     amount: auction.bids.reduce((total, b) => total + Number(b.amountIn), 0),
     baseToken: {
-      ...auction.baseToken,
-      totalSupply: BigInt(auction.baseToken.totalSupply),
+      name: auction.baseToken.name,
+      decimals: auction.baseToken.decimals,
+      symbol: auction.baseToken.symbol,
       address: auction.baseToken.address as `0x${string}`,
     },
     bidStats: {

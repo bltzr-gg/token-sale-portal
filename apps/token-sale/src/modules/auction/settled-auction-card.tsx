@@ -9,6 +9,8 @@ import {
 import { SettledAuctionChart } from "./settled-auction-chart";
 import { useAuctionSuspense } from "@/hooks/use-auction";
 import { formatCurrencyUnits } from "@/utils/currency";
+import { useReadContract } from "wagmi";
+import { erc20Abi } from "viem";
 
 type FormatUnitProps = {
   label: string;
@@ -41,14 +43,20 @@ const FormatUnits = ({
 
 const AuctionHeader = () => {
   const { data: auction } = useAuctionSuspense();
+  const totalSupply = useReadContract({
+    abi: erc20Abi,
+    address: auction.baseToken.address,
+    functionName: "totalSupply",
+    chainId: auction.chainId,
+  });
 
   const clearingPrice = auction.marginalPrice;
   const modifier = 10n ** BigInt(auction.baseToken.decimals);
-  const fdv = auction.baseToken.totalSupply ?? (0n * clearingPrice) / modifier;
+  const fdv = totalSupply.data && (totalSupply.data * clearingPrice) / modifier;
 
   return (
     <div className="flex- flex items-end gap-x-[8px] pb-[16px]">
-      {auction.settled && (
+      {auction.settled && totalSupply.isSuccess && (
         <>
           <FormatUnits
             label="Clearing price"
@@ -67,7 +75,7 @@ const AuctionHeader = () => {
           <FormatUnits
             label="FDV"
             token={auction.quoteToken}
-            amount={fdv ?? 0}
+            amount={fdv ?? 0n}
             timestamp={auction.end}
             className="min-w-[188px]"
           />

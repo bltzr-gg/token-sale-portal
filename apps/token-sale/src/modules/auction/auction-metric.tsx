@@ -108,12 +108,6 @@ const handlers: MetricHandlers = {
       formatCurrencyUnits(auction.capacity, auction.baseToken),
   },
 
-  totalSupply: {
-    label: "Total Supply",
-    handler: (auction) =>
-      formatCurrencyUnits(auction.baseToken.totalSupply, auction.baseToken),
-  },
-
   price: {
     label: "Price",
     handler: (auction) =>
@@ -130,23 +124,6 @@ const handlers: MetricHandlers = {
     label: "Sold",
     handler: (auction) => formatCurrencyUnits(auction.sold, auction.baseToken),
   },
-
-  tokensAvailable: {
-    label: "Tokens Available",
-    handler: (auction) => {
-      const supplyPercentage =
-        (auction.initialCapacity * 10000n) / auction.baseToken.totalSupply;
-
-      const availableTokens = formatCurrencyUnits(
-        auction.initialCapacity,
-        auction.baseToken,
-      );
-
-      const formatted = (Number(supplyPercentage) / 100).toFixed(2);
-
-      return `${availableTokens} (${formatted}%)`;
-    },
-  },
   vestingDuration: {
     label: "Vesting",
     handler: (auction) => {
@@ -160,17 +137,6 @@ const handlers: MetricHandlers = {
       const duration = getDaysBetweenDates(end, start);
 
       return `${duration} days`;
-    },
-  },
-  minPriceFDV: {
-    label: "Min Price FDV",
-    handler: (auction) => {
-      const fdv = auction.baseToken.totalSupply * auction.minPrice;
-
-      return formatCurrencyUnits(fdv, {
-        decimals: auction.quoteToken.decimals + auction.baseToken.decimals,
-        symbol: auction.quoteToken.symbol,
-      });
     },
   },
   rate: {
