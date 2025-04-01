@@ -14,7 +14,7 @@ import Hero from "components/hero";
 import { useAnimatedNumber } from "@/hooks/use-animated-number";
 import { Button } from "@bltzr-gg/ui";
 import { ArrowBigDown } from "lucide-react";
-import { AUCTION_CHAIN_ID } from "../../app-config";
+import { AUCTION_CHAIN_ID, AUCTION_ID } from "../../app-config";
 import { useAuction } from "@/hooks/use-auction";
 import { formatUnits } from "viem";
 
@@ -67,9 +67,10 @@ export default function AuctionPage() {
     return (
       <div className="absolute inset-0 -top-40 flex h-full flex-col items-center justify-center text-center">
         <h4>
-          This auction doesn&apos;t seem to exist
+          Auction doesn&apos;t seem to exist
           <span className="ml-1 italic">yet</span>
         </h4>
+        <pre className="mt-5">{AUCTION_ID}</pre>
         <p className="text-axis-light-mid mt-10 max-w-sm text-xs">
           If you just created it, try refreshing below to see the subgraph has
           indexed it
