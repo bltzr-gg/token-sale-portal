@@ -124,21 +124,6 @@ const handlers: MetricHandlers = {
     label: "Sold",
     handler: (auction) => formatCurrencyUnits(auction.sold, auction.baseToken),
   },
-  vestingDuration: {
-    label: "Vesting",
-    handler: (auction) => {
-      if (!auction.linearVesting) {
-        return "None";
-      }
-
-      const start = new Date(+auction.linearVesting.startTimestamp * 1000);
-      const end = new Date(+auction.linearVesting.expiryTimestamp * 1000);
-
-      const duration = getDaysBetweenDates(end, start);
-
-      return `${duration} days`;
-    },
-  },
   rate: {
     label: "Rate",
     handler: (auction) =>

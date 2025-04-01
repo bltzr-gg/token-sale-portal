@@ -82,14 +82,41 @@ export const transform = (auction: BatchAuctionLot) => {
   assert(auction.baseToken.address.startsWith("0x"));
 
   const status = getAuctionStatus(auction);
-  const price = BigInt(auction.encryptedMarginalPrice?.minPrice ?? "0");
-  const minFilled = BigInt(auction.encryptedMarginalPrice?.minFilled ?? "0");
+
+  // START: Lot of bullshit here with the team refusing to use bigint strings
+  const price = BigInt(
+    parseFloat(auction.encryptedMarginalPrice?.minPrice ?? "0") *
+      10 ** auction.quoteToken.decimals,
+  );
+  const minFilled = BigInt(
+    parseFloat(auction.encryptedMarginalPrice?.minFilled ?? "0") *
+      10 ** auction.quoteToken.decimals,
+  );
   const callbacks = auction.callbacks as `0x${string}`;
-  // START BULLSHIT: I SHOULDNT HAVE TO DO THIS, IT SHOULD BE IN 18 DECIMAL PLACE ALREADY
-  const initialCapacity = BigInt(auction.capacityInitial) * 10n ** 18n;
-  // END BULLSHIT
-  const baseModifier = 10n ** BigInt(auction.baseToken.decimals);
-  const targetRaise = (initialCapacity * price) / baseModifier;
+  const initialCapacity = BigInt(
+    parseFloat(auction.capacityInitial) * 10 ** 18,
+  );
+  const targetRaise =
+    (initialCapacity * price) / 10n ** BigInt(auction.baseToken.decimals);
+  const totalAmount = auction.bids.reduce(
+    (total, b) => total + BigInt(b.amountIn),
+    0n,
+  );
+  const marginalPrice = BigInt(
+    parseFloat(auction.encryptedMarginalPrice?.marginalPrice ?? "0") *
+      10 ** auction.quoteToken.decimals,
+  );
+  const minBidSize = BigInt(
+    parseFloat(auction.encryptedMarginalPrice?.minBidSize ?? "0") *
+      10 ** auction.quoteToken.decimals,
+  );
+  const purchased = BigInt(
+    parseFloat(auction.purchased ?? "0") * 10 ** auction.quoteToken.decimals,
+  );
+  const capacity = BigInt(
+    parseFloat(auction.capacity ?? "0") * 10 ** auction.baseToken.decimals,
+  );
+  // END bullshit zone
 
   return {
     amount: auction.bids.reduce((total, b) => total + Number(b.amountIn), 0),
@@ -100,10 +127,7 @@ export const transform = (auction: BatchAuctionLot) => {
       address: auction.baseToken.address as `0x${string}`,
     },
     bidStats: {
-      totalAmount: auction.bids.reduce(
-        (total, b) => total + BigInt(b.amountIn),
-        0n,
-      ),
+      totalAmount,
       claimed: auction.bids.filter((b) => b.status === "claimed").length,
       decrypted: auction.bids.filter((b) => b.status === "decrypted").length,
       refunded: auction.bidsRefunded.length,
@@ -115,21 +139,24 @@ export const transform = (auction: BatchAuctionLot) => {
     bids: auction.bids,
     callbacks,
     callbacksType: getCallbacksType(callbacks),
-    capacity: BigInt(auction.capacity ?? "0"),
+    capacity,
     initialCapacity,
     chainId: AUCTION_CHAIN_ID,
     end: new Date(Number(auction.conclusion) * 1000),
     derivativeType: auction.derivativeType,
     id: auction.id,
-    linearVesting: auction.linearVesting,
+    vesting: auction.linearVesting && {
+      ...auction.linearVesting,
+      start: new Date(Number(auction.linearVesting.startTimestamp) * 1000),
+      end: new Date(Number(auction.linearVesting.expiryTimestamp) * 1000),
+    },
     lotId: Number(auction.lotId),
-    marginalPrice: BigInt(auction.encryptedMarginalPrice?.marginalPrice ?? "0"),
-    minBidSize: BigInt(auction.encryptedMarginalPrice?.minBidSize ?? "0"),
+    marginalPrice,
+    minBidSize,
     minFilled,
     minPrice: price,
     minRaise: minFilled * price,
-
-    purchased: BigInt(auction.purchased ?? "0"),
+    purchased,
     quoteToken: {
       ...auction.quoteToken,
       address: auction.quoteToken.address as `0x${string}`,

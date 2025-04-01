@@ -3,7 +3,7 @@ import { WagmiProvider, createConfig, http } from "wagmi";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import WalletProvider from "./wallet-provider";
-import { sepolia, mainnet } from "viem/chains";
+import * as chains from "viem/chains";
 import { connectorsForWallets } from "@rainbow-me/rainbowkit";
 import {
   injectedWallet,
@@ -13,7 +13,6 @@ import {
 } from "@rainbow-me/rainbowkit/wallets";
 
 const projectId = import.meta.env.VITE_WALLETCONNECT_PROJECT_ID;
-const isProduction = import.meta.env.VITE_ENVIRONMENT === "production";
 
 const connectors = connectorsForWallets(
   [
@@ -43,23 +42,12 @@ const queryClient = new QueryClient({
   },
 });
 
-const development = createConfig({
-  chains: [sepolia],
+const config = createConfig({
+  chains: [chains.mainnet],
   multiInjectedProviderDiscovery: false,
   connectors,
   transports: {
-    [sepolia.id]: http(
-      `https://eth-sepolia.g.alchemy.com/v2/${import.meta.env.VITE_ALCHEMY_API_KEY}`,
-    ),
-  },
-});
-
-const production = createConfig({
-  chains: [mainnet],
-  multiInjectedProviderDiscovery: false,
-  connectors,
-  transports: {
-    [mainnet.id]: http(
+    [chains.mainnet.id]: http(
       `https://eth-mainnet.g.alchemy.com/v2/${import.meta.env.VITE_ALCHEMY_API_KEY}`,
     ),
   },
@@ -73,7 +61,7 @@ export function BlockchainProvider({
   disableDevTools?: boolean;
 }) {
   return (
-    <WagmiProvider config={isProduction ? production : development}>
+    <WagmiProvider config={config}>
       <QueryClientProvider client={queryClient}>
         <WalletProvider>{children}</WalletProvider>
         {!disableDevTools && <ReactQueryDevtools />}

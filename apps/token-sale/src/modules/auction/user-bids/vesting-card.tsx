@@ -51,10 +51,8 @@ export function VestingCard() {
   });
 
   const { data: vestingTokenId } = useVestingTokenId({
-    linearVestingStartTimestamp: Number(auction?.linearVesting?.startTimestamp),
-    linearVestingExpiryTimestamp: Number(
-      auction?.linearVesting?.expiryTimestamp,
-    ),
+    linearVestingStartTimestamp: Number(auction?.vesting?.startTimestamp),
+    linearVestingExpiryTimestamp: Number(auction?.vesting?.expiryTimestamp),
     baseToken: auction.baseToken,
     derivativeModuleAddress: vestingModuleAddress,
   });
@@ -72,7 +70,7 @@ export function VestingCard() {
     });
 
   const redeemedAmount =
-    auction.linearVesting?.redemptions
+    auction.vesting?.redemptions
       .filter(
         (redemption) =>
           redemption.bidder.toLowerCase() === address?.toLowerCase(),
@@ -93,18 +91,18 @@ export function VestingCard() {
   );
 
   const hasVestingPeriodStarted =
-    Date.now() / 1000 > Number(auction?.linearVesting?.startTimestamp);
+    Date.now() / 1000 > Number(auction?.vesting?.startTimestamp);
 
   const userHasUnvestedTokens = redeemedAmount < userTotalSuccessfulOutAmount;
 
   const vestingProgress = calculateVestingProgress(
-    Number(auction?.linearVesting?.startTimestamp),
-    Number(auction?.linearVesting?.expiryTimestamp),
+    Number(auction?.vesting?.startTimestamp),
+    Number(auction?.vesting?.expiryTimestamp),
   );
 
   const vestingTerm = calculateVestingTerm(
-    Number(auction?.linearVesting?.startTimestamp),
-    Number(auction?.linearVesting?.expiryTimestamp),
+    Number(auction?.vesting?.startTimestamp),
+    Number(auction?.vesting?.expiryTimestamp),
   );
 
   const redeemableAmountDecimal = Number(
@@ -173,12 +171,12 @@ export function VestingCard() {
             {vestingTerm}
           </Metric>
           <Metric size="s" label="Vesting Begins" childrenClassName="text-sm">
-            {auction.linearVesting?.startDate != null &&
-              formatDate.fullLocal(new Date(auction.linearVesting.startDate))}
+            {auction.vesting?.startDate != null &&
+              formatDate.fullLocal(new Date(auction.vesting.startDate))}
           </Metric>
           <Metric size="s" label="Vesting Ends" childrenClassName="text-sm">
-            {auction.linearVesting?.startDate != null &&
-              formatDate.fullLocal(new Date(auction.linearVesting.expiryDate))}
+            {auction.vesting?.startDate != null &&
+              formatDate.fullLocal(new Date(auction.vesting.expiryDate))}
           </Metric>
         </div>
 

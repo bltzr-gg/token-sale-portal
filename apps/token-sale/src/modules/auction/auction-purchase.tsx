@@ -190,27 +190,13 @@ export function AuctionPurchase() {
   const isWaiting = bid.isWaiting;
   const actionKeyword = "Bid";
 
-  const amountInInvalid =
-    parsedAmountIn > (quoteTokenBalance ?? BigInt(0)) || // greater than balance
-    parsedAmountIn === undefined ||
-    parsedAmountIn === BigInt(0); // zero or empty
-
-  const amountOutInvalid =
-    minAmountOut === undefined ||
-    parsedMinAmountOut === BigInt(0) || // zero or empty
-    parsedMinAmountOut >
-      parseUnits(auction.capacity.toString(), auction.baseToken.decimals) || // exceeds capacity
-    (parsedAmountIn * parseUnits("1", auction.baseToken.decimals)) /
-      parsedMinAmountOut <
-      parseUnits(auction.minPrice.toString(), auction.quoteToken.decimals); // less than min price
-
   const isWalletChainIncorrect =
     auction.chainId !== currentChainId || !walletAccount.isConnected;
 
   return (
     <div id="auction-bids" className="mx-auto lg:min-w-[477px]">
       <FormProvider {...form}>
-        <form onSubmit={(e) => e.preventDefault()}>
+        <form onSubmit={form.handleSubmit(handleSubmit)}>
           <Card
             title={
               <>
@@ -262,10 +248,7 @@ export function AuctionPurchase() {
               className="mt-4 "
             >
               <div className="mt-4 w-full">
-                <Button
-                  className="w-full"
-                  disabled={isWaiting || amountInInvalid || amountOutInvalid}
-                >
+                <Button type="submit" className="w-full" disabled={isWaiting}>
                   {!isWaiting && actionKeyword.toUpperCase()}
                   {isWaiting && (
                     <div className="flex">

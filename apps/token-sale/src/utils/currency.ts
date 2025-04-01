@@ -45,6 +45,7 @@ export const formatCurrencyUnits = (
     precision?: number;
     locale?: string;
     symbol?: string;
+    compact?: boolean; // Add this line for compact display option
   },
 ): string => {
   const optionsWithDefaults = Object.assign(
@@ -52,9 +53,11 @@ export const formatCurrencyUnits = (
       decimals: 18,
       precision: 6,
       locale: "en-US",
+      compact: false, // Default to false
     },
     options,
   );
+
   const formatted = formatUnits(balance, optionsWithDefaults.decimals);
   const dotIndex = formatted.indexOf(".");
 
@@ -74,6 +77,7 @@ export const formatCurrencyUnits = (
   return `${new Intl.NumberFormat(optionsWithDefaults.locale, {
     minimumFractionDigits: 2,
     maximumFractionDigits: optionsWithDefaults.precision,
+    notation: optionsWithDefaults.compact ? "compact" : "standard", // Add this line to toggle notation
   }).format(
     number,
   )}${optionsWithDefaults.symbol ? ` ${optionsWithDefaults.symbol}` : ""}`;

@@ -21,10 +21,8 @@ export function RedeemVestedTokensTxn({
   });
 
   const { data: vestingTokenId } = useVestingTokenId({
-    linearVestingStartTimestamp: Number(auction?.linearVesting?.startTimestamp),
-    linearVestingExpiryTimestamp: Number(
-      auction?.linearVesting?.expiryTimestamp,
-    ),
+    linearVestingStartTimestamp: Number(auction?.vesting?.startTimestamp),
+    linearVestingExpiryTimestamp: Number(auction?.vesting?.expiryTimestamp),
     baseToken: auction.baseToken,
     derivativeModuleAddress: vestingModuleAddress,
   });
