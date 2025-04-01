@@ -1,8 +1,8 @@
-import type { Chain, PropsWithAuction } from "@axis-finance/types";
+import type { Chain } from "@axis-finance/types";
 import { Badge, cn } from "@bltzr-gg/ui";
 import { CountdownChip } from "./countdown-chip";
 
-type AuctionCardBannerProps = PropsWithAuction & {
+type AuctionCardBannerProps = {
   chain: Chain;
   image?: string;
   curator?: {
