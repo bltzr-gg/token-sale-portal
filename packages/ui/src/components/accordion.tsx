@@ -21,7 +21,7 @@ const AccordionTrigger = React.forwardRef<
 >(({ className, children, ...props }, ref) => (
   <AccordionPrimitive.Header className="flex">
     <AccordionPrimitive.Trigger ref={ref} {...props} asChild>
-      <Button className={cn('my-8', className)}>
+      <Button className={cn('my-3', className)}>
         {children}
         <ChevronDownIcon className="h-4 w-4 shrink-0 transition-transform duration-200" />
       </Button>
