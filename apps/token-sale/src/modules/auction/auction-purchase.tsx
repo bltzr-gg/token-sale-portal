@@ -159,7 +159,6 @@ export function AuctionPurchase() {
   }, [form, quoteTokens]);
 
   const bid = useBidAuction(
-    auction.chainId,
     auction.lotId,
     parsedAmountIn,
     parsedMinAmountOut,
@@ -170,9 +169,12 @@ export function AuctionPurchase() {
   const isWalletChainIncorrect =
     auction.chainId !== currentChainId || !walletAccount.isConnected;
 
-  const handleSubmission = useCallback(() => {
+  const handleSubmission = useCallback(async () => {
+    if (!bid.allowance.isSufficientAllowance) {
+      await bid.allowance.execute();
+    }
     setOpen(true);
-  }, []);
+  }, [bid.allowance]);
 
   const isValidInput = form.formState.isValid;
 
@@ -237,15 +239,14 @@ export function AuctionPurchase() {
               </>
             }
           >
-            {quoteTokens.isSuccess && quoteTokens.data > 0n && (
-              <div className="flex gap-x-2">
-                Balance:{" "}
-                {formatCurrencyUnits(quoteTokens.data, auction.quoteToken)}
-              </div>
-            )}
-            <p className="text-destructive empty:hidden">
-              {bid.error?.message}
-            </p>
+            <div>
+              {quoteTokens.isSuccess && quoteTokens.data > 0n && (
+                <span>
+                  Balance:{" "}
+                  {formatCurrencyUnits(quoteTokens.data, auction.quoteToken)}
+                </span>
+              )}
+            </div>
 
             {quoteTokens.isSuccess && quoteTokens.data === 0n && (
               <p>
@@ -281,7 +282,8 @@ export function AuctionPurchase() {
                   loading={
                     bid.isWaiting ||
                     bid.allowance.isLoading ||
-                    bid.bidTx.isPending
+                    bid.bidTx.isPending ||
+                    bid.allowance.approveTx.isPending
                   }
                   className="w-full"
                 >

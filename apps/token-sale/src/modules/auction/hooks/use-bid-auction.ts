@@ -3,13 +3,11 @@ import { toHex, zeroAddress } from "viem";
 import { useAccount } from "wagmi";
 import { useBid } from "@axis-finance/sdk/react";
 import { useReferrer } from "state/referral";
-import { getAuctionId } from "../utils/get-auction-id";
 import { useAuctionSuspense } from "@/hooks/use-auction";
 import { useAllowance } from "@/loaders/use-allowance";
 import { auctionHouse } from "@/constants/contracts";
 
 export const useBidAuction = (
-  chainId: string | number,
   lotId: string | number,
   amountIn: bigint,
   amountOut: bigint,
@@ -18,9 +16,6 @@ export const useBidAuction = (
 ) => {
   const { data: auction } = useAuctionSuspense();
 
-  const id = getAuctionId(chainId, lotId);
-
-  if (!auction) throw new Error(`Unable to find auction ${id}`);
   const { address: bidderAddress } = useAccount();
   const referrer = useReferrer();
 
@@ -45,10 +40,6 @@ export const useBidAuction = (
     callbackData,
   });
 
-  const bidTx = bid.transaction;
-
-  const bidReceipt = bid.receipt;
-
   const handleBid = useCallback(async () => {
     if (bidderAddress === undefined) {
       throw new Error("Not connected. Try connecting your wallet.");
@@ -62,19 +53,19 @@ export const useBidAuction = (
   }, [allowance, bid, bidderAddress]);
 
   React.useEffect(() => {
-    if (bidReceipt == null || !bidReceipt.isSuccess) return;
+    if (bid.receipt == null || !bid.receipt.isSuccess) return;
 
     // Consumer can pass optional callback to be executed after the bid is successful
     onSuccess?.();
-  }, [bidReceipt, onSuccess]);
+  }, [bid.receipt, onSuccess]);
 
   return {
     handleBid,
-    bidReceipt,
-    bidTx,
+    bidReceipt: bid.receipt,
+    bidTx: bid.transaction,
     isWaiting: bid.isWaiting,
     simulation: bid.simulation,
-    receipt: bidReceipt,
+    receipt: bid.receipt,
     error: bid.error as Error | undefined,
     allowance,
   };

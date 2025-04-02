@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { Address, erc20Abi, formatUnits } from "viem";
+import { Address, erc20Abi } from "viem";
 import {
   useReadContract,
   useWriteContract,
@@ -13,13 +13,15 @@ export type UseAllowanceProps = {
   decimals?: number;
   ownerAddress?: Address;
   spenderAddress?: Address;
-  amount?: bigint;
+  amount: bigint;
 };
 
 /** Used to manage an address' allowance for a given token */
 export const useAllowance = (args: UseAllowanceProps) => {
-  const approveTx = useWriteContract();
-  const approveReceipt = useWaitForTransactionReceipt({ hash: approveTx.data });
+  const writeContract = useWriteContract();
+  const approveReceipt = useWaitForTransactionReceipt({
+    hash: writeContract.data,
+  });
 
   const allowance = useReadContract({
     abi: erc20Abi,
@@ -36,7 +38,7 @@ export const useAllowance = (args: UseAllowanceProps) => {
     },
   });
 
-  const amountToApprove = args.amount ?? 0n;
+  const amountToApprove = args.amount;
 
   const { data: approveCall } = useSimulateContract({
     abi: erc20Abi,
@@ -45,7 +47,7 @@ export const useAllowance = (args: UseAllowanceProps) => {
     args: [args.spenderAddress!, amountToApprove],
   });
 
-  const execute = () => approveTx.writeContractAsync(approveCall!.request);
+  const execute = () => writeContract.writeContractAsync(approveCall!.request);
 
   useEffect(() => {
     if (approveReceipt.isSuccess) {
@@ -53,16 +55,15 @@ export const useAllowance = (args: UseAllowanceProps) => {
     }
   }, [allowance, approveReceipt.isSuccess]);
 
-  const currentAllowance = allowance.data ?? 0n;
-
   return {
-    approveTx,
+    data: allowance.data,
+    approveTx: writeContract,
     approveReceipt,
     allowance,
     execute,
-    currentAllowance,
-    isSufficientAllowance: currentAllowance >= amountToApprove,
-    formattedAllowance: formatUnits(currentAllowance, args.decimals ?? 18),
+    isSufficientAllowance:
+      allowance.isSuccess && allowance.data >= amountToApprove,
     isLoading: allowance.isLoading,
+    isSuccess: allowance.isSuccess,
   };
 };
