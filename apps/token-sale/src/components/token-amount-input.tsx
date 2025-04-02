@@ -100,17 +100,6 @@ export const TokenAmountInput = React.forwardRef<
             </Button>
           )}
         </div>
-        <div className="flex justify-between">
-          {token && (
-            <div className="flex items-start">
-              <Text size="xs" color="secondary">
-                {!value && "≈ $0"}
-                {value && "≈ "}
-                {value}
-              </Text>
-            </div>
-          )}
-        </div>
         {error && (
           <div className="bg-feedback-alert mt-1.5 rounded p-2">
             <Text color="tertiary">{error}</Text>

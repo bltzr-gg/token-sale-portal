@@ -1,10 +1,12 @@
-import React from "react";
+import React, { useCallback } from "react";
 import { toHex, zeroAddress } from "viem";
 import { useAccount } from "wagmi";
 import { useBid } from "@axis-finance/sdk/react";
 import { useReferrer } from "state/referral";
 import { getAuctionId } from "../utils/get-auction-id";
 import { useAuctionSuspense } from "@/hooks/use-auction";
+import { useAllowance } from "@/loaders/use-allowance";
+import { auctionHouse } from "@/constants/contracts";
 
 export const useBidAuction = (
   chainId: string | number,
@@ -22,6 +24,15 @@ export const useBidAuction = (
   const { address: bidderAddress } = useAccount();
   const referrer = useReferrer();
 
+  const allowance = useAllowance({
+    ownerAddress: bidderAddress,
+    spenderAddress: auctionHouse.address,
+    tokenAddress: auction.quoteToken.address,
+    decimals: Number(auction.quoteToken.decimals),
+    chainId: auction.chainId,
+    amount: amountIn,
+  });
+
   const bid = useBid({
     lotId: Number(lotId),
     amountIn,
@@ -38,13 +49,17 @@ export const useBidAuction = (
 
   const bidReceipt = bid.receipt;
 
-  const handleBid = async () => {
+  const handleBid = useCallback(async () => {
     if (bidderAddress === undefined) {
       throw new Error("Not connected. Try connecting your wallet.");
     }
 
+    if (!allowance.isSufficientAllowance) {
+      await allowance.execute();
+    }
+
     bid.submit?.();
-  };
+  }, [allowance, bid, bidderAddress]);
 
   React.useEffect(() => {
     if (bid.simulation.isError) {
@@ -67,5 +82,6 @@ export const useBidAuction = (
     isSimulationSuccess: bid.simulation.isSuccess,
     receipt: bidReceipt,
     error: bid.error as Error | undefined,
+    allowance,
   };
 };

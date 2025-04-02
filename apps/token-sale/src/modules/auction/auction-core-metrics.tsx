@@ -38,8 +38,6 @@ const Value = ({
 const getDurationBetweenDates = (start: Date, end: Date) => {
   const duration = intervalToDuration({ end, start });
 
-  console.log(duration);
-
   const parts = [];
   if (duration.years && duration.years > 0)
     parts.push(`${duration.years} years`);

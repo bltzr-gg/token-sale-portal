@@ -10,15 +10,14 @@ import {
 import { formatUnits, parseUnits } from "viem";
 import { AuctionBidInput } from "./auction-bid-input";
 import { TransactionDialog } from "modules/transaction/transaction-dialog";
-import { LoadingIndicator } from "modules/app/loading-indicator";
 import { LockIcon } from "lucide-react";
-import { trimCurrency } from "utils";
+import { formatCurrencyUnits, trimCurrency } from "utils";
 import { useBidAuction } from "./hooks/use-bid-auction";
 import { useForm, FormProvider } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { RequiresChain } from "components/requires-chain";
-import React, { useMemo } from "react";
+import React, { useCallback, useMemo } from "react";
 import { UseWriteContractReturnType, useAccount, useChainId } from "wagmi";
 import useERC20Balance from "loaders/use-erc20-balance";
 import { QuestionMarkCircledIcon } from "@radix-ui/react-icons";
@@ -38,29 +37,35 @@ export function AuctionPurchase() {
   const currentChainId = useChainId();
   const walletAccount = useAccount();
 
-  const maxBidAmount = useMemo(() => {
-    const remaining = auction.initialCapacity - auction.bidStats.totalAmount;
-    return (
-      +formatUnits(remaining, auction.baseToken.decimals) *
-      +formatUnits(auction.minPrice, auction.quoteToken.decimals)
-    );
-  }, [auction]);
+  const maxBidAmount = useMemo(
+    () => auction.initialCapacity - auction.bidStats.totalAmount,
+    [auction],
+  );
 
-  const totalUserBidAmount =
-    auction?.bids
-      .filter(
-        (b) => b.bidder.toLowerCase() === walletAccount.address?.toLowerCase(),
-      )
-      .reduce((total, b) => {
-        total += BigInt(b.rawAmountIn);
-        return total;
-      }, 0n) ?? 0n;
+  const totalUserBidAmount = useMemo(
+    () =>
+      auction?.bids
+        .filter(
+          (b) =>
+            b.bidder.toLowerCase() === walletAccount.address?.toLowerCase(),
+        )
+        .reduce((total, b) => {
+          total += BigInt(b.rawAmountIn);
+          return total;
+        }, 0n) ?? 0n,
+    [auction?.bids, walletAccount.address],
+  );
 
   const formattedUserBidAmount = useMemo(
     () =>
       auction && formatUnits(totalUserBidAmount, auction.quoteToken.decimals),
     [auction, totalUserBidAmount],
   );
+
+  const quoteTokens = useERC20Balance({
+    tokenAddress: auction.quoteToken.address,
+    balanceAddress: walletAccount.address,
+  });
 
   const form = useForm<BidForm>({
     mode: "onChange",
@@ -88,10 +93,8 @@ export function AuctionPurchase() {
         .refine(
           (data) =>
             parseUnits(data.quoteTokenAmount, auction.quoteToken.decimals) >=
-            parseUnits(
-              auction.minBidSize.toString(),
-              auction.quoteToken.decimals,
-            ),
+            auction.minBidSize,
+
           {
             message: `Minimum bid is ${auction.minBidSize}`,
             path: ["quoteTokenAmount"],
@@ -100,10 +103,7 @@ export function AuctionPurchase() {
         .refine(
           (data) =>
             parseUnits(data.bidPrice ?? "0", auction.quoteToken.decimals) >=
-            parseUnits(
-              auction.minPrice.toString(),
-              auction.quoteToken.decimals,
-            ),
+            auction.minPrice,
           {
             message: `Min rate is ${auction.minPrice} ${auction.quoteToken.symbol}/${auction.baseToken.symbol}`,
             path: ["bidPrice"],
@@ -112,7 +112,7 @@ export function AuctionPurchase() {
         .refine(
           (data) =>
             parseUnits(data.quoteTokenAmount, auction.quoteToken.decimals) <=
-            (quoteTokenBalance ?? BigInt(0)),
+            (quoteTokens.data ?? BigInt(0)),
           {
             message: `Insufficient balance`,
             path: ["quoteTokenAmount"],
@@ -121,7 +121,7 @@ export function AuctionPurchase() {
         .refine(
           (data) =>
             parseUnits(data.baseTokenAmount, auction.baseToken.decimals) <=
-            parseUnits(auction.capacity.toString(), auction.baseToken.decimals),
+            auction.capacity,
           {
             message: "Amount out exceeds capacity",
             path: ["baseTokenAmount"],
@@ -145,25 +145,24 @@ export function AuctionPurchase() {
     "baseTokenAmount",
   ]);
 
-  const parsedAmountIn = amountIn
-    ? parseUnits(amountIn, auction.quoteToken.decimals)
-    : BigInt(0);
+  const parsedAmountIn = useMemo(
+    () =>
+      amountIn ? parseUnits(amountIn, auction.quoteToken.decimals) : BigInt(0),
+    [amountIn, auction.quoteToken.decimals],
+  );
 
-  const parsedMinAmountOut = minAmountOut
-    ? parseUnits(minAmountOut, auction.baseToken.decimals)
-    : BigInt(0);
+  const parsedMinAmountOut = useMemo(
+    () =>
+      minAmountOut
+        ? parseUnits(minAmountOut, auction.baseToken.decimals)
+        : BigInt(0),
+    [minAmountOut, auction.baseToken.decimals],
+  );
 
-  const { balance: quoteTokenBalance, refetch: refetchQuoteTokenBalance } =
-    useERC20Balance({
-      chainId: auction.chainId,
-      tokenAddress: auction.quoteToken.address,
-      balanceAddress: walletAccount.address,
-    });
-
-  const handleSuccessfulBid = () => {
+  const handleSuccessfulBid = useCallback(() => {
     form.reset();
-    refetchQuoteTokenBalance();
-  };
+    quoteTokens.refetch();
+  }, [form, quoteTokens]);
 
   const bid = useBidAuction(
     auction.chainId,
@@ -174,11 +173,6 @@ export function AuctionPurchase() {
     handleSuccessfulBid,
   );
 
-  // TODO Permit2 signature
-  const handleSubmit = () => {
-    bid.handleBid();
-  };
-
   const isValidInput = form.formState.isValid;
 
   const shouldDisable =
@@ -187,7 +181,6 @@ export function AuctionPurchase() {
     bid?.bidTx?.isPending ||
     !bid.isSimulationSuccess;
 
-  const isWaiting = bid.isWaiting;
   const actionKeyword = "Bid";
 
   const isWalletChainIncorrect =
@@ -196,8 +189,22 @@ export function AuctionPurchase() {
   return (
     <div id="auction-bids" className="mx-auto lg:min-w-[477px]">
       <FormProvider {...form}>
-        <form onSubmit={form.handleSubmit(handleSubmit)}>
+        <form onSubmit={form.handleSubmit(bid.handleBid)}>
           <Card
+            headerRightElement={
+              <div className="flex gap-x-2">
+                Balance{" "}
+                {quoteTokens.isSuccess && (
+                  <>
+                    {quoteTokens.data === 0n && (
+                      <span className="text-destructive"> is insufficent</span>
+                    )}
+                    {quoteTokens.data > 0n &&
+                      formatCurrencyUnits(quoteTokens.data, auction.quoteToken)}
+                  </>
+                )}
+              </div>
+            }
             title={
               <>
                 Place your bid{" "}
@@ -230,10 +237,21 @@ export function AuctionPurchase() {
               </>
             }
           >
+            <p className="text-destructive empty:hidden">
+              {bid.error?.message}
+            </p>
+
             <AuctionBidInput
-              balance={quoteTokenBalance}
+              balance={quoteTokens.data}
               disabled={isWalletChainIncorrect}
             />
+            {parseFloat(minAmountOut) > 0 && (
+              <p className="">
+                You will receive at least{" "}
+                {parseFloat(minAmountOut).toLocaleString()}{" "}
+                {auction.quoteToken.symbol}.
+              </p>
+            )}
             <div className="gap-x-xl mx-auto mt-4 flex w-full empty:hidden">
               {totalUserBidAmount > 0n && (
                 <Metric childrenClassName={"text-tertiary-300"} label="You bid">
@@ -248,15 +266,16 @@ export function AuctionPurchase() {
               className="mt-4 "
             >
               <div className="mt-4 w-full">
-                <Button type="submit" className="w-full" disabled={isWaiting}>
-                  {!isWaiting && actionKeyword.toUpperCase()}
-                  {isWaiting && (
-                    <div className="flex">
-                      Waiting for confirmation...
-                      <div className="w-1/2"></div>
-                      <LoadingIndicator />
-                    </div>
-                  )}
+                <Button
+                  loading={bid.isWaiting || bid.allowance.isLoading}
+                  type="submit"
+                  className="w-full"
+                >
+                  {bid.allowance.isLoading
+                    ? "Approving..."
+                    : bid.isWaiting
+                      ? "Waiting for confirmation..."
+                      : actionKeyword.toUpperCase()}
                 </Button>
               </div>
             </RequiresChain>
@@ -266,7 +285,7 @@ export function AuctionPurchase() {
             open={open}
             signatureMutation={bid.bidTx as UseWriteContractReturnType}
             error={bid.error}
-            onConfirm={handleSubmit}
+            onConfirm={bid.handleBid}
             mutation={bid.bidReceipt}
             chainId={auction.chainId}
             onOpenChange={(open) => {
@@ -276,7 +295,7 @@ export function AuctionPurchase() {
               setOpen(open);
             }}
             hash={bid.bidTx.data}
-            disabled={shouldDisable || isWaiting}
+            disabled={shouldDisable || bid.isWaiting}
             screens={{
               idle: {
                 Component: () => (
