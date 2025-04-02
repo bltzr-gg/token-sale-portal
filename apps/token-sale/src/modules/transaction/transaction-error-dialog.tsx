@@ -23,13 +23,11 @@ export function TransactionErrorDialog(props: { error: Error }) {
       <AccordionRoot collapsible type="single">
         <AccordionItem
           value={"item-0"}
-          className="flex flex-col justify-center"
+          className="flex flex-col items-center justify-center"
         >
-          <AccordionTrigger className="justify-center gap-x-1">
-            Show error details
-          </AccordionTrigger>
-          <AccordionContent className="space-y-3">
-            <p className="max-w-md">{error.message}</p>
+          <AccordionTrigger>Show error details</AccordionTrigger>
+          <AccordionContent>
+            <p>{error.message}</p>
 
             <Button onClick={() => handleCopy()} className="mt-4 uppercase">
               Copy Error Details

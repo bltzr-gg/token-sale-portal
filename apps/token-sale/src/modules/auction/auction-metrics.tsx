@@ -163,18 +163,15 @@ export function AuctionMetrics({ className }: { className?: string } = {}) {
         <h3 className="my-5 text-2xl font-light">
           The Notorious $REAL Token: Where Champions Play 👑🥊
         </h3>
-        <p className="text-lg text-white/90">
+        <p className="mb-2 text-lg text-white/90">
           <strong>$REAL</strong> is not just a token, it&apos;s Conor
           McGregor&apos;s unstoppable spirit, delivering a knockout punch in the
-          fight for real change.
+          fight for real change. By channeling the fearless energy of the
+          Notorious, <strong>$REAL</strong> is bringing citizens together to
+          champion bold new ways of funding and shaping leadership, putting
+          power back in the hands of the people.
         </p>
-        <p className="text-lg text-white/90">
-          By channeling the fearless energy of the Notorious,{" "}
-          <strong>$REAL</strong> is bringing citizens together to champion bold
-          new ways of funding and shaping leadership, putting power back in the
-          hands of the people.
-        </p>
-        <p className="text-lg text-white/90">
+        <p className="mb-2 text-lg text-white/90">
           This one-of-a-kind coin merges high-stakes spectacle with high-impact
           ideals, forging a movement that hits harder, goes further, and demands
           a new level of accountability - both in the ring and in the halls of
@@ -188,14 +185,21 @@ export function AuctionMetrics({ className }: { className?: string } = {}) {
             <AccordionTrigger className="gap-x-1">
               Why a Token Auction?
             </AccordionTrigger>
-            <AccordionContent>
+            <AccordionContent className="space-y-3">
               <p className="text-lg text-white/90">
-                We&apos;re using a sealed-bid auction to give the{" "}
-                <strong>$REAL</strong> community a truly fair and transparent
-                launch, free from the frantic chaos of traditional token sales.
-                Here&apos;s what makes it different:
+                We&apos;re using a{" "}
+                <Link
+                  className="text-primary"
+                  href="https://axis.finance/docs/dapp/sealed-bid-auctions"
+                >
+                  Sealed Bid Auction{" "}
+                  <ExternalLink className="mb-1 inline size-4" />
+                </Link>{" "}
+                to give the <strong>$REAL</strong> community a truly fair and
+                transparent launch, free from the frantic chaos of traditional
+                token sales. Here&apos;s what makes it different:
               </p>
-              <ul className="ml-6 list-disc text-lg text-white/90">
+              <ul className="ml-6 list-disc space-y-2 text-lg text-white/90">
                 <li>
                   <strong>No Sniping:</strong> In many token sales, timing can
                   be everything. People rush in right before the sale closes, or

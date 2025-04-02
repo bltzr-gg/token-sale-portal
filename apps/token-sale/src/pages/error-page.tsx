@@ -7,6 +7,7 @@ import {
 } from "@bltzr-gg/ui";
 import { environment } from "utils/environment";
 import { ErrorResponse, Link, useRouteError } from "react-router-dom";
+import { ArrowBigLeft } from "lucide-react";
 
 const showError = !environment.isProduction;
 
@@ -28,7 +29,7 @@ export default function ErrorPage() {
       id="__AXIS_ERROR_PAGE__"
       className="flex h-screen flex-col items-center justify-center"
     >
-      <div id="error-page" className="text-center">
+      <div id="error-page" className="container px-5 text-center">
         <h1>Oops!</h1>
         <p className="mt-2">Something has gone wrong...</p>
 
@@ -38,13 +39,11 @@ export default function ErrorPage() {
               value={"item-0"}
               className="flex flex-col justify-center"
             >
-              <AccordionTrigger className="justify-center gap-x-1">
+              <AccordionTrigger className="mb-5 justify-center gap-x-1">
                 Show error details
               </AccordionTrigger>
               <AccordionContent className="space-y-3">
-                <p className="max-w-md">
-                  <code>{stack}</code>
-                </p>
+                <code className="block">{stack}</code>
 
                 <Button onClick={() => handleCopy()} className="mt-4 uppercase">
                   Copy Error Details
@@ -54,8 +53,11 @@ export default function ErrorPage() {
           </AccordionRoot>
         )}
 
-        <Button className="mt-4" variant="secondary" size="sm">
-          <Link to="/">Head back</Link>
+        <Button className="mt-4" variant="outline">
+          <Link to="/">
+            <ArrowBigLeft className="mb-0.5 mr-1 inline" />
+            Head back
+          </Link>
         </Button>
       </div>
     </div>

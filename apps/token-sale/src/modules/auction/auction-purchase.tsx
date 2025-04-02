@@ -9,18 +9,19 @@ import {
 } from "@bltzr-gg/ui";
 import { parseUnits } from "viem";
 import { AuctionBidInput } from "./auction-bid-input";
-import { ExternalLink } from "lucide-react";
+import { ExternalLink, LockIcon } from "lucide-react";
 import { formatCurrencyUnits } from "utils";
 import { useBidAuction } from "./hooks/use-bid-auction";
 import { useForm, FormProvider } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { RequiresChain } from "components/requires-chain";
-import { useCallback, useMemo } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { useAccount, useChainId } from "wagmi";
 import useERC20Balance from "loaders/use-erc20-balance";
 import { QuestionMarkCircledIcon } from "@radix-ui/react-icons";
 import { useAuctionSuspense } from "@/hooks/use-auction";
+import { TransactionDialog } from "../transaction/transaction-dialog";
 
 const schema = z.object({
   baseTokenAmount: z.string(),
@@ -31,6 +32,7 @@ const schema = z.object({
 export type BidForm = z.infer<typeof schema>;
 
 export function AuctionPurchase() {
+  const [open, setOpen] = useState(false);
   const { data: auction } = useAuctionSuspense();
   const currentChainId = useChainId();
   const walletAccount = useAccount();
@@ -168,10 +170,23 @@ export function AuctionPurchase() {
   const isWalletChainIncorrect =
     auction.chainId !== currentChainId || !walletAccount.isConnected;
 
+  const handleSubmission = useCallback(() => {
+    setOpen(true);
+  }, []);
+
+  const isValidInput = form.formState.isValid;
+
+  const shouldDisable =
+    !isValidInput ||
+    bid.allowance.isLoading ||
+    bid?.bidReceipt?.isLoading ||
+    bid?.bidTx?.isPending ||
+    !bid.isSimulationSuccess;
+
   return (
     <div id="auction-bids">
       <FormProvider {...form}>
-        <form onSubmit={form.handleSubmit(bid.handleBid)}>
+        <form onSubmit={form.handleSubmit(handleSubmission)}>
           <Card
             headerRightElement={
               <div className="empty:hidden">
@@ -203,7 +218,8 @@ export function AuctionPurchase() {
                         className="text-primary font-bold"
                         href="https://axis.finance/docs/dapp/sealed-bid-auctions"
                       >
-                        Sealed Bid Auction
+                        Sealed Bid Auction{" "}
+                        <ExternalLink className="mb-1 inline size-4" />
                       </Link>{" "}
                       for purchasing the Notorious $REAL Token.
                     </h3>
@@ -267,7 +283,6 @@ export function AuctionPurchase() {
                     bid.allowance.isLoading ||
                     bid.bidTx.isPending
                   }
-                  type="submit"
                   className="w-full"
                 >
                   {bid.allowance.isLoading
@@ -280,6 +295,43 @@ export function AuctionPurchase() {
                 </Button>
               </div>
             </RequiresChain>
+
+            <TransactionDialog
+              open={open}
+              signatureMutation={bid.bidTx}
+              error={bid.error}
+              onConfirm={bid.handleBid}
+              mutation={bid.bidReceipt}
+              chainId={auction.chainId}
+              onOpenChange={(open) => {
+                if (!open) {
+                  bid.bidTx?.reset();
+                }
+                setOpen(open);
+              }}
+              hash={bid.bidTx.data}
+              disabled={shouldDisable || bid.isWaiting}
+              screens={{
+                idle: {
+                  Component: () => (
+                    <div className="mb-5 text-center">
+                      You&apos;re about to place a bid of{" "}
+                      {formatCurrencyUnits(parsedAmountIn, auction.quoteToken)}
+                    </div>
+                  ),
+                  title: `Confirm Bid`,
+                },
+                success: {
+                  Component: () => (
+                    <div className="mb-5 flex justify-center text-center">
+                      <LockIcon className="mr-1" />
+                      Bid encrypted and stored successfully!
+                    </div>
+                  ),
+                  title: "Transaction Confirmed",
+                },
+              }}
+            />
           </Card>
         </form>
       </FormProvider>

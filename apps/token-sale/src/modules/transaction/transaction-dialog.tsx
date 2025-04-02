@@ -97,17 +97,14 @@ export function TransactionDialog({
         </DialogTrigger>
       )}
       <DialogContent className="bg-light">
-        <DialogHeader className="text-lg">{title}</DialogHeader>
-
+        <DialogHeader className="text-bold mb-5 text-2xl">{title}</DialogHeader>
         <Component error={error} hash={props.hash} chainId={props.chainId} />
-
         <DialogFooter className="flex">
           {showFooter && (
             <Button
               disabled={props.disabled}
-              size="md"
+              className="w-full"
               type="submit"
-              className="mx-auto w-full max-w-sm"
               onClick={(e) => {
                 e.preventDefault();
                 props.onConfirm(e);
