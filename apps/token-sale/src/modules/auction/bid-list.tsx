@@ -21,6 +21,7 @@ import { FilterIcon } from "lucide-react";
 import { auctionHouse } from "@/constants/contracts";
 import { AuctionBid } from "@/hooks/use-auction/types";
 import { AUCTION_CHAIN_ID } from "../../app-config";
+import { sortBy } from "lodash";
 
 export const bidListColumnHelper = createColumnHelper<AuctionBid>();
 
@@ -133,28 +134,34 @@ export function BidList() {
 
   const mappedBids = useMemo(
     () =>
-      auction.bids
-        .filter(
-          (b) =>
-            !onlyUserBids || address?.toLowerCase() === b.bidder.toLowerCase(),
-        )
-        .map((bid) => {
-          //Checks if its a user bid and in local storage
-          const storedBid =
-            userBids.find(
-              (storageBid) =>
-                storageBid.bidId === bid.bidId &&
-                bid.bidder.toLowerCase() === address?.toLowerCase(),
-            ) ?? {};
+      sortBy(
+        auction.bids
+          .filter(
+            (b) =>
+              !onlyUserBids ||
+              address?.toLowerCase() === b.bidder.toLowerCase(),
+          )
+          .map((bid) => {
+            //Checks if its a user bid and in local storage
+            const storedBid =
+              userBids.find(
+                (storageBid) =>
+                  storageBid.bidId === bid.bidId &&
+                  bid.bidder.toLowerCase() === address?.toLowerCase(),
+              ) ?? {};
 
-          return {
-            ...bid,
-            ...storedBid,
-            auction: auction,
-          };
-        }) ?? [],
+            return {
+              ...bid,
+              ...storedBid,
+              auction: auction,
+            };
+          }),
+        (bid) => -new Date(bid.date).getTime(),
+      ),
     [onlyUserBids, address, userBids, auction],
   );
+
+  console.log(JSON.stringify(mappedBids.map((b) => b.bidId + "----" + b.date)));
 
   const isLoading = refund.isPending || refundReceipt.isLoading;
 
@@ -190,7 +197,6 @@ export function BidList() {
             return (
               <Button
                 size="sm"
-                variant="secondary"
                 onClick={() => {
                   setBidToRefund(bid);
                   setDialogOpen(true);

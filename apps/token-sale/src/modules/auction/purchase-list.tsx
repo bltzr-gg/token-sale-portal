@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { formatUnits } from "viem";
 import { Card, DataTable } from "@bltzr-gg/ui";
 import { CSVDownloader } from "components/csv-downloader";
@@ -11,6 +11,7 @@ import {
 } from "./bid-list";
 import { Format } from "components/format";
 import { useAuctionSuspense } from "@/hooks/use-auction";
+import { sortBy } from "lodash";
 
 export function PurchaseList() {
   const { data: auction } = useAuctionSuspense();
@@ -28,14 +29,24 @@ export function PurchaseList() {
 
   const columns = [timestampCol, amountInCol, amountOutCol, bidderCol];
 
-  const bids = auction.bids.map((b) => ({
-    ...b,
-    settledAmountOut:
-      auction.status === "settled"
-        ? b.settledAmountOut
-        : formatUnits(BigInt(b.rawAmountOut ?? 0), auction.baseToken.decimals),
-    auction,
-  }));
+  const bids = useMemo(
+    () =>
+      sortBy(
+        auction.bids.map((b) => ({
+          ...b,
+          settledAmountOut:
+            auction.status === "settled"
+              ? b.settledAmountOut
+              : formatUnits(
+                  BigInt(b.rawAmountOut ?? 0),
+                  auction.baseToken.decimals,
+                ),
+          auction,
+        })),
+        (bid) => -new Date(bid.date).getTime(),
+      ),
+    [auction],
+  );
 
   const [headers, body] = React.useMemo(() => {
     const values = bids.map((b) => ({
