@@ -1,11 +1,15 @@
 import React, { useCallback } from "react";
-import { toHex, zeroAddress } from "viem";
+import { formatUnits, toHex, zeroAddress } from "viem";
 import { useAccount } from "wagmi";
 import { useBid } from "@axis-finance/sdk/react";
 import { useReferrer } from "state/referral";
 import { useAuctionSuspense } from "@/hooks/use-auction";
 import { useAllowance } from "@/loaders/use-allowance";
 import { auctionHouse } from "@/constants/contracts";
+import { useApolloClient } from "@apollo/client";
+import { BatchAuctionBid } from "@axis-finance/types";
+
+let id = 0;
 
 export const useBidAuction = (
   lotId: string | number,
@@ -14,8 +18,8 @@ export const useBidAuction = (
   callbackData: `0x${string}`,
   onSuccess?: () => void,
 ) => {
+  const apollo = useApolloClient();
   const { data: auction } = useAuctionSuspense();
-
   const { address: bidderAddress } = useAccount();
   const referrer = useReferrer();
 
@@ -55,8 +59,40 @@ export const useBidAuction = (
   React.useEffect(() => {
     if (bid.receipt == null || !bid.receipt.isSuccess) return;
 
-    // Consumer can pass optional callback to be executed after the bid is successful
+    const currentBid: BatchAuctionBid = {
+      status: "pending",
+      bidId: `optimistic-${id++}`,
+      date: (new Date().getTime() / 1000).toString(),
+      bidder: bidderAddress as `0x${string}`,
+      blockTimestamp: (new Date().getTime() / 1000).toString(),
+      amountIn: formatUnits(amountIn, auction.quoteToken.decimals),
+      rawAmountIn: amountIn.toString(),
+      rawAmountOut: null,
+      rawMarginalPrice: null,
+      rawSubmittedPrice: null,
+      submittedPrice: null,
+      settledAmountIn: null,
+      settledAmountInRefunded: null,
+      settledAmountOut: null,
+      outcome: null,
+      referrer: null,
+    };
+
+    // optimistically update the bids
+    apollo.cache.modify({
+      id: apollo.cache.identify({
+        __typename: "BatchAuctionLot",
+        id: auction.id,
+      }),
+      fields: {
+        bids(existingBids) {
+          return [...existingBids, currentBid];
+        },
+      },
+    });
+
     onSuccess?.();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [bid.receipt, onSuccess]);
 
   return {

@@ -182,7 +182,7 @@ export function AuctionMetrics({ className }: { className?: string } = {}) {
             value={"item-0"}
             className="flex flex-col justify-center"
           >
-            <AccordionTrigger className="gap-x-1">
+            <AccordionTrigger className="self-start">
               Why a Token Auction?
             </AccordionTrigger>
             <AccordionContent className="space-y-3">

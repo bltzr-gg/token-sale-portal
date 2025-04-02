@@ -35,11 +35,8 @@ export default function ErrorPage() {
 
         {showError && stack && (
           <AccordionRoot collapsible type="single">
-            <AccordionItem
-              value={"item-0"}
-              className="flex flex-col justify-center"
-            >
-              <AccordionTrigger className="mb-5 justify-center gap-x-1">
+            <AccordionItem value={"item-0"}>
+              <AccordionTrigger className="my-5  text-center">
                 Show error details
               </AccordionTrigger>
               <AccordionContent className="space-y-3">
