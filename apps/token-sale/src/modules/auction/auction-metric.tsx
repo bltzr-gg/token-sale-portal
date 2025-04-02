@@ -54,10 +54,7 @@ const handlers: MetricHandlers = {
   duration: {
     label: "Duration",
     handler: (auction) => {
-      const days = getDaysBetweenDates(
-        new Date(+auction.end * 1000),
-        new Date(+auction.start * 1000),
-      );
+      const days = getDaysBetweenDates(auction.end, auction.start);
 
       //The minimum an auction can run for is 24h
       return `${days || 1} days`;

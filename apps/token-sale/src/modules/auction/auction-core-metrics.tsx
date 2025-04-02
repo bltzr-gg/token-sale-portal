@@ -1,11 +1,21 @@
-import { Card, cn, Link, Skeleton, trimAddress } from "@bltzr-gg/ui";
+import {
+  AccordionContent,
+  AccordionItem,
+  AccordionRoot,
+  AccordionTrigger,
+  Card,
+  cn,
+  Link,
+  Skeleton,
+  trimAddress,
+} from "@bltzr-gg/ui";
 import { AuctionMetric } from "./auction-metric";
 import { useAuctionSuspense } from "@/hooks/use-auction";
 import useBaseTokenAuctionStats from "@/hooks/use-base-token-auction-stats";
 import { formatCurrencyUnits } from "@/utils/currency";
 import { PropsWithChildren } from "react";
-import { intervalToDuration } from "date-fns";
 import { ExternalLink } from "lucide-react";
+import { getDurationBetweenDates } from "./utils/get-duration-between-dates";
 
 const Label = ({
   className,
@@ -34,21 +44,6 @@ const Value = ({
     {children}
   </h4>
 );
-
-const getDurationBetweenDates = (start: Date, end: Date) => {
-  const duration = intervalToDuration({ end, start });
-
-  const parts = [];
-  if (duration.years && duration.years > 0)
-    parts.push(`${duration.years} years`);
-  if (duration.months && duration.months > 0)
-    parts.push(`${duration.months} months`);
-  if (duration.days && duration.days > 0) parts.push(`${duration.days} days`);
-  if (duration.hours && duration.hours > 0)
-    parts.push(`${duration.hours} hours`);
-  return parts.join(", ");
-};
-
 export function AuctionCoreMetrics({ className }: { className?: string } = {}) {
   const { data: auction } = useAuctionSuspense();
   const isSuccessful = auction.settled;
@@ -162,13 +157,78 @@ export function AuctionCoreMetrics({ className }: { className?: string } = {}) {
           The Notorious $REAL Token: Where Champions Play 👑🥊
         </h3>
         <p className="text-lg text-white/90">
-          <strong>$REAL</strong> is more than a token—it&apos;s a movement. Born
-          from the unshakable confidence and bold vision of{" "}
-          <strong>Conor McGregor</strong>, <strong>$REAL</strong> is bringing
-          the knockout power of crypto to high-stakes entertainment and gaming.
-          This is your chance to be part of a legendary ecosystem that&apos;s
-          redefining what it means to compete, earn, and live boldly.
+          <strong>$REAL</strong> is not just a token, it&apos;s Conor
+          McGregor&apos;s unstoppable spirit, delivering a knockout punch in the
+          fight for real change.
         </p>
+        <p className="text-lg text-white/90">
+          By channeling the fearless energy of the Notorious,{" "}
+          <strong>$REAL</strong> is bringing citizens together to champion bold
+          new ways of funding and shaping leadership, putting power back in the
+          hands of the people.
+        </p>
+        <p className="text-lg text-white/90">
+          This one-of-a-kind coin merges high-stakes spectacle with high-impact
+          ideals, forging a movement that hits harder, goes further, and demands
+          a new level of accountability - both in the ring and in the halls of
+          power.
+        </p>
+        <h4 className="mb-2 mt-5 text-xl font-medium">Why a Token Auction?</h4>
+        <AccordionRoot collapsible type="single">
+          <AccordionItem
+            value={"item-0"}
+            className="flex flex-col justify-center"
+          >
+            <AccordionTrigger className="gap-x-1">Read more</AccordionTrigger>
+            <AccordionContent>
+              <p className="text-lg text-white/90">
+                We&apos;re using a sealed-bid auction to give the{" "}
+                <strong>$REAL</strong> community a truly fair and transparent
+                launch, free from the frantic chaos of traditional token sales.
+                Here&apos;s what makes it different:
+              </p>
+              <ul className="ml-6 list-disc text-lg text-white/90">
+                <li>
+                  <strong>No Sniping:</strong> In many token sales, timing can
+                  be everything. People rush in right before the sale closes, or
+                  bots swoop in early to gain an unfair edge. With sealed-bid
+                  auctions, all bids remain private until settlement, meaning no
+                  one can “snipe” at the last second by monitoring on-chain
+                  activity.
+                </li>
+                <li>
+                  <strong>Efficient, Equitable Distribution:</strong> Once
+                  bidding closes, bids are sorted highest to lowest, and tokens
+                  are allocated starting from the top until they&apos;re all
+                  distributed. Everyone who meets or exceeds the final clearing
+                  price gets tokens at that single, uniform price so you&apos;ll
+                  never overpay if you happened to bid higher.
+                </li>
+                <li>
+                  <strong>No Gas Wars:</strong> By decoupling timing from token
+                  allocation, sealed-bid auctions eliminate the common “gas war”
+                  problem. You can place your bid with confidence at any time
+                  before the auction ends, without fighting to get in first or
+                  pay exorbitant network fees to front-run other buyers.
+                </li>
+                <li>
+                  <strong>Smooth Post-Sale Dynamics:</strong> After the auction
+                  settles, <strong>$REAL</strong> will be available in Uniswap
+                  liquidity pools, giving everyone (bidders or not) quick and
+                  orderly access. This approach typically reduces volatility,
+                  because the price is anchored to the fair clearing price
+                  discovered during the auction.
+                </li>
+              </ul>
+              <p className="text-lg text-white/90">
+                Ultimately with this sealed-bid auction, the{" "}
+                <strong>$REAL</strong> token sale aims to deliver a no-drama,
+                no-FUD experience. One that ensures participants get a fair shot
+                at the tokens they want, at a fair market price.
+              </p>
+            </AccordionContent>
+          </AccordionItem>
+        </AccordionRoot>
       </div>
     </Card>
   );

@@ -3,6 +3,7 @@ import * as AccordionPrimitive from '@radix-ui/react-accordion';
 import { ChevronDownIcon } from '@radix-ui/react-icons';
 
 import { cn } from '@/lib/cn';
+import { Button } from './button';
 
 const AccordionRoot = AccordionPrimitive.Root;
 
@@ -22,13 +23,15 @@ const AccordionTrigger = React.forwardRef<
     <AccordionPrimitive.Trigger
       ref={ref}
       className={cn(
-        'flex flex-1 items-center justify-between py-4 text-sm font-medium transition-all hover:underline [&[data-state=open]>svg]:rotate-180',
+        'flex flex-1 items-center justify-between py-4 text-sm font-medium transition-all [&[data-state=open]>svg]:rotate-180',
         className,
       )}
       {...props}
     >
-      {children}
-      <ChevronDownIcon className="h-4 w-4 shrink-0 text-muted-foreground transition-transform duration-200" />
+      <Button>
+        {children}
+        <ChevronDownIcon className="h-4 w-4 shrink-0 transition-transform duration-200" />
+      </Button>
     </AccordionPrimitive.Trigger>
   </AccordionPrimitive.Header>
 ));

@@ -9,16 +9,15 @@ import {
 } from "@bltzr-gg/ui";
 import { parseUnits } from "viem";
 import { AuctionBidInput } from "./auction-bid-input";
-import { TransactionDialog } from "modules/transaction/transaction-dialog";
-import { ExternalLink, LockIcon } from "lucide-react";
-import { formatCurrencyUnits, trimCurrency } from "utils";
+import { ExternalLink } from "lucide-react";
+import { formatCurrencyUnits } from "utils";
 import { useBidAuction } from "./hooks/use-bid-auction";
 import { useForm, FormProvider } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { RequiresChain } from "components/requires-chain";
-import React, { useCallback, useMemo } from "react";
-import { UseWriteContractReturnType, useAccount, useChainId } from "wagmi";
+import { useCallback, useMemo } from "react";
+import { useAccount, useChainId } from "wagmi";
 import useERC20Balance from "loaders/use-erc20-balance";
 import { QuestionMarkCircledIcon } from "@radix-ui/react-icons";
 import { useAuctionSuspense } from "@/hooks/use-auction";
@@ -33,7 +32,6 @@ export type BidForm = z.infer<typeof schema>;
 
 export function AuctionPurchase() {
   const { data: auction } = useAuctionSuspense();
-  const [open, setOpen] = React.useState(false);
   const currentChainId = useChainId();
   const walletAccount = useAccount();
 
@@ -167,16 +165,6 @@ export function AuctionPurchase() {
     handleSuccessfulBid,
   );
 
-  const isValidInput = form.formState.isValid;
-
-  const shouldDisable =
-    !isValidInput ||
-    bid?.bidReceipt?.isLoading ||
-    bid?.bidTx?.isPending ||
-    !bid.isSimulationSuccess;
-
-  const actionKeyword = "Bid";
-
   const isWalletChainIncorrect =
     auction.chainId !== currentChainId || !walletAccount.isConnected;
 
@@ -274,7 +262,11 @@ export function AuctionPurchase() {
             >
               <div className="mt-4 w-full">
                 <Button
-                  loading={bid.isWaiting || bid.allowance.isLoading}
+                  loading={
+                    bid.isWaiting ||
+                    bid.allowance.isLoading ||
+                    bid.bidTx.isPending
+                  }
                   type="submit"
                   className="w-full"
                 >
@@ -282,49 +274,13 @@ export function AuctionPurchase() {
                     ? "Approving..."
                     : bid.isWaiting
                       ? "Waiting for confirmation..."
-                      : actionKeyword.toUpperCase()}
+                      : bid.bidTx.isPending
+                        ? "Bidding..."
+                        : "Bid"}
                 </Button>
               </div>
             </RequiresChain>
           </Card>
-
-          <TransactionDialog
-            open={open}
-            signatureMutation={bid.bidTx as UseWriteContractReturnType}
-            error={bid.error}
-            onConfirm={bid.handleBid}
-            mutation={bid.bidReceipt}
-            chainId={auction.chainId}
-            onOpenChange={(open) => {
-              if (!open) {
-                bid.bidTx?.reset();
-              }
-              setOpen(open);
-            }}
-            hash={bid.bidTx.data}
-            disabled={shouldDisable || bid.isWaiting}
-            screens={{
-              idle: {
-                Component: () => (
-                  <div className="text-center">
-                    {`You're about to place a bid of ${trimCurrency(amountIn)} ${
-                      auction.quoteToken.symbol
-                    }`}
-                  </div>
-                ),
-                title: `Confirm ${actionKeyword}`,
-              },
-              success: {
-                Component: () => (
-                  <div className="flex justify-center text-center">
-                    <LockIcon className="mr-1" />
-                    Bid encrypted and stored successfully!
-                  </div>
-                ),
-                title: "Transaction Confirmed",
-              },
-            }}
-          />
         </form>
       </FormProvider>
     </div>

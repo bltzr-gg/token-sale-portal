@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import type { AuctionStatus } from "@axis-finance/types";
 import { Metric, Text, cn } from "@bltzr-gg/ui";
 import { getCountdown, formatDate } from "utils/date";
@@ -51,30 +51,20 @@ export function AuctionCountdown({ className }: { className?: string }) {
   const { data: auction } = useAuctionSuspense();
   const [timeDistance, setTimeDistance] = useState<string | null>("");
 
-  const startDate = useMemo(
-    () => new Date(Number(auction.start) * 1000),
-    [auction.start],
-  );
-
-  const endDate = useMemo(
-    () => new Date(Number(auction.end) * 1000),
-    [auction.end],
-  );
-
   const now = new Date();
 
-  const isOngoing = startDate <= now && endDate > now;
+  const isOngoing = auction.start <= now && auction.end > now;
 
-  const isntStarted = startDate > now;
+  const isntStarted = auction.start > now;
   const isntFinished = isntStarted || isOngoing;
 
   const isFinished =
-    now > endDate ||
+    now > auction.end ||
     auction.status === "concluded" ||
     auction.status === "settled" ||
     auction.status === "decrypted";
 
-  const targetDate = isntStarted ? startDate : endDate;
+  const targetDate = isntStarted ? auction.start : auction.end;
 
   // Immediately set the countdown if the auction is ongoing
   useEffect(() => {
@@ -93,15 +83,13 @@ export function AuctionCountdown({ className }: { className?: string }) {
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [startDate, endDate, isOngoing, isntFinished, targetDate]);
+  }, [isOngoing, isntFinished, targetDate]);
 
   return (
     <div className={cn("flex items-center gap-x-6", className)}>
       <CountdownStatus status={auction.status} />
       {isFinished ? (
-        <Text size="lg">
-          {formatDate.simple(new Date(+auction.end * 1000))}
-        </Text>
+        <Text size="lg">{formatDate.simple(auction.end)}</Text>
       ) : (
         <CountdownDisplay time={isFinished ? "00:00:00:00" : timeDistance!} />
       )}
