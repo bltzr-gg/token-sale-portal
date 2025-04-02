@@ -21,17 +21,14 @@ export function SettleAuctionDtlCallbackBalance({
   });
   // Get the balance of the base token
   // This is used as settlement may result in the seller transferring the base token to a DTL callback
-  const { balance: sellerBaseTokenBalance, decimals: baseTokenDecimals } =
-    useERC20Balance({
-      chainId: auction.chainId,
-      tokenAddress: auction.baseToken.address,
-      balanceAddress: auction.seller as Address,
-    });
+  const { data: sellerBaseTokenBalance } = useERC20Balance({
+    tokenAddress: auction.baseToken.address,
+    balanceAddress: auction.seller as Address,
+  });
 
-  const sellerBaseTokenBalanceDecimal: number =
-    sellerBaseTokenBalance && baseTokenDecimals
-      ? Number(formatUnits(sellerBaseTokenBalance, baseTokenDecimals))
-      : 0;
+  const sellerBaseTokenBalanceDecimal: number = sellerBaseTokenBalance
+    ? Number(formatUnits(sellerBaseTokenBalance, auction.baseToken.decimals))
+    : 0;
   const hasSufficientBalanceForCallbacks: boolean =
     // No callback
     auction.callbacksType == CallbacksType.NONE ||

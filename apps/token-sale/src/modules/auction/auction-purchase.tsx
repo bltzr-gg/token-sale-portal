@@ -235,7 +235,7 @@ export function AuctionPurchase() {
             )}
 
             {quoteTokens.isSuccess && quoteTokens.data === 0n && (
-              <p className="text-destructive">
+              <p>
                 You&apos;ll need a {auction.quoteToken.symbol} balance to
                 bid.&nbsp;
                 <Link
