@@ -249,9 +249,9 @@ export function AuctionPurchase() {
               disabled={isWalletChainIncorrect}
             />
             {parseFloat(minAmountOut) > 0 && (
-              <p className="">
+              <p className="px-1.5">
                 A winning bid will award you a minimum of{" "}
-                {parseFloat(minAmountOut).toLocaleString()}{" "}
+                {parseFloat(minAmountOut).toLocaleString()} $
                 {auction.baseToken.symbol}.
               </p>
             )}

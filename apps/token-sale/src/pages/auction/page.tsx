@@ -11,7 +11,7 @@ import { Button } from "@bltzr-gg/ui";
 import { ArrowBigDown } from "lucide-react";
 import { AUCTION_CHAIN_ID, AUCTION_ID } from "../../app-config";
 import { useAuction } from "@/hooks/use-auction";
-import { AuctionCoreMetrics } from "@/modules/auction/auction-core-metrics";
+import { AuctionMetrics } from "@/modules/auction/auction-metrics";
 import { AuctionPurchase } from "@/modules/auction/auction-purchase";
 import { SettledAuctionCard } from "@/modules/auction/settled-auction-card";
 import { UserBidsCardContainer } from "@/modules/auction/user-bids";
@@ -64,26 +64,24 @@ export default function AuctionPage() {
             Public Token Sale
           </p>
         </div>
-        <div className="absolute bottom-24 z-30 flex w-full flex-col items-center">
-          <AuctionCountdown />
+        <div className="absolute bottom-[3.5%] z-30 flex w-full flex-col items-center">
           {auction.status === "live" && (
-            <div>
-              <Button
-                onClick={() => {
-                  scrollElementIntoView("auction-bids");
-                }}
-                className="mt-8 h-14 rounded-xl px-10 text-2xl"
-              >
-                <ArrowBigDown className="mt-2" />
-                &nbsp;&nbsp;Place your bids&nbsp;&nbsp;
-                <ArrowBigDown className="mt-2" />
-              </Button>
-            </div>
+            <Button
+              onClick={() => {
+                scrollElementIntoView("auction-bids");
+              }}
+              className="my-8 h-14 rounded-xl px-10 text-2xl"
+            >
+              <ArrowBigDown className="mt-2" />
+              &nbsp;&nbsp;Place your bids&nbsp;&nbsp;
+              <ArrowBigDown className="mt-2" />
+            </Button>
           )}
+          <AuctionCountdown />
         </div>
       </Hero>
       <div className="space-y-8">
-        <AuctionCoreMetrics />
+        <AuctionMetrics />
         {auction.status === "live" && (
           <>
             <div className="motion-preset-slide-right motion-delay-500">

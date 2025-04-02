@@ -243,7 +243,7 @@ export function BidList() {
               onClick={() => setOnlyUserBids((prev) => !prev)}
             >
               <FilterIcon className="mr-1" />
-              {onlyUserBids ? "All" : "My"} Bids
+              {onlyUserBids ? "My" : "All"} Bids
             </Button>
             <Button asChild variant="ghost" className="min-w-0">
               <CSVDownloader
