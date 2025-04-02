@@ -176,12 +176,12 @@ export function AuctionPurchase() {
 
   const isValidInput = form.formState.isValid;
 
-  const shouldDisable =
-    !isValidInput ||
+  const shouldDisable = !isValidInput || bid.simulation.isError;
+  const shouldLoading =
     bid.allowance.isLoading ||
     bid?.bidReceipt?.isLoading ||
     bid?.bidTx?.isPending ||
-    !bid.isSimulationSuccess;
+    bid.simulation.isPending;
 
   return (
     <div id="auction-bids">
@@ -298,6 +298,7 @@ export function AuctionPurchase() {
 
             <TransactionDialog
               open={open}
+              loading={shouldLoading}
               signatureMutation={bid.bidTx}
               error={bid.error}
               onConfirm={bid.handleBid}

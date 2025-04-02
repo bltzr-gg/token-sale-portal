@@ -63,6 +63,7 @@ export type TransactionDialogProps = {
   screens?: Partial<TransactionScreens>;
   submitText?: string;
   disabled?: boolean;
+  loading?: boolean;
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
 } & TransactionDialogElementProps;
@@ -104,13 +105,14 @@ export function TransactionDialog({
             <Button
               disabled={props.disabled}
               className="w-full"
+              loading={props.loading}
               type="submit"
               onClick={(e) => {
                 e.preventDefault();
                 props.onConfirm(e);
               }}
             >
-              {props.submitText ?? "CONFIRM"}
+              {props.loading ? "Loading..." : (props.submitText ?? "CONFIRM")}
             </Button>
           )}
         </DialogFooter>

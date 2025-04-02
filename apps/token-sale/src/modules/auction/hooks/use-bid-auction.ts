@@ -79,7 +79,7 @@ export const useBidAuction = (
     bidReceipt,
     bidTx,
     isWaiting: bid.isWaiting,
-    isSimulationSuccess: bid.simulation.isSuccess,
+    simulation: bid.simulation,
     receipt: bidReceipt,
     error: bid.error as Error | undefined,
     allowance,
