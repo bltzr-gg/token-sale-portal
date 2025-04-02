@@ -6,6 +6,7 @@ import { zeroAddress } from "viem";
 import { axisContracts } from "@axis-finance/deployments";
 import assert from "assert";
 import { AuctionStatusSchema } from "./types";
+import * as chains from "viem/chains";
 
 export function getCallbacksType(callbacks?: `0x${string}`): CallbacksType {
   if (!callbacks || callbacks === zeroAddress) {
@@ -118,7 +119,11 @@ export const transform = (auction: BatchAuctionLot) => {
   );
   // END bullshit zone
 
+  const [chainKey] =
+    Object.entries(chains).find(([, { id }]) => id === AUCTION_CHAIN_ID) ?? [];
+
   return {
+    chainName: chainKey as keyof typeof chains,
     amount: auction.bids.reduce((total, b) => total + Number(b.amountIn), 0),
     baseToken: {
       name: auction.baseToken.name,

@@ -5,7 +5,7 @@ import useBaseTokenAuctionStats from "@/hooks/use-base-token-auction-stats";
 import { formatCurrencyUnits } from "@/utils/currency";
 import { PropsWithChildren } from "react";
 import { intervalToDuration } from "date-fns";
-import { LinkIcon } from "lucide-react";
+import { ExternalLink } from "lucide-react";
 
 const Label = ({
   className,
@@ -66,7 +66,7 @@ export function AuctionCoreMetrics({ className }: { className?: string } = {}) {
               href={`https://etherscan.io/token/${auction.baseToken.address}`}
             >
               {trimAddress(auction.baseToken.address)}
-              <LinkIcon className="inline size-4" />
+              <ExternalLink className="mb-1 ml-0.5 inline size-4" />
             </Link>
           </Value>
         </div>

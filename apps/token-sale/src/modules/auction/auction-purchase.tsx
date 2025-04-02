@@ -10,7 +10,7 @@ import {
 import { formatUnits, parseUnits } from "viem";
 import { AuctionBidInput } from "./auction-bid-input";
 import { TransactionDialog } from "modules/transaction/transaction-dialog";
-import { LockIcon } from "lucide-react";
+import { ExternalLink, LockIcon } from "lucide-react";
 import { formatCurrencyUnits, trimCurrency } from "utils";
 import { useBidAuction } from "./hooks/use-bid-auction";
 import { useForm, FormProvider } from "react-hook-form";
@@ -191,20 +191,6 @@ export function AuctionPurchase() {
       <FormProvider {...form}>
         <form onSubmit={form.handleSubmit(bid.handleBid)}>
           <Card
-            headerRightElement={
-              <div className="flex gap-x-2">
-                Balance{" "}
-                {quoteTokens.isSuccess && (
-                  <>
-                    {quoteTokens.data === 0n && (
-                      <span className="text-destructive"> is insufficent</span>
-                    )}
-                    {quoteTokens.data > 0n &&
-                      formatCurrencyUnits(quoteTokens.data, auction.quoteToken)}
-                  </>
-                )}
-              </div>
-            }
             title={
               <>
                 Place your bid{" "}
@@ -241,6 +227,26 @@ export function AuctionPurchase() {
               {bid.error?.message}
             </p>
 
+            {quoteTokens.isSuccess && quoteTokens.data > 0n && (
+              <div className="flex gap-x-2">
+                Balance:{" "}
+                {formatCurrencyUnits(quoteTokens.data, auction.quoteToken)}
+              </div>
+            )}
+
+            {quoteTokens.isSuccess && quoteTokens.data === 0n && (
+              <p className="text-destructive">
+                You&apos;ll need a {auction.quoteToken.symbol} balance to
+                bid.&nbsp;
+                <Link
+                  className="font-bold text-white"
+                  href={`https://app.uniswap.org/swap?chain=${auction.chainName}&inputCurrency=NATIVE&outputCurrency=${auction.quoteToken.address}`}
+                >
+                  Luckily, you can get some here
+                  <ExternalLink className="mb-0.5 ml-0.5 inline size-4" />.
+                </Link>
+              </p>
+            )}
             <AuctionBidInput
               balance={quoteTokens.data}
               disabled={isWalletChainIncorrect}
