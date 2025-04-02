@@ -100,7 +100,7 @@ export function TransactionDialog({
       <DialogContent className="bg-light">
         <DialogHeader className="text-bold mb-5 text-2xl">{title}</DialogHeader>
         <Component error={error} hash={props.hash} chainId={props.chainId} />
-        <DialogFooter className="mt-5 flex">
+        <DialogFooter className="mt-5 flex empty:hidden">
           {showFooter && (
             <Button
               disabled={props.disabled}
@@ -113,6 +113,16 @@ export function TransactionDialog({
               }}
             >
               {props.loading ? "Loading..." : (props.submitText ?? "CONFIRM")}
+            </Button>
+          )}
+          {status === "success" && (
+            <Button
+              className="w-full"
+              onClick={() => {
+                onOpenChange?.(false);
+              }}
+            >
+              Ok
             </Button>
           )}
         </DialogFooter>
