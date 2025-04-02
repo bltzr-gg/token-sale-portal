@@ -6,7 +6,6 @@ import {
 import { BidList } from "modules/auction/bid-list";
 import { AuctionCountdown } from "modules/auction/countdown";
 import { useAccount, useSwitchChain } from "wagmi";
-import Hero from "components/hero";
 import { Button } from "@bltzr-gg/ui";
 import { ArrowBigDown } from "lucide-react";
 import { AUCTION_CHAIN_ID, AUCTION_ID } from "../../app-config";
@@ -16,6 +15,8 @@ import { AuctionPurchase } from "@/modules/auction/auction-purchase";
 import { SettledAuctionCard } from "@/modules/auction/settled-auction-card";
 import { UserBidsCardContainer } from "@/modules/auction/user-bids";
 import { ReferralRewards } from "@/modules/auction/referral-rewards";
+import phoneVideo from "@/assets/videos/phone-connor-promo.mp4";
+import wideVideo from "@/assets/videos/large-connor-promo.mp4";
 
 function scrollElementIntoView(elementId: string) {
   const element = document.getElementById(elementId);
@@ -55,16 +56,36 @@ export default function AuctionPage() {
 
   return (
     <>
-      <Hero>
-        <div className="absolute inset-0 pt-64 text-center">
-          <h1 className="text-shadow-lg motion-preset-blur-up motion-ease-in motion-duration-1500 px-3 text-4xl font-black sm:text-5xl md:px-5 md:text-6xl lg:text-7xl">
-            The Notorious $REAL
-          </h1>
-          <p className="text-shadow-md motion-preset-blur-up motion-ease-in motion-delay-500 motion-duration-1500 mt-3 text-2xl font-light sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl">
-            Public Token Sale
-          </p>
+      <section className=" w-full overflow-hidden">
+        <div className="relative -mb-[5%] h-[80vh] ">
+          <div className="absolute inset-0 z-10 pt-64 text-center">
+            <h1 className="text-shadow-lg motion-preset-blur-up motion-ease-in motion-duration-1500 px-3 text-4xl font-black sm:text-5xl md:px-5 md:text-6xl lg:text-7xl">
+              The Notorious $REAL
+            </h1>
+            <p className="text-shadow-md motion-preset-blur-up motion-ease-in motion-delay-500 motion-duration-1500 mt-3 text-2xl font-light sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl">
+              Public Token Sale
+            </p>
+          </div>
+          <div className="pointer-events-none absolute inset-0 bg-black opacity-50"></div>
+          <video
+            className="-mt-24 hidden h-full w-full object-cover md:block"
+            src={wideVideo}
+            autoPlay
+            loop
+            muted
+            playsInline
+          />
+          <video
+            className="block h-full w-full object-cover md:hidden"
+            src={phoneVideo}
+            autoPlay
+            loop
+            muted
+            playsInline
+          />
         </div>
-        <div className="absolute bottom-[3.5%] z-30 flex w-full flex-col items-center">
+
+        <div className="relative z-20 flex w-full flex-col items-center pb-10">
           {auction.status === "live" && (
             <Button
               onClick={() => {
@@ -79,7 +100,7 @@ export default function AuctionPage() {
           )}
           <AuctionCountdown />
         </div>
-      </Hero>
+      </section>
       <div className="space-y-8">
         <AuctionMetrics />
         {auction.status === "live" && (
