@@ -23,7 +23,7 @@ export function ReferralRewards() {
         </div>
 
         {!hasRewards && (
-          <p>
+          <p className="mt-5">
             You can claim your referral rewards as soon as the users you&apos;ve
             referred have successfully claimed their bids.
           </p>

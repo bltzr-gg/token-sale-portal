@@ -90,7 +90,7 @@ const AuctionHeader = () => {
 
 const SettledAuctionCard = () => {
   return (
-    <Card className="min-h-64 md:aspect-video">
+    <Card className="min-h-80 px-5 md:aspect-video md:px-8">
       <AuctionHeader />
       <SettledAuctionChart />
     </Card>

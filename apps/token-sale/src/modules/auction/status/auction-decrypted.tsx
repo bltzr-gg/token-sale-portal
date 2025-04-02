@@ -6,7 +6,6 @@ import { RequiresChain } from "components/requires-chain";
 import { LoadingIndicator } from "modules/app/loading-indicator";
 import { SettleAuctionCallbackInput } from "./settle-callback-input";
 import { SettleAuctionDtlCallbackBalance } from "./settle-dtl-callback-balance";
-import { AuctionCoreMetrics } from "../auction-core-metrics";
 import { useAuctionSuspense } from "@/hooks/use-auction";
 
 export function AuctionDecrypted() {
@@ -36,10 +35,6 @@ export function AuctionDecrypted() {
 
   return (
     <div>
-      <div className="w-full">
-        <AuctionCoreMetrics />
-      </div>
-
       <div className="mt-8 w-full">
         <TransactionDialog
           signatureMutation={settle.settleTx}
@@ -57,11 +52,14 @@ export function AuctionDecrypted() {
             }
           }}
         />
-        <Card title="Decrypted">
+        <Card
+          headerRightElement={
+            <Text size="xl">All bids have been decrypted</Text>
+          }
+          title="Decrypted"
+        >
           <div className="w-fill flex items-center justify-center">
-            <div className="flex flex-col items-center gap-2">
-              <Text size="xl">All bids have been decrypted</Text>
-            </div>
+            <div className="flex flex-col items-center gap-2"></div>
           </div>
           {hasCallbacks && (
             <div>

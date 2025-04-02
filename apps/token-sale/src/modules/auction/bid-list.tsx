@@ -234,25 +234,29 @@ export function BidList() {
 
   return (
     <div className="motion-preset-slide-up">
-      <div className="flex justify-end gap-3 px-3 py-2">
-        <Button
-          variant="ghost"
-          className="min-w-0"
-          onClick={() => setOnlyUserBids((prev) => !prev)}
-        >
-          <FilterIcon className="mr-1" />
-          {onlyUserBids ? "All" : "My"} Bids
-        </Button>
-        <Button asChild variant="ghost" className="min-w-0">
-          <CSVDownloader
-            tooltip="Download this bid history in CSV format."
-            filename={`bids-${auction.type}-${auction.id}`}
-            headers={headers}
-            data={body}
-          />
-        </Button>
-      </div>
-      <Card title={"Bid History"}>
+      <Card
+        headerRightElement={
+          <div className="flex justify-end gap-3 px-3 py-2">
+            <Button
+              variant="ghost"
+              className="min-w-0"
+              onClick={() => setOnlyUserBids((prev) => !prev)}
+            >
+              <FilterIcon className="mr-1" />
+              {onlyUserBids ? "All" : "My"} Bids
+            </Button>
+            <Button asChild variant="ghost" className="min-w-0">
+              <CSVDownloader
+                tooltip="Download this bid history in CSV format."
+                filename={`bids-${auction.type}-${auction.id}`}
+                headers={headers}
+                data={body}
+              />
+            </Button>
+          </div>
+        }
+        title={"Bid History"}
+      >
         <DataTable
           emptyText={
             auction.status == "created" || auction.status == "live"

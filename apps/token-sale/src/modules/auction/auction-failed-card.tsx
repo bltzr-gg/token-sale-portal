@@ -1,6 +1,4 @@
 import { useMemo, useState } from "react";
-import { Link } from "react-router-dom";
-import { ArrowRightIcon } from "lucide-react";
 
 import { Badge, Button, Card, Metric, Text } from "@bltzr-gg/ui";
 import { useAuctionSuspense, type Auction } from "@/hooks/use-auction";
@@ -27,7 +25,7 @@ const getFailReason = (auction: Auction) => {
   }
 
   // Unknown reason. RFC: should this condition ever trigger? I don't think it should.
-  return "The auction did not settle successfully";
+  return "The auction did not settle successfully so there is nothing to claim";
 };
 
 export function AuctionFailedCard() {
@@ -42,92 +40,74 @@ export function AuctionFailedCard() {
   const failReason = useMemo(() => getFailReason(auction), [auction]);
 
   return (
-    <div className="gap-y-md flex flex-col">
-      <Card
-        title="Claim"
-        className="lg:w-[496px]"
-        headerRightElement={<Badge color="alert">Auction Failed</Badge>}
-      >
-        <RequiresChain chainId={auction.chainId}>
-          <div className="gap-y-md flex flex-col">
-            <div className="bg-light-tertiary p-sm rounded">
-              <Metric size="l" label="You Bid">
-                {shorten(totalAmount)} {auction.quoteToken.symbol}
-              </Metric>
-            </div>
+    <Card
+      title="Claim"
+      headerRightElement={<Badge color="alert">Auction Failed</Badge>}
+    >
+      <RequiresChain chainId={auction.chainId}>
+        <div className="grid gap-3 md:grid-cols-4 lg:grid-cols-8">
+          <Metric size="l" label="You Bid">
+            {shorten(totalAmount)} {auction.quoteToken.symbol}
+          </Metric>
 
-            {refundTotal > 0 && (
-              <div className="bg-light-tertiary p-sm rounded">
-                <Metric size="l" label="You Refunded">
-                  {shorten(refundTotal)} {auction.quoteToken.symbol}
-                </Metric>
+          {refundTotal > 0 && (
+            <Metric size="l" label="You Refunded">
+              {shorten(refundTotal)} {auction.quoteToken.symbol}
+            </Metric>
+          )}
+
+          <Metric size="l" label="You Get">
+            0 {auction.baseToken.symbol}
+          </Metric>
+        </div>
+
+        <Text className="my-5 text-center text-red-500">{failReason}</Text>
+        {!claimedFullRefund && (
+          <Button
+            size="lg"
+            className="w-full"
+            onClick={() => setTxnDialogOpen(true)}
+          >
+            Claim refund
+          </Button>
+        )}
+      </RequiresChain>
+
+      <TransactionDialog
+        open={isTxnDialogOpen}
+        signatureMutation={claimBidsTxn.claimTx}
+        error={claimBidsTxn.error}
+        onConfirm={claimBidsTxn.handleClaim}
+        mutation={claimBidsTxn.claimReceipt}
+        chainId={auction.chainId}
+        onOpenChange={(open: boolean) => {
+          if (!open) {
+            claimBidsTxn.claimTx.reset();
+          }
+          setTxnDialogOpen(open);
+        }}
+        hash={claimBidsTxn.claimTx.data}
+        disabled={claimBidsTxn.isWaiting}
+        screens={{
+          idle: {
+            Component: () => (
+              <div className="text-center">
+                You&apos;re about to claim all of your outstanding refunds for
+                this auction.
               </div>
-            )}
-
-            <div className="bg-light-tertiary p-sm rounded">
-              <Metric size="l" label="You Get">
-                0 {auction.baseToken.symbol}
-              </Metric>
-              <Text size="sm" className="text-red-500">
-                {failReason}
-              </Text>
-            </div>
-
-            {!claimedFullRefund && (
-              <Button
-                size="lg"
-                className="w-full"
-                onClick={() => setTxnDialogOpen(true)}
-              >
-                Claim refund
-              </Button>
-            )}
-            {claimedFullRefund && (
-              <Link to="/auctions">
-                <Button size="lg" variant="secondary" className="w-full">
-                  View live auctions <ArrowRightIcon className="size-6" />
-                </Button>
-              </Link>
-            )}
-          </div>
-        </RequiresChain>
-
-        <TransactionDialog
-          open={isTxnDialogOpen}
-          signatureMutation={claimBidsTxn.claimTx}
-          error={claimBidsTxn.error}
-          onConfirm={claimBidsTxn.handleClaim}
-          mutation={claimBidsTxn.claimReceipt}
-          chainId={auction.chainId}
-          onOpenChange={(open: boolean) => {
-            if (!open) {
-              claimBidsTxn.claimTx.reset();
-            }
-            setTxnDialogOpen(open);
-          }}
-          hash={claimBidsTxn.claimTx.data}
-          disabled={claimBidsTxn.isWaiting}
-          screens={{
-            idle: {
-              Component: () => (
-                <div className="text-center">
-                  You&apos;re about to claim all of your outstanding refunds for
-                  this auction.
-                </div>
-              ),
-              title: `Confirm refund`,
-            },
-            success: {
-              Component: () => (
-                <div className="flex justify-center text-center">
-                  <p>Bids refunded successfully!</p>
-                </div>
-              ),
-              title: "Transaction Confirmed",
-            },
-          }}
-        />
-      </Card>
-    </div>
+            ),
+            title: `Confirm refund`,
+          },
+          success: {
+            Component: () => (
+              <div className="flex justify-center text-center">
+                <p>Bids refunded successfully!</p>
+              </div>
+            ),
+            title: "Transaction Confirmed",
+          },
+        }}
+      />
+    </Card>
   );
 }

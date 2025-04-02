@@ -169,7 +169,7 @@ export function AuctionPurchase() {
     auction.chainId !== currentChainId || !walletAccount.isConnected;
 
   return (
-    <div id="auction-bids" className="mx-auto lg:min-w-[477px]">
+    <div id="auction-bids">
       <FormProvider {...form}>
         <form onSubmit={form.handleSubmit(bid.handleBid)}>
           <Card

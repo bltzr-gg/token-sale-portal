@@ -98,9 +98,9 @@ export const SettledAuctionChart = () => {
   const winning = filterWinningBids(bids);
 
   return (
-    <div className="relative -ml-8 size-full pb-16 md:-ml-5">
+    <div className="relative -ml-8 size-full pb-5 md:-ml-5 md:pb-20">
       {auction && <SettledAuctionChartOverlay />}
-      <ResponsiveContainer className="font-mono">
+      <ResponsiveContainer className="min-h-64 font-mono">
         <ComposedChart data={bids}>
           <CartesianGrid
             stroke={neutral400}
@@ -186,7 +186,13 @@ export const SettledAuctionChart = () => {
           />
           <Legend
             align="left"
-            wrapperStyle={{ position: "relative", padding: 0, margin: 0 }}
+            wrapperStyle={{
+              position: "relative",
+              padding: 0,
+              paddingLeft: 32,
+              margin: 0,
+              marginTop: -32,
+            }}
             formatter={plainTextFormatter}
             payload={[
               {

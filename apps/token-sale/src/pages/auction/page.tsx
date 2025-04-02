@@ -1,11 +1,7 @@
 import React from "react";
-import { type AuctionStatus } from "@axis-finance/types";
 import {
-  EncryptedMarginalPriceAuctionConcluded,
-  AuctionCreated,
   AuctionDecrypted,
-  AuctionSettled,
-  AuctionLive,
+  DecryptMarginalPriceSection,
 } from "modules/auction/status";
 import { BidList } from "modules/auction/bid-list";
 import { AuctionCountdown } from "modules/auction/countdown";
@@ -15,16 +11,11 @@ import { Button } from "@bltzr-gg/ui";
 import { ArrowBigDown } from "lucide-react";
 import { AUCTION_CHAIN_ID, AUCTION_ID } from "../../app-config";
 import { useAuction } from "@/hooks/use-auction";
-
-const statuses: Record<AuctionStatus, () => React.ReactNode> = {
-  created: AuctionCreated,
-  live: AuctionLive,
-  concluded: EncryptedMarginalPriceAuctionConcluded,
-  decrypted: AuctionDecrypted,
-  settled: AuctionSettled,
-  aborted: AuctionSettled,
-  cancelled: AuctionSettled,
-};
+import { AuctionCoreMetrics } from "@/modules/auction/auction-core-metrics";
+import { AuctionPurchase } from "@/modules/auction/auction-purchase";
+import { SettledAuctionCard } from "@/modules/auction/settled-auction-card";
+import { UserBidsCardContainer } from "@/modules/auction/user-bids";
+import { ReferralRewards } from "@/modules/auction/referral-rewards";
 
 function scrollElementIntoView(elementId: string) {
   const element = document.getElementById(elementId);
@@ -62,8 +53,6 @@ export default function AuctionPage() {
       </div>
     );
 
-  const AuctionElement = statuses[auction.status];
-
   return (
     <>
       <Hero>
@@ -74,8 +63,11 @@ export default function AuctionPage() {
           <p className="text-shadow-md motion-preset-blur-up motion-ease-in motion-delay-500 motion-duration-1500 mt-3 text-2xl font-light sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl">
             Public Token Sale
           </p>
-          <div className="mt-16 empty:hidden">
-            {auction.status === "live" && (
+        </div>
+        <div className="absolute bottom-24 z-30 flex w-full flex-col items-center">
+          <AuctionCountdown />
+          {auction.status === "live" && (
+            <div>
               <Button
                 onClick={() => {
                   scrollElementIntoView("auction-bids");
@@ -86,15 +78,32 @@ export default function AuctionPage() {
                 &nbsp;&nbsp;Place your bids&nbsp;&nbsp;
                 <ArrowBigDown className="mt-2" />
               </Button>
-            )}
-          </div>
-        </div>
-        <div className="absolute bottom-24 z-30 flex w-full justify-center">
-          <AuctionCountdown />
+            </div>
+          )}
         </div>
       </Hero>
-      <AuctionElement />
-      <BidList />
+      <div className="space-y-8">
+        <AuctionCoreMetrics />
+        {auction.status === "live" && (
+          <>
+            <div className="motion-preset-slide-right motion-delay-500">
+              <AuctionPurchase />
+            </div>
+            <div className="motion-preset-slide-left motion-delay-500">
+              <BidList />
+            </div>
+          </>
+        )}
+        {auction.status === "decrypted" && <AuctionDecrypted />}
+        {auction.status === "concluded" && <DecryptMarginalPriceSection />}
+        {["settled", "aborted", "cancelled"].includes(auction?.status) && (
+          <>
+            <SettledAuctionCard />
+            <UserBidsCardContainer />
+            {isConnected && <ReferralRewards />}
+          </>
+        )}
+      </div>
     </>
   );
 }

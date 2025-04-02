@@ -43,6 +43,7 @@ export const formatCurrencyUnits = (
   options?: {
     decimals?: number;
     precision?: number;
+    minPrecision?: number;
     locale?: string;
     symbol?: string;
     compact?: boolean; // Add this line for compact display option
@@ -52,6 +53,7 @@ export const formatCurrencyUnits = (
     {
       decimals: 18,
       precision: 6,
+      minPrecision: 2,
       locale: "en-US",
       compact: false, // Default to false
     },
@@ -72,13 +74,22 @@ export const formatCurrencyUnits = (
     trimmed = formatted;
   }
 
+  const currencyIsFiat = optionsWithDefaults.symbol?.includes("USD");
+  const currencyIsToken = optionsWithDefaults.symbol && !currencyIsFiat;
+
   // Use Intl.NumberFormat to localize the number
   const number = parseFloat(trimmed);
-  return `${new Intl.NumberFormat(optionsWithDefaults.locale, {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: optionsWithDefaults.precision,
-    notation: optionsWithDefaults.compact ? "compact" : "standard", // Add this line to toggle notation
-  }).format(
+  return `${currencyIsFiat ? "$" : ""}${new Intl.NumberFormat(
+    optionsWithDefaults.locale,
+    {
+      minimumFractionDigits: Math.min(
+        optionsWithDefaults.minPrecision,
+        optionsWithDefaults.precision,
+      ),
+      maximumFractionDigits: optionsWithDefaults.precision,
+      notation: optionsWithDefaults.compact ? "compact" : "standard", // Add this line to toggle notation
+    },
+  ).format(
     number,
-  )}${optionsWithDefaults.symbol ? ` ${optionsWithDefaults.symbol}` : ""}`;
+  )}${optionsWithDefaults.symbol ? ` ${currencyIsToken ? "$" : ""}${optionsWithDefaults.symbol}` : ""}`;
 };

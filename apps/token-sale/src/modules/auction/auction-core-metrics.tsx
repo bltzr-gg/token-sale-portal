@@ -99,6 +99,7 @@ export function AuctionCoreMetrics({ className }: { className?: string } = {}) {
                     auction.quoteToken.decimals + auction.baseToken.decimals,
                   symbol: auction.quoteToken.symbol,
                   compact: true,
+                  precision: 0,
                 },
               )
             )}
@@ -110,10 +111,11 @@ export function AuctionCoreMetrics({ className }: { className?: string } = {}) {
             {baseTokenStats.isLoading ? (
               <Skeleton />
             ) : (
-              formatCurrencyUnits(
-                baseTokenStats.data?.totalSupply ?? 0n,
-                auction.baseToken,
-              )
+              formatCurrencyUnits(baseTokenStats.data?.totalSupply ?? 0n, {
+                ...auction.baseToken,
+                compact: true,
+                precision: 0,
+              })
             )}
           </Value>
         </div>
@@ -124,10 +126,11 @@ export function AuctionCoreMetrics({ className }: { className?: string } = {}) {
               <Skeleton />
             ) : (
               <>
-                {formatCurrencyUnits(
-                  auction.initialCapacity,
-                  auction.baseToken,
-                )}{" "}
+                {formatCurrencyUnits(auction.initialCapacity, {
+                  ...auction.baseToken,
+                  precision: 0,
+                  compact: true,
+                })}{" "}
                 ({baseTokenStats.data?.auctionSupplyPercentage}%)
               </>
             )}
@@ -173,13 +176,14 @@ export function AuctionCoreMetrics({ className }: { className?: string } = {}) {
           a new level of accountability - both in the ring and in the halls of
           power.
         </p>
-        <h4 className="mb-2 mt-5 text-xl font-medium">Why a Token Auction?</h4>
         <AccordionRoot collapsible type="single">
           <AccordionItem
             value={"item-0"}
             className="flex flex-col justify-center"
           >
-            <AccordionTrigger className="gap-x-1">Read more</AccordionTrigger>
+            <AccordionTrigger className="gap-x-1">
+              Why a Token Auction?
+            </AccordionTrigger>
             <AccordionContent>
               <p className="text-lg text-white/90">
                 We&apos;re using a sealed-bid auction to give the{" "}
