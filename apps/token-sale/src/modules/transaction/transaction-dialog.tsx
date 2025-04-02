@@ -100,7 +100,7 @@ export function TransactionDialog({
       <DialogContent className="bg-light">
         <DialogHeader className="text-bold mb-5 text-2xl">{title}</DialogHeader>
         <Component error={error} hash={props.hash} chainId={props.chainId} />
-        <DialogFooter className="flex">
+        <DialogFooter className="mt-5 flex">
           {showFooter && (
             <Button
               disabled={props.disabled}

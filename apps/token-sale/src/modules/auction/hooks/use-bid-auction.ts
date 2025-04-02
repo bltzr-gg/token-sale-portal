@@ -62,12 +62,6 @@ export const useBidAuction = (
   }, [allowance, bid, bidderAddress]);
 
   React.useEffect(() => {
-    if (bid.simulation.isError) {
-      bid.simulation.refetch();
-    }
-  }, [bid.simulation]);
-
-  React.useEffect(() => {
     if (bidReceipt == null || !bidReceipt.isSuccess) return;
 
     // Consumer can pass optional callback to be executed after the bid is successful
