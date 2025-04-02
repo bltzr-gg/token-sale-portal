@@ -4,7 +4,7 @@ export function AmountInCell({ value }: { value: number }) {
   const { data: auction } = useAuctionSuspense();
   return (
     <>
-      `${value} ${auction.quoteToken.symbol}
+      {value} ${auction.quoteToken.symbol}
     </>
   );
 }

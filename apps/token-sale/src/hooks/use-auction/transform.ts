@@ -100,7 +100,9 @@ export const transform = (auction: BatchAuctionLot) => {
   const targetRaise =
     (initialCapacity * price) / 10n ** BigInt(auction.baseToken.decimals);
   const totalAmount = auction.bids.reduce(
-    (total, b) => total + BigInt(b.amountIn),
+    (total, b) =>
+      total +
+      BigInt(parseFloat(b.amountIn) * 10 ** auction.quoteToken.decimals),
     0n,
   );
   const marginalPrice = BigInt(

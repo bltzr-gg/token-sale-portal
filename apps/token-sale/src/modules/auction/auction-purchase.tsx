@@ -223,16 +223,15 @@ export function AuctionPurchase() {
               </>
             }
           >
-            <p className="text-destructive empty:hidden">
-              {bid.error?.message}
-            </p>
-
             {quoteTokens.isSuccess && quoteTokens.data > 0n && (
               <div className="flex gap-x-2">
                 Balance:{" "}
                 {formatCurrencyUnits(quoteTokens.data, auction.quoteToken)}
               </div>
             )}
+            <p className="text-destructive empty:hidden">
+              {bid.error?.message}
+            </p>
 
             {quoteTokens.isSuccess && quoteTokens.data === 0n && (
               <p>
