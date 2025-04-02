@@ -7,7 +7,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@bltzr-gg/ui";
-import { formatUnits, parseUnits } from "viem";
+import { parseUnits } from "viem";
 import { AuctionBidInput } from "./auction-bid-input";
 import { TransactionDialog } from "modules/transaction/transaction-dialog";
 import { ExternalLink, LockIcon } from "lucide-react";
@@ -54,12 +54,6 @@ export function AuctionPurchase() {
           return total;
         }, 0n) ?? 0n,
     [auction?.bids, walletAccount.address],
-  );
-
-  const formattedUserBidAmount = useMemo(
-    () =>
-      auction && formatUnits(totalUserBidAmount, auction.quoteToken.decimals),
-    [auction, totalUserBidAmount],
   );
 
   const quoteTokens = useERC20Balance({
@@ -191,6 +185,22 @@ export function AuctionPurchase() {
       <FormProvider {...form}>
         <form onSubmit={form.handleSubmit(bid.handleBid)}>
           <Card
+            headerRightElement={
+              <div className="empty:hidden">
+                {totalUserBidAmount > 0n && (
+                  <Metric
+                    className="text-right"
+                    childrenClassName={"text-tertiary-300"}
+                    label="Your total bid"
+                  >
+                    {formatCurrencyUnits(
+                      totalUserBidAmount,
+                      auction.quoteToken,
+                    )}
+                  </Metric>
+                )}
+              </div>
+            }
             title={
               <>
                 Place your bid{" "}
@@ -252,19 +262,11 @@ export function AuctionPurchase() {
             />
             {parseFloat(minAmountOut) > 0 && (
               <p className="">
-                You will receive at least{" "}
+                A winning bid will award you a minimum of{" "}
                 {parseFloat(minAmountOut).toLocaleString()}{" "}
-                {auction.quoteToken.symbol}.
+                {auction.baseToken.symbol}.
               </p>
             )}
-            <div className="gap-x-xl mx-auto mt-4 flex w-full empty:hidden">
-              {totalUserBidAmount > 0n && (
-                <Metric childrenClassName={"text-tertiary-300"} label="You bid">
-                  {trimCurrency(formattedUserBidAmount)}{" "}
-                  {auction.quoteToken.symbol}
-                </Metric>
-              )}
-            </div>
             <RequiresChain
               buttonClass="w-full"
               chainId={auction.chainId}

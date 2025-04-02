@@ -77,6 +77,17 @@ export function AuctionCoreMetrics({ className }: { className?: string } = {}) {
           "Error fetching base token metrics. Are you sure it implements the ERC20 standard?"}
       </p>
       <div className="grid grid-cols-2 gap-5 gap-x-8 md:grid-cols-4 xl:grid-cols-6">
+        {auction.bidStats.totalAmount > 0n && (
+          <div>
+            <Label>Total Raised</Label>
+            <Value>
+              {formatCurrencyUnits(
+                auction.bidStats.totalAmount,
+                auction.quoteToken,
+              )}
+            </Value>
+          </div>
+        )}
         <AuctionMetric id="targetRaise" />
         <AuctionMetric id="minRaise" />
         <AuctionMetric id="minPrice" />

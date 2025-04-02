@@ -11,12 +11,10 @@ import { BidList } from "modules/auction/bid-list";
 import { AuctionCountdown } from "modules/auction/countdown";
 import { useAccount, useSwitchChain } from "wagmi";
 import Hero from "components/hero";
-import { useAnimatedNumber } from "@/hooks/use-animated-number";
 import { Button } from "@bltzr-gg/ui";
 import { ArrowBigDown } from "lucide-react";
 import { AUCTION_CHAIN_ID, AUCTION_ID } from "../../app-config";
 import { useAuction } from "@/hooks/use-auction";
-import { formatUnits } from "viem";
 
 const statuses: Record<AuctionStatus, () => React.ReactNode> = {
   created: AuctionCreated,
@@ -39,20 +37,6 @@ export default function AuctionPage() {
   const { data: auction } = useAuction();
   const { isConnected, chainId: connectedChainId } = useAccount();
   const { switchChain } = useSwitchChain();
-
-  const animatedRaised = useAnimatedNumber(
-    formatUnits(
-      auction?.bidStats?.totalAmount ?? 0n,
-      auction?.quoteToken.decimals ?? 0,
-    ),
-    {
-      delay: 1000,
-      duration: 3000,
-      locale: "en-US",
-      compact: true,
-      easing: "ease-out",
-    },
-  );
 
   // Forcefully switch chain
   React.useEffect(() => {
@@ -91,11 +75,6 @@ export default function AuctionPage() {
             Public Token Sale
           </p>
           <div className="mt-16 empty:hidden">
-            {auction.bidStats.totalAmount > 0n && (
-              <p className="text-shadow-md motion-preset-blur-up motion-ease-in motion-delay-1000 motion-duration-1500 text-4xl font-bold sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl">
-                {animatedRaised}$ Raised
-              </p>
-            )}
             {auction.status === "live" && (
               <Button
                 onClick={() => {
