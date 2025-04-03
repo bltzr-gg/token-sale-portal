@@ -91,11 +91,9 @@ export const BatchAuctionLotSchema = z
         outcome: z.string().nullable(),
         referrer: z.string().nullable(),
         claimed: z
-          .array(
-            z.object({
-              id: z.string(),
-            }),
-          )
+          .object({
+            id: z.string(),
+          })
           .nullable(),
       }),
     ),
@@ -131,7 +129,7 @@ export const BatchAuctionLotSchema = z
         partialBidId: z.string().nullable(),
       })
       .nullable(),
-    settled: z.array(z.object({ id: z.string() })).nullable(),
+    settled: z.object({ id: z.string() }).nullable(),
   })
   .nullable();
 
