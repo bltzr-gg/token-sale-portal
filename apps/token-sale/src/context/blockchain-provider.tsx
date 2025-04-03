@@ -10,17 +10,22 @@ import {
   rainbowWallet,
   frameWallet,
   walletConnectWallet,
+  metaMaskWallet,
+  phantomWallet,
 } from "@rainbow-me/rainbowkit/wallets";
+import { chain } from "@/app-config";
 
 const projectId = import.meta.env.VITE_WALLETCONNECT_PROJECT_ID;
 
 const connectors = connectorsForWallets(
   [
     {
-      groupName: "Common",
+      groupName: "Supported Wallets",
       wallets: [
-        injectedWallet,
+        metaMaskWallet,
+        phantomWallet,
         rainbowWallet,
+        injectedWallet,
         frameWallet,
         walletConnectWallet,
       ],
@@ -43,12 +48,15 @@ const queryClient = new QueryClient({
 });
 
 const config = createConfig({
-  chains: [chains.mainnet],
+  chains: [chain],
   multiInjectedProviderDiscovery: false,
   connectors,
   transports: {
     [chains.mainnet.id]: http(
       `https://eth-mainnet.g.alchemy.com/v2/${import.meta.env.VITE_ALCHEMY_API_KEY}`,
+    ),
+    [chains.sepolia.id]: http(
+      `https://eth-sepolia.g.alchemy.com/v2/${import.meta.env.VITE_ALCHEMY_API_KEY}`,
     ),
   },
 });
