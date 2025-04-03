@@ -91,11 +91,9 @@ export const BatchAuctionLotSchema = z
         outcome: z.string().nullable(),
         referrer: z.string().nullable(),
         claimed: z
-          .array(
-            z.object({
-              id: z.string(),
-            }),
-          )
+          .object({
+            id: z.string(),
+          })
           .nullable(),
       }),
     ),
