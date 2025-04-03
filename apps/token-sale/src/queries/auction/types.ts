@@ -131,7 +131,7 @@ export const BatchAuctionLotSchema = z
         partialBidId: z.string().nullable(),
       })
       .nullable(),
-    settled: z.array(z.object({ id: z.string() })).nullable(),
+    settled: z.object({ id: z.string() }).nullable(),
   })
   .nullable();
 
