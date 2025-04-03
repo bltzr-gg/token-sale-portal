@@ -9,10 +9,10 @@ export type Chain = GetObjectValueType<typeof supportedChains>;
 export type ChainId = GetObjectValueType<typeof supportedChains>["id"];
 export type ChainKey = keyof typeof supportedChains;
 
-export const networkIdExists = (
-  id: string | number | undefined | null,
-): id is ChainId =>
-  Object.values(supportedChains).some((chain) => chain.id === id);
+export const networkIdExists = (id: string | number): id is ChainId =>
+  Object.values(supportedChains).some(
+    (chain) => chain.id === parseInt(id.toString()),
+  );
 
 const isHexString = (str: string): str is `0x${string}` => str.startsWith("0x");
 assert(
