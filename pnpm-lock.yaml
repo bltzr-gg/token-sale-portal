@@ -39,17 +39,17 @@ importers:
         specifier: 0.0.3
         version: 0.0.3
       "@axis-finance/cloak":
-        specifier: 0.0.13
-        version: 0.0.13(viem@2.17.3(bufferutil@4.0.9)(typescript@5.2.2)(utf-8-validate@5.0.10)(zod@3.24.2))
+        specifier: 0.0.14
+        version: 0.0.14(viem@2.17.3(bufferutil@4.0.9)(typescript@5.2.2)(utf-8-validate@5.0.10)(zod@3.24.2))
       "@axis-finance/deployments":
-        specifier: 0.0.9
-        version: 0.0.9
+        specifier: 0.0.10
+        version: 0.0.10
       "@axis-finance/env":
-        specifier: 0.0.13
-        version: 0.0.13(viem@2.17.3(bufferutil@4.0.9)(typescript@5.2.2)(utf-8-validate@5.0.10)(zod@3.24.2))
+        specifier: 0.0.14
+        version: 0.0.14(viem@2.17.3(bufferutil@4.0.9)(typescript@5.2.2)(utf-8-validate@5.0.10)(zod@3.24.2))
       "@axis-finance/sdk":
-        specifier: 0.0.34
-        version: 0.0.34(@tanstack/react-query@5.18.1(react@18.3.1))(@trpc/server@10.45.2)(postcss@8.5.1)(react@18.3.1)(typescript@5.2.2)(viem@2.17.3(bufferutil@4.0.9)(typescript@5.2.2)(utf-8-validate@5.0.10)(zod@3.24.2))(wagmi@2.5.2(@react-native-async-storage/async-storage@1.24.0(react-native@0.77.0(@babel/core@7.26.10)(@babel/preset-env@7.26.7(@babel/core@7.26.10))(@types/react@18.2.48)(bufferutil@4.0.9)(react@18.3.1)(utf-8-validate@5.0.10)))(@tanstack/query-core@5.18.1)(@tanstack/react-query@5.18.1(react@18.3.1))(@types/react@18.2.48)(bufferutil@4.0.9)(immer@9.0.21)(react-dom@18.3.1(react@18.3.1))(react-native@0.77.0(@babel/core@7.26.10)(@babel/preset-env@7.26.7(@babel/core@7.26.10))(@types/react@18.2.48)(bufferutil@4.0.9)(react@18.3.1)(utf-8-validate@5.0.10))(react@18.3.1)(rollup@4.37.0)(typescript@5.2.2)(utf-8-validate@5.0.10)(viem@2.17.3(bufferutil@4.0.9)(typescript@5.2.2)(utf-8-validate@5.0.10)(zod@3.24.2))(zod@3.24.2))(zod@3.24.2)
+        specifier: 0.0.36
+        version: 0.0.36(@tanstack/react-query@5.18.1(react@18.3.1))(@trpc/server@10.45.2)(postcss@8.5.1)(react@18.3.1)(typescript@5.2.2)(viem@2.17.3(bufferutil@4.0.9)(typescript@5.2.2)(utf-8-validate@5.0.10)(zod@3.24.2))(wagmi@2.5.2(@react-native-async-storage/async-storage@1.24.0(react-native@0.77.0(@babel/core@7.26.10)(@babel/preset-env@7.26.7(@babel/core@7.26.10))(@types/react@18.2.48)(bufferutil@4.0.9)(react@18.3.1)(utf-8-validate@5.0.10)))(@tanstack/query-core@5.18.1)(@tanstack/react-query@5.18.1(react@18.3.1))(@types/react@18.2.48)(bufferutil@4.0.9)(immer@9.0.21)(react-dom@18.3.1(react@18.3.1))(react-native@0.77.0(@babel/core@7.26.10)(@babel/preset-env@7.26.7(@babel/core@7.26.10))(@types/react@18.2.48)(bufferutil@4.0.9)(react@18.3.1)(utf-8-validate@5.0.10))(react@18.3.1)(rollup@4.37.0)(typescript@5.2.2)(utf-8-validate@5.0.10)(viem@2.17.3(bufferutil@4.0.9)(typescript@5.2.2)(utf-8-validate@5.0.10)(zod@3.24.2))(zod@3.24.2))(zod@3.24.2)
       "@axis-finance/subgraph-client":
         specifier: 0.0.11
         version: 0.0.11(@tanstack/react-query@5.18.1(react@18.3.1))(react@18.3.1)
@@ -353,22 +353,22 @@ packages:
         integrity: sha512-x+ymMtsxutsVxhRn49c6jNJz6mP+njhlPEuIZjmOodsZ02oF8qnMl0ir6GmyDTGHgFKgJgPmLlsOlRaMAcPxCA==,
       }
 
-  "@axis-finance/cloak@0.0.13":
+  "@axis-finance/cloak@0.0.14":
     resolution:
       {
-        integrity: sha512-4PRgQo2nJScqcwZeJ+IaLNFyfWjSvJ/Sebua5poT2gnB4fXAccT0F+4lUvYikoanC0u25UJQCZjP2hvIBqOABQ==,
+        integrity: sha512-vGWRomS5TJk5b1Oeqsx+HgxirWJYoPsyGuLkJhGgo9O9iJdxvBPSgyVdSUoiqx+zpIRWuEtbiARWophuaYHcbQ==,
       }
 
-  "@axis-finance/deployments@0.0.9":
+  "@axis-finance/deployments@0.0.10":
     resolution:
       {
-        integrity: sha512-ILSdb9OFZl79Lo4NUz1Shi/ZVON14R/1Bk+bjrqmPxQ6/0yXaFiasoYORiWhEya7OVreN3rWI+xbrT3m1P3b3w==,
+        integrity: sha512-0WVh+UxGonuSd0yr8h2fVSU408RWeIOnr6CcUKvlzzf0C1iWRKOvO1a+ganP4yPD18vHBk938MHbOn+R6bMdJw==,
       }
 
-  "@axis-finance/env@0.0.13":
+  "@axis-finance/env@0.0.14":
     resolution:
       {
-        integrity: sha512-4703UU+T1zj91QLcUlstvUA9JFmUF+vSrcD8yHqgLZz4zekihm8vHMRiO/oTT6H5kKGb0jW570cpMsbTu43EJg==,
+        integrity: sha512-yXf8k8X6DkebtNUqu6ReDKbfqhqm6Eb4duR4KNIzVAPOCa4q/Bih0qh+ChUjVWMebHOS6t++fh2Dmc+EGS4WXA==,
       }
     peerDependencies:
       viem: 2.17.3
@@ -379,10 +379,10 @@ packages:
         integrity: sha512-xH6l+o3u+QxBqJRQeO7jQeetQhGSSgqS2VZ0+I5caDVSuMWk0S2w5xUb8qqz7VrAlEmDvoR3MJqC8xzXRPcQZg==,
       }
 
-  "@axis-finance/sdk@0.0.34":
+  "@axis-finance/sdk@0.0.36":
     resolution:
       {
-        integrity: sha512-PzdiKFpDNjl7/9lPPWx99wFQCb7cbw6/vpCF8PrapSnMyn0XZk0pXdph8xd1wwlw6JIbqySBB5ICxn2UR4KHpQ==,
+        integrity: sha512-Ha6Asqeh9uj/eT9wbLayffatIwaDY8ytrPJ6gBhbXbFaMRrr1arLVZR7fRgYxPyPbYNUZBDNKCem/KHwRLNsEg==,
       }
     peerDependencies:
       "@tanstack/react-query": 5.18.1
@@ -12540,29 +12540,29 @@ snapshots:
 
   "@axis-finance/abis@0.0.3": {}
 
-  "@axis-finance/cloak@0.0.13(viem@2.17.3(bufferutil@4.0.9)(typescript@5.2.2)(utf-8-validate@5.0.10)(zod@3.24.2))":
+  "@axis-finance/cloak@0.0.14(viem@2.17.3(bufferutil@4.0.9)(typescript@5.2.2)(utf-8-validate@5.0.10)(zod@3.24.2))":
     dependencies:
-      "@axis-finance/env": 0.0.13(viem@2.17.3(bufferutil@4.0.9)(typescript@5.2.2)(utf-8-validate@5.0.10)(zod@3.24.2))
+      "@axis-finance/env": 0.0.14(viem@2.17.3(bufferutil@4.0.9)(typescript@5.2.2)(utf-8-validate@5.0.10)(zod@3.24.2))
     transitivePeerDependencies:
       - viem
 
-  "@axis-finance/deployments@0.0.9":
+  "@axis-finance/deployments@0.0.10":
     dependencies:
       "@axis-finance/abis": 0.0.3
 
-  "@axis-finance/env@0.0.13(viem@2.17.3(bufferutil@4.0.9)(typescript@5.2.2)(utf-8-validate@5.0.10)(zod@3.24.2))":
+  "@axis-finance/env@0.0.14(viem@2.17.3(bufferutil@4.0.9)(typescript@5.2.2)(utf-8-validate@5.0.10)(zod@3.24.2))":
     dependencies:
-      "@axis-finance/deployments": 0.0.9
+      "@axis-finance/deployments": 0.0.10
       viem: 2.17.3(bufferutil@4.0.9)(typescript@5.2.2)(utf-8-validate@5.0.10)(zod@3.24.2)
 
   "@axis-finance/eslint-config@0.0.2": {}
 
-  "@axis-finance/sdk@0.0.34(@tanstack/react-query@5.18.1(react@18.3.1))(@trpc/server@10.45.2)(postcss@8.5.1)(react@18.3.1)(typescript@5.2.2)(viem@2.17.3(bufferutil@4.0.9)(typescript@5.2.2)(utf-8-validate@5.0.10)(zod@3.24.2))(wagmi@2.5.2(@react-native-async-storage/async-storage@1.24.0(react-native@0.77.0(@babel/core@7.26.10)(@babel/preset-env@7.26.7(@babel/core@7.26.10))(@types/react@18.2.48)(bufferutil@4.0.9)(react@18.3.1)(utf-8-validate@5.0.10)))(@tanstack/query-core@5.18.1)(@tanstack/react-query@5.18.1(react@18.3.1))(@types/react@18.2.48)(bufferutil@4.0.9)(immer@9.0.21)(react-dom@18.3.1(react@18.3.1))(react-native@0.77.0(@babel/core@7.26.10)(@babel/preset-env@7.26.7(@babel/core@7.26.10))(@types/react@18.2.48)(bufferutil@4.0.9)(react@18.3.1)(utf-8-validate@5.0.10))(react@18.3.1)(rollup@4.37.0)(typescript@5.2.2)(utf-8-validate@5.0.10)(viem@2.17.3(bufferutil@4.0.9)(typescript@5.2.2)(utf-8-validate@5.0.10)(zod@3.24.2))(zod@3.24.2))(zod@3.24.2)":
+  "@axis-finance/sdk@0.0.36(@tanstack/react-query@5.18.1(react@18.3.1))(@trpc/server@10.45.2)(postcss@8.5.1)(react@18.3.1)(typescript@5.2.2)(viem@2.17.3(bufferutil@4.0.9)(typescript@5.2.2)(utf-8-validate@5.0.10)(zod@3.24.2))(wagmi@2.5.2(@react-native-async-storage/async-storage@1.24.0(react-native@0.77.0(@babel/core@7.26.10)(@babel/preset-env@7.26.7(@babel/core@7.26.10))(@types/react@18.2.48)(bufferutil@4.0.9)(react@18.3.1)(utf-8-validate@5.0.10)))(@tanstack/query-core@5.18.1)(@tanstack/react-query@5.18.1(react@18.3.1))(@types/react@18.2.48)(bufferutil@4.0.9)(immer@9.0.21)(react-dom@18.3.1(react@18.3.1))(react-native@0.77.0(@babel/core@7.26.10)(@babel/preset-env@7.26.7(@babel/core@7.26.10))(@types/react@18.2.48)(bufferutil@4.0.9)(react@18.3.1)(utf-8-validate@5.0.10))(react@18.3.1)(rollup@4.37.0)(typescript@5.2.2)(utf-8-validate@5.0.10)(viem@2.17.3(bufferutil@4.0.9)(typescript@5.2.2)(utf-8-validate@5.0.10)(zod@3.24.2))(zod@3.24.2))(zod@3.24.2)":
     dependencies:
       "@axis-finance/abis": 0.0.3
-      "@axis-finance/cloak": 0.0.13(viem@2.17.3(bufferutil@4.0.9)(typescript@5.2.2)(utf-8-validate@5.0.10)(zod@3.24.2))
-      "@axis-finance/deployments": 0.0.9
-      "@axis-finance/env": 0.0.13(viem@2.17.3(bufferutil@4.0.9)(typescript@5.2.2)(utf-8-validate@5.0.10)(zod@3.24.2))
+      "@axis-finance/cloak": 0.0.14(viem@2.17.3(bufferutil@4.0.9)(typescript@5.2.2)(utf-8-validate@5.0.10)(zod@3.24.2))
+      "@axis-finance/deployments": 0.0.10
+      "@axis-finance/env": 0.0.14(viem@2.17.3(bufferutil@4.0.9)(typescript@5.2.2)(utf-8-validate@5.0.10)(zod@3.24.2))
       "@axis-finance/subgraph-client": 0.0.11(@tanstack/react-query@5.18.1(react@18.3.1))(react@18.3.1)
       "@axis-finance/types": 0.0.21(@tanstack/react-query@5.18.1(react@18.3.1))(postcss@8.5.1)(react@18.3.1)(typescript@5.2.2)
       "@fleek-platform/sdk": 3.6.2

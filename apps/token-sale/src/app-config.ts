@@ -35,7 +35,7 @@ const AUCTION_HOUSE_CONTRACT_ADDRESS =
 export const AUCTION_CHAIN_ID = parseInt(
   import.meta.env.VITE_AUCTION_CHAIN_ID ?? "1",
 );
-export const SUBGRAPH_URL = `https://subgraph.satsuma-prod.com/44c4cc082f74/spaces-team/axis-origin-mainnet/version/v1.0.6/api`;
+export const SUBGRAPH_URL = `https://subgraph.satsuma-prod.com/44c4cc082f74/spaces-team/axis-origin-mainnet/version/v1.0.6.3/api`;
 // end
 
 export const chainName = Object.entries(supportedChains).find(
