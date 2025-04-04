@@ -55,7 +55,7 @@ const AuctionHeader = () => {
   const fdv = totalSupply.data && (totalSupply.data * clearingPrice) / modifier;
 
   return (
-    <div className="flex- flex items-end gap-x-[8px] pb-[16px]">
+    <div className="grid grid-cols-2 gap-3 pb-[16px] md:grid-cols-4">
       {auction.settled && totalSupply.isSuccess && (
         <>
           <FormatUnits
@@ -90,9 +90,11 @@ const AuctionHeader = () => {
 
 const SettledAuctionCard = () => {
   return (
-    <Card className="min-h-80 px-5 md:aspect-video md:px-8">
+    <Card>
       <AuctionHeader />
-      <SettledAuctionChart />
+      <div className="min-h-80 px-5 md:aspect-video md:px-8">
+        <SettledAuctionChart />
+      </div>
     </Card>
   );
 };

@@ -1,19 +1,11 @@
 import { cn } from "@bltzr-gg/ui";
-import { UsdToggle } from "components/usd-toggle";
 
 type PageHeaderProps = React.HTMLAttributes<HTMLDivElement> & {
   backNavigationPath?: string;
   backNavigationText?: string;
-  toggle?: boolean;
-  toggleSymbol?: string;
 };
 
-export function PageHeader({
-  className,
-  children,
-  toggle,
-  toggleSymbol = "Quote",
-}: PageHeaderProps) {
+export function PageHeader({ className, children }: PageHeaderProps) {
   return (
     <div
       className={cn(
@@ -22,12 +14,6 @@ export function PageHeader({
       )}
     >
       <div className="col-span-2 row-start-2 mx-auto ">{children}</div>
-
-      {toggle && (
-        <div className="flex w-full items-center justify-end lg:w-1/5 lg:pr-0">
-          {<UsdToggle currencySymbol={toggleSymbol} />}
-        </div>
-      )}
     </div>
   );
 }

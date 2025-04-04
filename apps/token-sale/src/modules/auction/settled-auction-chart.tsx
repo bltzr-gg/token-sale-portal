@@ -15,7 +15,6 @@ import {
 import { format } from "date-fns";
 import { shorten } from "utils/number";
 import { formatDate } from "utils/date";
-import { SettledAuctionChartOverlay } from "./settled-auction-chart-overlay";
 import {
   BID_OUTCOME,
   type SortedBid,
@@ -23,6 +22,7 @@ import {
 } from "./hooks/use-sorted-bids";
 import { OriginIcon } from "./origin-icon";
 import { useAuctionSuspense } from "@/hooks/use-auction";
+import { formatUnits } from "viem";
 
 type BidTooltipProps = TooltipProps<number, "timestamp" | "price" | "amountIn">;
 
@@ -86,24 +86,28 @@ const filterWinningBids = (bids: SortedBid[]) => {
 
 export const SettledAuctionChart = () => {
   const { data: auction } = useAuctionSuspense();
-  /* Recharts doesn't support classNames, so we obtain the colors from the stylesheet */
-  const primary500 = `hsl(var(--primary-500))`;
-  const red500 = `hsl(var(--red-500))`;
+  const primary = `#f73b48`;
+  const white = `#FFFFFF`;
   const textSecondary = `#b0bec5`;
-  const textTertiary = `#8d8d8d`;
-  const neutral400 = `hsl(var(--neutral-400))`;
+  const light = `#212121`;
 
   const bids = useSortedBids();
-  const clearingPrice = auction.marginalPrice;
+  const clearingPrice = formatUnits(
+    auction.marginalPrice,
+    auction.quoteToken.decimals,
+  );
   const winning = filterWinningBids(bids);
+  const totalAmount = formatUnits(
+    auction.bidStats.totalAmount,
+    auction.quoteToken.decimals,
+  );
 
   return (
     <div className="relative -ml-8 size-full pb-5 md:-ml-5 md:pb-20">
-      {auction && <SettledAuctionChartOverlay />}
       <ResponsiveContainer className="min-h-64 font-mono">
         <ComposedChart data={bids}>
           <CartesianGrid
-            stroke={neutral400}
+            stroke={light}
             strokeDasharray="0"
             strokeWidth={0.5}
             vertical={false}
@@ -111,14 +115,14 @@ export const SettledAuctionChart = () => {
           <XAxis
             dataKey="cumulativeAmountIn"
             type="number"
-            tick={{ fill: textTertiary, fontSize: 14 }}
+            tick={{ fill: primary, fontSize: 14 }}
             tickFormatter={(value) => shorten(value, 0)}
             tickLine={false}
           />
           <YAxis
             dataKey="price"
             type="number"
-            tick={{ fill: textTertiary, fontSize: 14 }}
+            tick={{ fill: primary, fontSize: 14 }}
             tickLine={false}
           />
           <Area
@@ -126,14 +130,14 @@ export const SettledAuctionChart = () => {
             type="stepBefore"
             dataKey="price"
             dot={false}
-            fill={neutral400}
+            fill={primary}
             stroke="none"
           />
           <Line
             data={bids}
             type="stepBefore"
             dataKey="price"
-            stroke={primary500}
+            stroke={primary}
             dot={false}
             strokeWidth={2}
           />
@@ -162,13 +166,12 @@ export const SettledAuctionChart = () => {
           />
           <ReferenceLine
             segment={[
-              { x: 0, y: clearingPrice.toString() },
               {
-                x: auction.bidStats.totalAmount.toString(),
-                y: clearingPrice.toString(),
+                x: totalAmount,
+                y: clearingPrice,
               },
             ]}
-            stroke={red500}
+            stroke={white}
             strokeDasharray="8 8"
             strokeWidth={2}
           />
@@ -191,27 +194,15 @@ export const SettledAuctionChart = () => {
               padding: 0,
               paddingLeft: 32,
               margin: 0,
-              marginTop: -32,
+              marginTop: -24,
             }}
             formatter={plainTextFormatter}
             payload={[
               {
                 value: "Bid price (y) and Amount (x)",
                 type: "plainline",
-                color: primary500,
+                color: primary,
                 payload: { strokeDasharray: "1 0" },
-              },
-              {
-                value: `${auction.quoteToken.symbol} raised`,
-                type: "plainline",
-                color: textTertiary,
-                payload: { strokeDasharray: "8 8" },
-              },
-              {
-                value: `Clearing price`,
-                type: "plainline",
-                color: red500,
-                payload: { strokeDasharray: "8 8" },
               },
             ]}
           />
