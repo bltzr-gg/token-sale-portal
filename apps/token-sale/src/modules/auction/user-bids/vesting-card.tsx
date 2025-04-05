@@ -13,13 +13,30 @@ import { RedeemVestedTokensTxn } from "./redeem-vested-tokens-txn";
 import { shorten } from "@/utils/number";
 import { useAuctionSuspense } from "@/hooks/use-auction";
 
-const calculateVestingProgress = (start?: number, end?: number): number => {
-  if (start == null || end == null) return 0;
+const calculateVestingProgress = (
+  auctionEnd?: number,
+  vestingStart?: number,
+  vestingEnd?: number,
+): number => {
+  if (vestingStart == null || vestingEnd == null) {
+    return 0;
+  }
+
+  // If the difference between start and end is less than 1 minute,
+  // we only care about how soon the vesting starts, not the duration
+  if (!!auctionEnd && vestingEnd - vestingStart < 60) {
+    const now = Date.now() / 1000;
+    const auctionEndSeconds = auctionEnd / 1000;
+
+    const total = vestingStart - auctionEndSeconds;
+    const elapsed = now - auctionEndSeconds;
+    return Math.min(100, (elapsed / total) * 100);
+  }
 
   // Return the percentage of time elapsed between the start and end, expressed as 0-100
   const now = Date.now() / 1000;
-  const elapsed = now - start;
-  const total = end - start;
+  const elapsed = now - vestingStart;
+  const total = vestingEnd - vestingStart;
 
   return Math.min(100, (elapsed / total) * 100);
 };
@@ -107,6 +124,7 @@ export function VestingCard() {
   const userHasUnvestedTokens = redeemedAmount < userTotalSuccessfulOutAmount;
 
   const vestingProgress = calculateVestingProgress(
+    Number(auction?.end),
     Number(auction?.vesting?.startTimestamp),
     Number(auction?.vesting?.expiryTimestamp),
   );
@@ -178,13 +196,17 @@ export function VestingCard() {
           <Progress value={vestingProgress} className="mt-2" />
         </Metric>
         <div className="col-span-full grid grid-cols-subgrid">
-          <Metric size="s" label="Term">
-            {vestingTerm}
-          </Metric>
-          <Metric size="s" label="Vesting Begins" childrenClassName="text-sm">
-            {auction.vesting?.startDate != null &&
-              formatDate.fullLocal(new Date(auction.vesting.startDate))}
-          </Metric>
+          {vestingTerm !== "Instant" && (
+            <Metric size="s" label="Term">
+              {vestingTerm}
+            </Metric>
+          )}
+          {vestingTerm !== "Instant" && (
+            <Metric size="s" label="Vesting Begins" childrenClassName="text-sm">
+              {auction.vesting?.startDate != null &&
+                formatDate.fullLocal(new Date(auction.vesting.startDate))}
+            </Metric>
+          )}
           <Metric size="s" label="Vesting Ends" childrenClassName="text-sm">
             {auction.vesting?.startDate != null &&
               formatDate.fullLocal(new Date(auction.vesting.expiryDate))}
