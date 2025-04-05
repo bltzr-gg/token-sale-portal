@@ -1,8 +1,4 @@
 import {
-  AccordionContent,
-  AccordionItem,
-  AccordionRoot,
-  AccordionTrigger,
   Avatar,
   Card,
   cn,
@@ -236,73 +232,39 @@ export function AuctionMetrics({ className }: { className?: string } = {}) {
           a new level of accountability - both in the ring and in the halls of
           power.
         </p>
-        <AccordionRoot collapsible type="single">
-          <AccordionItem
-            value={"item-0"}
-            className="flex flex-col justify-center"
+        <h4 className="my-5 text-xl font-light">Getting $REAL</h4>
+        <p className="mb-2 text-lg text-white/90">
+          The $REAL token is launching via a sealed-bid auction followed by a
+          Uniswap liquidity rollout. This process is designed to ensure fair
+          access for all participants, and renders sniping impossible. The
+          auction will be open for bidding for 26 hours. Tokens will be locked
+          for six hours after auction close to facilitate a snipe-free
+          deployment of on-chain liquidity. Proceeds from the auction will seed
+          this pool and fund the DAO treasury.
+        </p>
+        <p className="mb-2 text-lg text-white/90">
+          Sealed-bid auctions clear at a single auction price. Anyone who bids
+          above the final clearing price will receive more $REAL tokens, and any
+          excess ETH. Anyone who bids below the final clearing price will
+          receive no $REAL tokens and be refunded all of their ETH.
+        </p>
+        <div className="flex justify-center px-2 py-6">
+          <img
+            src={graphImg}
+            alt="Sealed Auction Graph"
+            className="w-full max-w-3xl"
+          />
+        </div>
+        <p className="mb-2 text-lg text-white/90">
+          To read more about the sealed price auction mechanism, refer to the
+          Axis Finance{" "}
+          <Link
+            className="text-primary"
+            href="https://axis.finance/docs/dapp/sealed-bid-auctions"
           >
-            <AccordionTrigger className="self-start">
-              Why a Token Auction?
-            </AccordionTrigger>
-            <AccordionContent className="space-y-3">
-              <p className="text-lg text-white/90">
-                We&apos;re using a{" "}
-                <Link
-                  className="text-primary"
-                  href="https://axis.finance/docs/dapp/sealed-bid-auctions"
-                >
-                  Sealed Bid Auction{" "}
-                  <ExternalLink className="mb-1 inline size-4" />
-                </Link>{" "}
-                to give the <strong>$REAL</strong> community a truly fair and
-                transparent launch, free from the frantic chaos of traditional
-                token sales. Here&apos;s what makes it different:
-              </p>
-              <ul className="ml-6 list-disc space-y-2 text-lg text-white/90">
-                <li>
-                  <strong>No Sniping:</strong> In many token sales, timing can
-                  be everything. People rush in right before the sale closes, or
-                  bots swoop in early to gain an unfair edge. With sealed-bid
-                  auctions, all bids remain private until settlement, meaning no
-                  one can “snipe” at the last second by monitoring on-chain
-                  activity.
-                </li>
-                <li>
-                  <strong>Efficient, Equitable Distribution:</strong> Once
-                  bidding closes, bids are sorted highest to lowest, and tokens
-                  are allocated starting from the top until they&apos;re all
-                  distributed. Everyone who meets or exceeds the final clearing
-                  price gets tokens at that single, uniform price so you&apos;ll
-                  never overpay if you happened to bid higher.
-                </li>
-                <li>
-                  <strong>No Gas Wars:</strong> By decoupling timing from token
-                  allocation, sealed-bid auctions eliminate the common “gas war”
-                  problem. You can place your bid with confidence at any time
-                  before the auction ends, without fighting to get in first or
-                  pay exorbitant network fees to front-run other buyers.
-                </li>
-                <li>
-                  <strong>Smooth Post-Sale Dynamics:</strong> After the auction
-                  settles, <strong>$REAL</strong> will be available in Uniswap
-                  liquidity pools, giving everyone (bidders or not) quick and
-                  orderly access. This approach typically reduces volatility,
-                  because the price is anchored to the fair clearing price
-                  discovered during the auction.
-                </li>
-              </ul>
-              <p className="text-lg text-white/90">
-                Ultimately with this sealed-bid auction, the{" "}
-                <strong>$REAL</strong> token sale aims to deliver a no-drama,
-                no-FUD experience. One that ensures participants get a fair shot
-                at the tokens they want, at a fair market price.
-              </p>
-              <div className="px-2 pt-5">
-                <img src={graphImg} alt="Sealed Auction Graph" />
-              </div>
-            </AccordionContent>
-          </AccordionItem>
-        </AccordionRoot>
+            documentation <ExternalLink className="mb-1 inline size-4" />
+          </Link>
+        </p>
       </div>
     </Card>
   );
