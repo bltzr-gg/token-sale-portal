@@ -218,18 +218,18 @@ export function AuctionMetrics({ className }: { className?: string } = {}) {
         <h3 className="my-5 text-2xl font-light">Getting $REAL</h3>
         <p className="mb-2 text-lg text-white/90">
           The $REAL token is launching via a sealed-bid auction followed by a
-          Uniswap liquidity rollout. This process is designed to ensure fair
-          access for all participants, and renders sniping impossible. The
-          auction will be open for bidding for 26 hours. Tokens will be locked
-          for six hours after auction close to facilitate a snipe-free
+          deployment on Uniswap. This ensures fair access for all participants
+          and renders sniping impossible. The auction will be open for 28 hours,
+          after which a single clearing price will be determined. Tokens will be
+          locked for 12 hours after auction close to facilitate a snipe-free
           deployment of on-chain liquidity. Proceeds from the auction will seed
           this pool and fund the DAO treasury.
         </p>
         <p className="mb-2 text-lg text-white/90">
           Sealed-bid auctions clear at a single auction price. Anyone who bids
-          above the final clearing price will receive more $REAL tokens, and any
-          excess ETH. Anyone who bids below the final clearing price will
-          receive no $REAL tokens and be refunded all of their ETH.
+          above the final clearing price will receive extra $REAL tokens. Anyone
+          who bids below the final clearing price will receive no $REAL tokens
+          and be refunded their USDC.
         </p>
         <div className="flex justify-center px-2 py-6">
           <img
