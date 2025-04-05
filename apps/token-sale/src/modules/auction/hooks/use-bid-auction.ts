@@ -49,12 +49,8 @@ export const useBidAuction = (
       throw new Error("Not connected. Try connecting your wallet.");
     }
 
-    if (!allowance.isSufficientAllowance) {
-      await allowance.execute();
-    }
-
     bid.submit?.();
-  }, [allowance, bid, bidderAddress]);
+  }, [bid, bidderAddress]);
 
   React.useEffect(() => {
     if (bid.receipt == null || !bid.receipt.isSuccess) return;

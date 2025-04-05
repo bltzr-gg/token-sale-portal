@@ -22,6 +22,7 @@ import useERC20Balance from "loaders/use-erc20-balance";
 import { QuestionMarkCircledIcon } from "@radix-ui/react-icons";
 import { useAuctionSuspense } from "@/hooks/use-auction";
 import { TransactionDialog } from "../transaction/transaction-dialog";
+import { useMutation } from "@tanstack/react-query";
 
 const schema = z.object({
   baseTokenAmount: z.string(),
@@ -169,12 +170,16 @@ export function AuctionPurchase() {
   const isWalletChainIncorrect =
     auction.chainId !== currentChainId || !walletAccount.isConnected;
 
-  const handleSubmission = useCallback(async () => {
-    if (!bid.allowance.isSufficientAllowance) {
-      await bid.allowance.execute();
-    }
-    setOpen(true);
-  }, [bid.allowance]);
+  const submissionHandlerMutation = useMutation({
+    mutationFn: async () => {
+      if (!bid.allowance.isSufficientAllowance) {
+        await bid.allowance.execute();
+        await bid.simulation.refetch();
+        await bid.allowance.refetch();
+      }
+      setOpen(true);
+    },
+  });
 
   const isValidInput = form.formState.isValid;
 
@@ -222,7 +227,9 @@ export function AuctionPurchase() {
   return (
     <div id="auction-bids">
       <FormProvider {...form}>
-        <form onSubmit={form.handleSubmit(handleSubmission)}>
+        <form
+          onSubmit={form.handleSubmit(() => submissionHandlerMutation.mutate())}
+        >
           <Card
             headerRightElement={
               <div className="empty:hidden">
@@ -314,6 +321,7 @@ export function AuctionPurchase() {
               <div className="mt-4 w-full">
                 <Button
                   loading={
+                    submissionHandlerMutation.isPending ||
                     bid.isWaiting ||
                     bid.allowance.isLoading ||
                     bid.bidTx.isPending ||
@@ -321,7 +329,7 @@ export function AuctionPurchase() {
                   }
                   className="w-full"
                 >
-                  {bid.allowance.isLoading
+                  {submissionHandlerMutation.isPending
                     ? "Approving..."
                     : bid.isWaiting
                       ? "Waiting for confirmation..."

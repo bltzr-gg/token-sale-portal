@@ -53,7 +53,7 @@ export const useAllowance = (args: UseAllowanceProps) => {
     const written = await writeContract.writeContractAsync(
       approveCall!.request,
     );
-    await client?.waitForTransactionReceipt({ hash: written });
+    await client!.waitForTransactionReceipt({ hash: written });
   }, [approveCall, client, writeContract]);
 
   useEffect(() => {
@@ -64,6 +64,7 @@ export const useAllowance = (args: UseAllowanceProps) => {
 
   return {
     data: allowance.data,
+    refetch: allowance.refetch,
     approveTx: writeContract,
     approveReceipt,
     allowance,
