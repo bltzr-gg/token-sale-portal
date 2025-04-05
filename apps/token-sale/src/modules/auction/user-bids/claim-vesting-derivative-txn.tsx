@@ -17,7 +17,7 @@ export function ClaimVestingDervivativeTxn({
       open={true}
       signatureMutation={claimBidsTxn.claimTx}
       error={claimBidsTxn.error}
-      onConfirm={claimBidsTxn.handleClaim}
+      onConfirm={() => claimBidsTxn.handleClaim.mutateAsync()}
       mutation={claimBidsTxn.claimReceipt}
       chainId={auction.chainId}
       onOpenChange={(open: boolean) => {
@@ -27,6 +27,7 @@ export function ClaimVestingDervivativeTxn({
         }
       }}
       hash={claimBidsTxn.claimTx.data}
+      loading={claimBidsTxn.handleClaim.isPending}
       disabled={claimBidsTxn.isWaiting}
       screens={{
         idle: {
