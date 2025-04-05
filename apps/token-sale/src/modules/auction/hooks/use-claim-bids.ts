@@ -1,15 +1,22 @@
-import { useCallback, useEffect, useMemo } from "react";
+import { useMemo } from "react";
 import {
   useAccount,
+  usePublicClient,
   useSimulateContract,
   useWaitForTransactionReceipt,
   useWriteContract,
 } from "wagmi";
 import { useSdk } from "@axis-finance/sdk/react";
 import { useAuctionSuspense } from "@/hooks/use-auction";
+import { useMutation } from "@tanstack/react-query";
+import assert from "assert";
+import { decodeEventLog } from "viem";
+import { auctionHouse } from "@/constants/contracts";
+import { useApolloClient } from "@apollo/client";
+import { AuctionBid } from "@/hooks/use-auction/types";
 
 export function useClaimBids() {
-  const { data: auction, refetch } = useAuctionSuspense();
+  const { data: auction } = useAuctionSuspense();
   const { address: userAddress } = useAccount();
   const sdk = useSdk();
 
@@ -43,19 +50,91 @@ export function useClaimBids() {
   const claimTx = useWriteContract();
   const claimReceipt = useWaitForTransactionReceipt({ hash: claimTx.data });
 
-  // When someone claims their bids, refetch the auction from the subgraph so the dapp has the latest data
-  // TODO: we should optimistically update the auction bids here instead
-  useEffect(() => {
-    if (claimReceipt.isSuccess) {
-      setTimeout(() => refetch(), 2500);
-    }
-  }, [claimReceipt.isSuccess, refetch]);
+  const client = usePublicClient();
+  const apollo = useApolloClient();
 
-  const handleClaim = useCallback(() => {
-    if (claimCall.data) {
-      claimTx.writeContract(claimCall.data.request!);
-    }
-  }, [claimCall.data, claimTx]);
+  const handleClaim = useMutation({
+    mutationFn: async () => {
+      assert(claimCall.data, "claimCall.data is null");
+      if (claimCall.data) {
+        const tx = await claimTx.writeContractAsync(claimCall.data.request!);
+        const receipt = await client!.waitForTransactionReceipt({ hash: tx });
+
+        for (const log of receipt.logs) {
+          const decoded = decodeEventLog({
+            abi: auctionHouse.abi,
+            data: log.data,
+            topics: log.topics,
+          });
+
+          switch (decoded.eventName) {
+            case "ClaimBid":
+              apollo.cache.modify({
+                id: apollo.cache.identify({
+                  __typename: "BatchAuctionLot",
+                  id: auction.id,
+                }),
+                fields: {
+                  bids(existingBids) {
+                    const index = existingBids.findIndex(
+                      (bid: AuctionBid) =>
+                        bid.bidId === decoded.args.bidId.toString(),
+                    );
+
+                    if (index === -1) {
+                      throw new Error("Bid not found");
+                    }
+
+                    return existingBids.map((bid: AuctionBid, i: number) => {
+                      if (i === index) {
+                        return {
+                          ...bid,
+                          status: "claimed",
+                        };
+                      }
+
+                      return bid;
+                    });
+                  },
+                },
+              });
+              break;
+            case "RefundBid":
+              apollo.cache.modify({
+                id: apollo.cache.identify({
+                  __typename: "BatchAuctionLot",
+                  id: auction.id,
+                }),
+                fields: {
+                  bids(existingBids) {
+                    const index = existingBids.findIndex(
+                      (bid: AuctionBid) =>
+                        bid.bidId === decoded.args.bidId.toString(),
+                    );
+
+                    if (index === -1) {
+                      throw new Error("Bid not found");
+                    }
+
+                    return existingBids.map((bid: AuctionBid, i: number) => {
+                      if (i === index) {
+                        return {
+                          ...bid,
+                          status: "refunded",
+                        };
+                      }
+
+                      return bid;
+                    });
+                  },
+                },
+              });
+              break;
+          }
+        }
+      }
+    },
+  });
 
   const isWaiting =
     claimTx.isPending ||

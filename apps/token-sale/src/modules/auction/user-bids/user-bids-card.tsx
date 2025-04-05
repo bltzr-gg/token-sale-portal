@@ -30,7 +30,7 @@ export function UserBidsCard() {
       >
         <RequiresChain chainId={auction.chainId}>
           <div className="gap-y-md flex flex-col">
-            <Metric size="l" label="You Bid">
+            <Metric size="l" label="Your Bid">
               {shorten(userBids.totalAmount)} {auction.quoteToken.symbol}
             </Metric>
             {userBids.unsuccessfulBids > 0 && (
@@ -70,7 +70,7 @@ export function UserBidsCard() {
           open={isTxnDialogOpen}
           signatureMutation={claimBidsTxn.claimTx}
           error={claimBidsTxn.claimCall.error || claimBidsTxn.claimTx.error} // Catch both simulation and execution errors
-          onConfirm={claimBidsTxn.handleClaim}
+          onConfirm={() => claimBidsTxn.handleClaim.mutateAsync()}
           mutation={claimBidsTxn.claimReceipt}
           chainId={auction.chainId}
           onOpenChange={(open: boolean) => {
