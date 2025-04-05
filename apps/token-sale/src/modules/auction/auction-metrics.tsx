@@ -20,6 +20,7 @@ import { formatCurrencyUnits } from "@/utils/currency";
 import { PropsWithChildren } from "react";
 import { ExternalLink, HelpCircle } from "lucide-react";
 import { getDurationBetweenDates } from "./utils/get-duration-between-dates";
+import graphImg from "@/assets/images/sealed-auction-graph.png";
 
 const Label = ({
   className,
@@ -296,6 +297,9 @@ export function AuctionMetrics({ className }: { className?: string } = {}) {
                 no-FUD experience. One that ensures participants get a fair shot
                 at the tokens they want, at a fair market price.
               </p>
+              <div className="px-2 pt-5">
+                <img src={graphImg} alt="Sealed Auction Graph" />
+              </div>
             </AccordionContent>
           </AccordionItem>
         </AccordionRoot>
