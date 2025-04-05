@@ -179,7 +179,7 @@ export function VestingCard() {
     <Card title={`${shouldShowClaimVesting ? "Claim" : "Redeem"}`}>
       <div className="mb-5 grid grid-cols-2 gap-5 md:grid-cols-4">
         <div className="col-span-full grid grid-cols-subgrid gap-5">
-          <Metric size="l" label="You Bid">
+          <Metric size="l" label="Your Bid">
             {shorten(userTotalBidAmount)} {auction.quoteToken.symbol}
           </Metric>
           {userTotalUnsuccessfulBidAmount > 0 && (
@@ -188,7 +188,7 @@ export function VestingCard() {
               {auction.quoteToken.symbol}
             </Metric>
           )}
-          <Metric size="l" label="You Get">
+          <Metric size="l" label="You Won">
             {shorten(userTotalTokensWon)} {auction.baseToken.symbol}
           </Metric>
         </div>

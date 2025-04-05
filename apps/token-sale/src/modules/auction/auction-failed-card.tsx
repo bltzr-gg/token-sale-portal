@@ -46,17 +46,17 @@ export function AuctionFailedCard() {
     >
       <RequiresChain chainId={auction.chainId}>
         <div className="grid gap-3 md:grid-cols-4 lg:grid-cols-8">
-          <Metric size="l" label="You Bid">
+          <Metric size="l" label="Your Bid">
             {shorten(totalAmount)} {auction.quoteToken.symbol}
           </Metric>
 
           {refundTotal > 0 && (
-            <Metric size="l" label="You Refunded">
+            <Metric size="l" label="Your Refund Amount">
               {shorten(refundTotal)} {auction.quoteToken.symbol}
             </Metric>
           )}
 
-          <Metric size="l" label="You Get">
+          <Metric size="l" label="Claim Amount">
             0 {auction.baseToken.symbol}
           </Metric>
         </div>

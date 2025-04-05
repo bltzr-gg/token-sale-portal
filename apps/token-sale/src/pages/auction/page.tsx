@@ -14,7 +14,6 @@ import { AuctionMetrics } from "@/modules/auction/auction-metrics";
 import { AuctionPurchase } from "@/modules/auction/auction-purchase";
 import { SettledAuctionCard } from "@/modules/auction/settled-auction-card";
 import { UserBidsCardContainer } from "@/modules/auction/user-bids";
-import { ReferralRewards } from "@/modules/auction/referral-rewards";
 import phoneVideo from "@/assets/videos/phone-connor-promo.mp4";
 import wideVideo from "@/assets/videos/large-connor-promo.mp4";
 
@@ -119,7 +118,6 @@ export default function AuctionPage() {
           <>
             <SettledAuctionCard />
             <UserBidsCardContainer />
-            {isConnected && <ReferralRewards />}
           </>
         )}
       </div>

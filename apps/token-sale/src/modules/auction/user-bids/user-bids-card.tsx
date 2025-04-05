@@ -38,7 +38,7 @@ export function UserBidsCard() {
                 {shorten(userBids.refundTotal)} {auction.quoteToken.symbol}
               </Metric>
             )}
-            <Metric size="l" label="You Get">
+            <Metric size="l" label="Tokens Won">
               {shorten(userBids.tokensWon)} {auction.baseToken.symbol}
             </Metric>
 
