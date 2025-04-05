@@ -64,12 +64,18 @@ export function AuctionMetrics({ className }: { className?: string } = {}) {
     <Card
       headerRightElement={
         <Popover>
-          <PopoverTrigger className="group pl-2 text-right">
-            <Label>Curated by </Label>
-            <Value className="group-hover:text-primary whitespace-nowrap">
-              Conor McGregor
-              <HelpCircle className="mb-0.5 ml-0.5 inline size-4" />
-            </Value>
+          <PopoverTrigger className="group flex items-center gap-3 pl-2 text-right">
+            <div>
+              <Label>Curated by </Label>
+              <Value className="group-hover:text-primary whitespace-nowrap">
+                Conor McGregor
+                <HelpCircle className="mb-0.5 ml-0.5 inline size-4" />
+              </Value>
+            </div>
+            <Avatar
+              src="https://pbs.twimg.com/profile_images/1858650849959985152/6k3O-svn_400x400.jpg"
+              className="mt-1 size-12"
+            />
           </PopoverTrigger>
           <PopoverContent
             align="end"
