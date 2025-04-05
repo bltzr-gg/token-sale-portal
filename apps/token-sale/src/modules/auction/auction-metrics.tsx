@@ -100,7 +100,7 @@ export function AuctionMetrics({ className }: { className?: string } = {}) {
               <div className="text-right">
                 <Link
                   className="group"
-                  href="https://app.axis.finance/#/curator/TheNotoriousMMA"
+                  href="https://app.axis.finance/#/curator/369583954"
                 >
                   Verified by{" "}
                   <svg
