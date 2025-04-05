@@ -11,13 +11,16 @@ export function NotConnectedClaimCard() {
             <img
               className="w-[92.351]px h-[80px]"
               src="/images/axis-logo.svg"
-              alt="Axis Logo"
             />
             <Text size="xl">Auction has ended</Text>
             <Text>Connect your wallet to claim your tokens</Text>
           </div>
         </div>
-        <RequiresChain className="w-full max-w-lg" chainId={AUCTION_CHAIN_ID} />
+        <RequiresChain
+          buttonClass="w-full"
+          className="w-full"
+          chainId={AUCTION_CHAIN_ID}
+        />
       </div>
     </Card>
   );

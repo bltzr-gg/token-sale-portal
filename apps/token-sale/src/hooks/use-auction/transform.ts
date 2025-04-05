@@ -119,6 +119,8 @@ export const transform = (auction: BatchAuctionLot) => {
   const capacity = BigInt(
     parseFloat(auction.capacity ?? "0") * 10 ** auction.baseToken.decimals,
   );
+  const minRaise =
+    (minFilled * price) / 10n ** BigInt(auction.baseToken.decimals);
   // END bullshit zone
 
   const [chainKey] =
@@ -162,7 +164,7 @@ export const transform = (auction: BatchAuctionLot) => {
     minBidSize,
     minFilled,
     minPrice: price,
-    minRaise: minFilled * price,
+    minRaise,
     purchased,
     quoteToken: {
       ...auction.quoteToken,

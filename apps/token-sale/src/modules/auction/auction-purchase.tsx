@@ -90,7 +90,7 @@ export function AuctionPurchase() {
             auction.minBidSize,
 
           {
-            message: `Minimum bid is ${auction.minBidSize}`,
+            message: `Minimum bid is ${formatCurrencyUnits(auction.minBidSize, auction.quoteToken)}`,
             path: ["quoteTokenAmount"],
           },
         )
@@ -127,7 +127,7 @@ export function AuctionPurchase() {
             parseUnits(data.quoteTokenAmount, auction.quoteToken.decimals) <=
               maxBidAmount,
           {
-            message: `Exceeds remaining capacity of ${maxBidAmount} ${auction.quoteToken.symbol}`,
+            message: `Exceeds remaining capacity of ${formatCurrencyUnits(maxBidAmount, auction.baseToken)} ${auction.baseToken.symbol}`,
             path: ["quoteTokenAmount"],
           },
         ),
