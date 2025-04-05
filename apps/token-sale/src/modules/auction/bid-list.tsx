@@ -161,8 +161,6 @@ export function BidList() {
     [onlyUserBids, address, userBids, auction],
   );
 
-  console.log(JSON.stringify(mappedBids.map((b) => b.bidId + "----" + b.date)));
-
   const isLoading = refund.isPending || refundReceipt.isLoading;
 
   const handleRefund = (bidId?: string) => {
