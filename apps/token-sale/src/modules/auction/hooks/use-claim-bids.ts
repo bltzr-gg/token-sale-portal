@@ -16,7 +16,7 @@ import { useApolloClient } from "@apollo/client";
 import { AuctionBid } from "@/hooks/use-auction/types";
 
 export function useClaimBids() {
-  const { data: auction } = useAuctionSuspense();
+  const { data: auction, refetch } = useAuctionSuspense();
   const { address: userAddress } = useAccount();
   const sdk = useSdk();
 
@@ -56,83 +56,86 @@ export function useClaimBids() {
   const handleClaim = useMutation({
     mutationFn: async () => {
       assert(claimCall.data, "claimCall.data is null");
-      if (claimCall.data) {
-        const tx = await claimTx.writeContractAsync(claimCall.data.request!);
-        const receipt = await client!.waitForTransactionReceipt({ hash: tx });
 
-        for (const log of receipt.logs) {
-          const decoded = decodeEventLog({
-            abi: auctionHouse.abi,
-            data: log.data,
-            topics: log.topics,
-          });
+      const tx = await claimTx.writeContractAsync(claimCall.data.request!);
+      const receipt = await client!.waitForTransactionReceipt({ hash: tx });
 
-          switch (decoded.eventName) {
-            case "ClaimBid":
-              apollo.cache.modify({
-                id: apollo.cache.identify({
-                  __typename: "BatchAuctionLot",
-                  id: auction.id,
-                }),
-                fields: {
-                  bids(existingBids) {
-                    const index = existingBids.findIndex(
-                      (bid: AuctionBid) =>
-                        bid.bidId === decoded.args.bidId.toString(),
-                    );
+      for (const log of receipt.logs) {
+        const decoded = decodeEventLog({
+          abi: auctionHouse.abi,
+          data: log.data,
+          topics: log.topics,
+        });
 
-                    if (index === -1) {
-                      throw new Error("Bid not found");
+        switch (decoded.eventName) {
+          case "ClaimBid":
+            apollo.cache.modify({
+              id: apollo.cache.identify({
+                __typename: "BatchAuctionLot",
+                id: auction.id,
+              }),
+              fields: {
+                bids(existingBids) {
+                  const index = existingBids.findIndex(
+                    (bid: AuctionBid) =>
+                      bid.bidId === decoded.args.bidId.toString(),
+                  );
+
+                  if (index === -1) {
+                    throw new Error("Bid not found");
+                  }
+
+                  return existingBids.map((bid: AuctionBid, i: number) => {
+                    if (i === index) {
+                      return {
+                        ...bid,
+                        status: "claimed",
+                      };
                     }
 
-                    return existingBids.map((bid: AuctionBid, i: number) => {
-                      if (i === index) {
-                        return {
-                          ...bid,
-                          status: "claimed",
-                        };
-                      }
-
-                      return bid;
-                    });
-                  },
+                    return bid;
+                  });
                 },
-              });
-              break;
-            case "RefundBid":
-              apollo.cache.modify({
-                id: apollo.cache.identify({
-                  __typename: "BatchAuctionLot",
-                  id: auction.id,
-                }),
-                fields: {
-                  bids(existingBids) {
-                    const index = existingBids.findIndex(
-                      (bid: AuctionBid) =>
-                        bid.bidId === decoded.args.bidId.toString(),
-                    );
+              },
+            });
+            break;
+          case "RefundBid":
+            apollo.cache.modify({
+              id: apollo.cache.identify({
+                __typename: "BatchAuctionLot",
+                id: auction.id,
+              }),
+              fields: {
+                bids(existingBids) {
+                  const index = existingBids.findIndex(
+                    (bid: AuctionBid) =>
+                      bid.bidId === decoded.args.bidId.toString(),
+                  );
 
-                    if (index === -1) {
-                      throw new Error("Bid not found");
+                  if (index === -1) {
+                    throw new Error("Bid not found");
+                  }
+
+                  return existingBids.map((bid: AuctionBid, i: number) => {
+                    if (i === index) {
+                      return {
+                        ...bid,
+                        status: "refunded",
+                      };
                     }
 
-                    return existingBids.map((bid: AuctionBid, i: number) => {
-                      if (i === index) {
-                        return {
-                          ...bid,
-                          status: "refunded",
-                        };
-                      }
-
-                      return bid;
-                    });
-                  },
+                    return bid;
+                  });
                 },
-              });
-              break;
-          }
+              },
+            });
+            break;
         }
       }
+    },
+    onSuccess: async () => {
+      await new Promise((resolve) => setTimeout(resolve, 5000));
+      await refetch();
     },
   });
 
