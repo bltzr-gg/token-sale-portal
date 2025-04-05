@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from "react";
+import { useCallback, useEffect, useMemo } from "react";
 import {
   useAccount,
   useSimulateContract,
@@ -51,11 +51,11 @@ export function useClaimBids() {
     }
   }, [claimReceipt.isSuccess, refetch]);
 
-  const handleClaim = () => {
+  const handleClaim = useCallback(() => {
     if (claimCall.data) {
       claimTx.writeContract(claimCall.data.request!);
     }
-  };
+  }, [claimCall.data, claimTx]);
 
   const isWaiting =
     claimTx.isPending ||

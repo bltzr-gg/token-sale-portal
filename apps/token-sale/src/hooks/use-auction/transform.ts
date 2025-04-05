@@ -73,6 +73,11 @@ function getAuctionStatus({
   return AuctionStatusSchema.parse(subgraphStatus);
 }
 
+const convertNumberStringToBigInt = (
+  str: undefined | string | null,
+  decimals: number,
+) => BigInt(Math.floor(parseFloat(str ?? "0") * 10 ** decimals));
+
 export const transform = (auction: BatchAuctionLot) => {
   assert(
     auction.encryptedMarginalPrice !== null,
@@ -84,42 +89,46 @@ export const transform = (auction: BatchAuctionLot) => {
 
   const status = getAuctionStatus(auction);
 
-  // START: Lot of bullshit here with the team refusing to use bigint strings
-  const price = BigInt(
-    parseFloat(auction.encryptedMarginalPrice?.minPrice ?? "0") *
-      10 ** auction.quoteToken.decimals,
-  );
-  const minFilled = BigInt(
-    parseFloat(auction.encryptedMarginalPrice?.minFilled ?? "0") *
-      10 ** auction.baseToken.decimals,
-  );
   const callbacks = auction.callbacks as `0x${string}`;
-  const initialCapacity = BigInt(
-    parseFloat(auction.capacityInitial) * 10 ** auction.baseToken.decimals,
+  // START: Lot of bullshit here with the team refusing to use bigint strings
+  const price = convertNumberStringToBigInt(
+    auction.encryptedMarginalPrice?.minPrice,
+    auction.quoteToken.decimals,
   );
-
-  const targetRaise =
-    (initialCapacity * price) / 10n ** BigInt(auction.baseToken.decimals);
+  const minFilled = convertNumberStringToBigInt(
+    auction.encryptedMarginalPrice?.minFilled,
+    auction.baseToken.decimals,
+  );
+  const initialCapacity = convertNumberStringToBigInt(
+    auction.capacityInitial,
+    auction.baseToken.decimals,
+  );
   const totalAmount = auction.bids.reduce(
-    (total, b) =>
-      total +
-      BigInt(parseFloat(b.amountIn) * 10 ** auction.quoteToken.decimals),
+    (total, b) => total + BigInt(b.rawAmountIn),
     0n,
   );
-  const marginalPrice = BigInt(
-    parseFloat(auction.encryptedMarginalPrice?.marginalPrice ?? "0") *
-      10 ** auction.quoteToken.decimals,
+  const marginalPrice = convertNumberStringToBigInt(
+    auction.encryptedMarginalPrice?.marginalPrice,
+    auction.quoteToken.decimals,
   );
-  const minBidSize = BigInt(
-    parseFloat(auction.encryptedMarginalPrice?.minBidSize ?? "0") *
-      10 ** auction.quoteToken.decimals,
+  const minBidSize = convertNumberStringToBigInt(
+    auction.encryptedMarginalPrice?.minBidSize,
+    auction.quoteToken.decimals,
   );
-  const purchased = BigInt(
-    parseFloat(auction.purchased ?? "0") * 10 ** auction.quoteToken.decimals,
+  const purchased = convertNumberStringToBigInt(
+    auction.purchased,
+    auction.quoteToken.decimals,
   );
-  const capacity = BigInt(
-    parseFloat(auction.capacity ?? "0") * 10 ** auction.baseToken.decimals,
+  const capacity = convertNumberStringToBigInt(
+    auction.capacity,
+    auction.baseToken.decimals,
   );
+  const sold = convertNumberStringToBigInt(
+    auction.sold,
+    auction.baseToken.decimals,
+  );
+  const targetRaise =
+    (initialCapacity * price) / 10n ** BigInt(auction.baseToken.decimals);
   const minRaise =
     (minFilled * price) / 10n ** BigInt(auction.baseToken.decimals);
   // END bullshit zone
@@ -175,7 +184,7 @@ export const transform = (auction: BatchAuctionLot) => {
     referrerFee: parseFloat(auction.referrerFee) * 100,
     seller: auction.seller as `0x${string}`,
     settled: !!auction.encryptedMarginalPrice?.settlementSuccessful,
-    sold: BigInt(auction.sold ?? "0"),
+    sold,
     start: new Date(Number(auction.start) * 1000),
     status,
     symbol: `${auction.quoteToken.symbol}/${auction.baseToken.symbol}`,

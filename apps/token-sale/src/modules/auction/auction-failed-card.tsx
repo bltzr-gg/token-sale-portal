@@ -28,6 +28,26 @@ const getFailReason = (auction: Auction) => {
   return "The auction did not settle successfully so there is nothing to claim";
 };
 
+const screens = {
+  idle: {
+    Component: () => (
+      <div className="text-center">
+        You&apos;re about to claim all of your outstanding refunds for this
+        auction.
+      </div>
+    ),
+    title: `Confirm refund`,
+  },
+  success: {
+    Component: () => (
+      <div className="flex justify-center text-center">
+        <p>Bids refunded successfully!</p>
+      </div>
+    ),
+    title: "Transaction Confirmed",
+  },
+};
+
 export function AuctionFailedCard() {
   const { data: auction } = useAuctionSuspense();
   const [isTxnDialogOpen, setTxnDialogOpen] = useState(false);
@@ -88,25 +108,7 @@ export function AuctionFailedCard() {
         }}
         hash={claimBidsTxn.claimTx.data}
         disabled={claimBidsTxn.isWaiting}
-        screens={{
-          idle: {
-            Component: () => (
-              <div className="text-center">
-                You&apos;re about to claim all of your outstanding refunds for
-                this auction.
-              </div>
-            ),
-            title: `Confirm refund`,
-          },
-          success: {
-            Component: () => (
-              <div className="flex justify-center text-center">
-                <p>Bids refunded successfully!</p>
-              </div>
-            ),
-            title: "Transaction Confirmed",
-          },
-        }}
+        screens={screens}
       />
     </Card>
   );
