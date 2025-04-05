@@ -185,6 +185,40 @@ export function AuctionPurchase() {
     bid?.bidTx?.isPending ||
     bid.simulation.isPending;
 
+  const screens = useMemo(
+    () => ({
+      idle: {
+        Component: () => (
+          <div className="mb-5 text-center">
+            You&apos;re about to place a bid of{" "}
+            {formatCurrencyUnits(parsedAmountIn, auction.quoteToken)}
+          </div>
+        ),
+        title: `Confirm Bid`,
+      },
+      success: {
+        Component: () => (
+          <div className="mb-5 flex justify-center text-center">
+            <LockIcon className="mr-1" />
+            Bid encrypted and stored successfully!
+          </div>
+        ),
+        title: "Transaction Confirmed",
+      },
+    }),
+    [auction.quoteToken, parsedAmountIn],
+  );
+
+  const onOpenChange = useCallback(
+    (open: boolean) => {
+      if (!open) {
+        bid.bidTx?.reset();
+      }
+      setOpen(open);
+    },
+    [bid.bidTx],
+  );
+
   return (
     <div id="auction-bids">
       <FormProvider {...form}>
@@ -306,34 +340,10 @@ export function AuctionPurchase() {
               onConfirm={bid.handleBid}
               mutation={bid.bidReceipt}
               chainId={auction.chainId}
-              onOpenChange={(open) => {
-                if (!open) {
-                  bid.bidTx?.reset();
-                }
-                setOpen(open);
-              }}
+              onOpenChange={onOpenChange}
               hash={bid.bidTx.data}
               disabled={shouldDisable || bid.isWaiting}
-              screens={{
-                idle: {
-                  Component: () => (
-                    <div className="mb-5 text-center">
-                      You&apos;re about to place a bid of{" "}
-                      {formatCurrencyUnits(parsedAmountIn, auction.quoteToken)}
-                    </div>
-                  ),
-                  title: `Confirm Bid`,
-                },
-                success: {
-                  Component: () => (
-                    <div className="mb-5 flex justify-center text-center">
-                      <LockIcon className="mr-1" />
-                      Bid encrypted and stored successfully!
-                    </div>
-                  ),
-                  title: "Transaction Confirmed",
-                },
-              }}
+              screens={screens}
             />
           </Card>
         </form>

@@ -12,7 +12,7 @@ import {
   DialogHeader,
   DialogTrigger,
 } from "@bltzr-gg/ui";
-import React from "react";
+import React, { useMemo } from "react";
 
 export type TransactionDialogElementProps = {
   chainId?: number;
@@ -76,7 +76,10 @@ export function TransactionDialog({
   onOpenChange,
   ...props
 }: TransactionDialogProps) {
-  const allScreens = { ...defaultScreens, ...screens };
+  const allScreens = useMemo(
+    () => ({ ...defaultScreens, ...screens }),
+    [screens],
+  );
 
   let status: TransactionScreenStatus = "idle";
   if (signatureMutation && signatureMutation.isPending) status = "signing";
@@ -85,7 +88,10 @@ export function TransactionDialog({
 
   const error = props.error ?? mutation?.error;
 
-  const { Component, title } = allScreens[status];
+  const { Component, title } = useMemo(
+    () => allScreens[status],
+    [allScreens, status],
+  );
   const showFooter = status === "idle";
 
   return (
