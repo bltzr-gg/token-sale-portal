@@ -99,7 +99,7 @@ export function AuctionPurchase() {
             parseUnits(data.bidPrice ?? "0", auction.quoteToken.decimals) >=
             auction.minPrice,
           {
-            message: `Min rate is ${auction.minPrice} ${auction.quoteToken.symbol}/${auction.baseToken.symbol}`,
+            message: `Min rate is ${formatCurrencyUnits(auction.minPrice, auction.quoteToken)}/${auction.baseToken.symbol}`,
             path: ["bidPrice"],
           },
         )

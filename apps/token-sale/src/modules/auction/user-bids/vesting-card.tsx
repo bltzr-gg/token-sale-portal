@@ -13,27 +13,55 @@ import { RedeemVestedTokensTxn } from "./redeem-vested-tokens-txn";
 import { shorten } from "@/utils/number";
 import { useAuctionSuspense } from "@/hooks/use-auction";
 
-const calculateVestingProgress = (start?: number, end?: number): number => {
-  if (start == null || end == null) return 0;
+const calculateVestingProgress = (
+  auctionEnd?: number,
+  vestingStart?: number,
+  vestingEnd?: number,
+): number => {
+  if (vestingStart == null || vestingEnd == null) {
+    return 0;
+  }
+
+  // If the difference between start and end is less than 1 minute,
+  // we only care about how soon the vesting starts, not the duration
+  if (!!auctionEnd && vestingEnd - vestingStart < 60) {
+    const now = Date.now() / 1000;
+    const auctionEndSeconds = auctionEnd / 1000;
+
+    const total = vestingStart - auctionEndSeconds;
+    const elapsed = now - auctionEndSeconds;
+    return Math.min(100, (elapsed / total) * 100);
+  }
 
   // Return the percentage of time elapsed between the start and end, expressed as 0-100
   const now = Date.now() / 1000;
-  const elapsed = now - start;
-  const total = end - start;
+  const elapsed = now - vestingStart;
+  const total = vestingEnd - vestingStart;
 
   return Math.min(100, (elapsed / total) * 100);
 };
 
 const calculateVestingTerm = (start?: number, end?: number): string => {
-  if (start == null || end == null) return "0";
+  if (start == null || end == null) {
+    return "0";
+  }
+
+  // If less than 1 minute, return "instant"
+  if (end - start < 60) {
+    return "Instant";
+  }
 
   const termDays = (end - start) / 60 / 60 / 24;
 
   // If less than a day, return hours
-  if (termDays < 1) return `${Math.floor(termDays * 24)}H`;
+  if (termDays < 1) {
+    return `${Math.floor(termDays * 24)}H`;
+  }
 
   // If less than a month, return days
-  if (termDays < 31) return `${Math.floor(termDays)}D`;
+  if (termDays < 31) {
+    return `${Math.floor(termDays)}D`;
+  }
 
   // Return months
   return `${Math.floor(termDays / 30)}M`;
@@ -96,6 +124,7 @@ export function VestingCard() {
   const userHasUnvestedTokens = redeemedAmount < userTotalSuccessfulOutAmount;
 
   const vestingProgress = calculateVestingProgress(
+    Number(auction?.end),
     Number(auction?.vesting?.startTimestamp),
     Number(auction?.vesting?.expiryTimestamp),
   );
@@ -167,13 +196,17 @@ export function VestingCard() {
           <Progress value={vestingProgress} className="mt-2" />
         </Metric>
         <div className="col-span-full grid grid-cols-subgrid">
-          <Metric size="s" label="Term">
-            {vestingTerm}
-          </Metric>
-          <Metric size="s" label="Vesting Begins" childrenClassName="text-sm">
-            {auction.vesting?.startDate != null &&
-              formatDate.fullLocal(new Date(auction.vesting.startDate))}
-          </Metric>
+          {vestingTerm !== "Instant" && (
+            <Metric size="s" label="Term">
+              {vestingTerm}
+            </Metric>
+          )}
+          {vestingTerm !== "Instant" && (
+            <Metric size="s" label="Vesting Begins" childrenClassName="text-sm">
+              {auction.vesting?.startDate != null &&
+                formatDate.fullLocal(new Date(auction.vesting.startDate))}
+            </Metric>
+          )}
           <Metric size="s" label="Vesting Ends" childrenClassName="text-sm">
             {auction.vesting?.startDate != null &&
               formatDate.fullLocal(new Date(auction.vesting.expiryDate))}

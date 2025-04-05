@@ -35,13 +35,11 @@ const AUCTION_HOUSE_CONTRACT_ADDRESS =
 export const AUCTION_CHAIN_ID = parseInt(
   import.meta.env.VITE_AUCTION_CHAIN_ID ?? "1",
 );
-export const SUBGRAPH_URL =
-  import.meta.env.VITE_SUBGRAPH_URL ??
-  `https://subgraph.satsuma-prod.com/44c4cc082f74/spaces-team/axis-origin-mainnet/version/v1.0.6.3/api`;
-// end
-
 export const chainName = Object.entries(supportedChains).find(
   ([, key]) => key.id === AUCTION_CHAIN_ID,
 )?.[0] as keyof typeof supportedChains;
+export const SUBGRAPH_URL = `https://subgraph.satsuma-prod.com/44c4cc082f74/spaces-team/axis-origin-${chainName}/version/v1.0.6.3/api`;
+// end
+
 export const chain = supportedChains[chainName];
 export const AUCTION_ID = `${chainName}-${AUCTION_HOUSE_CONTRACT_ADDRESS}-${AUCTION_LOT_ID}`;
