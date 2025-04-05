@@ -182,6 +182,7 @@ export const transform = (auction: BatchAuctionLot) => {
     },
     urlPath: `/${AUCTION_CHAIN_ID}/${auction.id}`,
     referrerFee: parseFloat(auction.referrerFee) * 100,
+    refundedIds: auction.bidsRefunded.map((b) => b.id),
     seller: auction.seller as `0x${string}`,
     settled: !!auction.encryptedMarginalPrice?.settlementSuccessful,
     sold,

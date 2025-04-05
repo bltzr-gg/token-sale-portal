@@ -48,13 +48,14 @@ export function AuctionPurchase() {
       auction?.bids
         .filter(
           (b) =>
-            b.bidder.toLowerCase() === walletAccount.address?.toLowerCase(),
+            b.bidder.toLowerCase() === walletAccount.address?.toLowerCase() &&
+            !auction.refundedIds.includes(b.bidId),
         )
         .reduce((total, b) => {
           total += BigInt(b.rawAmountIn);
           return total;
         }, 0n) ?? 0n,
-    [auction?.bids, walletAccount.address],
+    [auction?.bids, auction.refundedIds, walletAccount.address],
   );
 
   const quoteTokens = useERC20Balance({
