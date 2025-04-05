@@ -1,10 +1,11 @@
-import { useEffect } from "react";
+import { useCallback, useEffect } from "react";
 import { Address, erc20Abi } from "viem";
 import {
   useReadContract,
   useWriteContract,
   useWaitForTransactionReceipt,
   useSimulateContract,
+  usePublicClient,
 } from "wagmi";
 
 export type UseAllowanceProps = {
@@ -18,6 +19,7 @@ export type UseAllowanceProps = {
 
 /** Used to manage an address' allowance for a given token */
 export const useAllowance = (args: UseAllowanceProps) => {
+  const client = usePublicClient();
   const writeContract = useWriteContract();
   const approveReceipt = useWaitForTransactionReceipt({
     hash: writeContract.data,
@@ -47,7 +49,12 @@ export const useAllowance = (args: UseAllowanceProps) => {
     args: [args.spenderAddress!, amountToApprove],
   });
 
-  const execute = () => writeContract.writeContractAsync(approveCall!.request);
+  const execute = useCallback(async () => {
+    const written = await writeContract.writeContractAsync(
+      approveCall!.request,
+    );
+    await client?.waitForTransactionReceipt({ hash: written });
+  }, [approveCall, client, writeContract]);
 
   useEffect(() => {
     if (approveReceipt.isSuccess) {

@@ -91,12 +91,13 @@ export const transform = (auction: BatchAuctionLot) => {
   );
   const minFilled = BigInt(
     parseFloat(auction.encryptedMarginalPrice?.minFilled ?? "0") *
-      10 ** auction.quoteToken.decimals,
+      10 ** auction.baseToken.decimals,
   );
   const callbacks = auction.callbacks as `0x${string}`;
   const initialCapacity = BigInt(
-    parseFloat(auction.capacityInitial) * 10 ** 18,
+    parseFloat(auction.capacityInitial) * 10 ** auction.baseToken.decimals,
   );
+
   const targetRaise =
     (initialCapacity * price) / 10n ** BigInt(auction.baseToken.decimals);
   const totalAmount = auction.bids.reduce(
