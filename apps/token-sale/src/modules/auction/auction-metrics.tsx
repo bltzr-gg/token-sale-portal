@@ -210,12 +210,9 @@ export function AuctionMetrics({ className }: { className?: string } = {}) {
 
         {auction.vesting && (
           <div>
-            <Label>Vesting Duration</Label>
+            <Label>Unlock Cliff</Label>
             <Value>
-              {getDurationBetweenDates(
-                auction.vesting.start,
-                auction.vesting.end,
-              )}
+              {getDurationBetweenDates(auction.end, auction.vesting.start)}
             </Value>
           </div>
         )}
