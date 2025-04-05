@@ -25,15 +25,26 @@ const calculateVestingProgress = (start?: number, end?: number): number => {
 };
 
 const calculateVestingTerm = (start?: number, end?: number): string => {
-  if (start == null || end == null) return "0";
+  if (start == null || end == null) {
+    return "0";
+  }
+
+  // If less than 1 minute, return "instant"
+  if (end - start < 60) {
+    return "Instant";
+  }
 
   const termDays = (end - start) / 60 / 60 / 24;
 
   // If less than a day, return hours
-  if (termDays < 1) return `${Math.floor(termDays * 24)}H`;
+  if (termDays < 1) {
+    return `${Math.floor(termDays * 24)}H`;
+  }
 
   // If less than a month, return days
-  if (termDays < 31) return `${Math.floor(termDays)}D`;
+  if (termDays < 31) {
+    return `${Math.floor(termDays)}D`;
+  }
 
   // Return months
   return `${Math.floor(termDays / 30)}M`;
