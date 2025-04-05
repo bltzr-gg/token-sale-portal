@@ -41,7 +41,7 @@ export function RedeemVestedTokensTxn({
         redeemVestedTokensTxn.redeemCall.error ||
         redeemVestedTokensTxn.redeemTx.error
       }
-      onConfirm={redeemVestedTokensTxn.handleRedeem}
+      onConfirm={() => redeemVestedTokensTxn.handleRedeem()}
       mutation={redeemVestedTokensTxn.redeemReceipt}
       chainId={auction.chainId}
       onOpenChange={(open: boolean) => {
