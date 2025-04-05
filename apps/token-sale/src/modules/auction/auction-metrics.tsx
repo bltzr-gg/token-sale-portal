@@ -215,24 +215,7 @@ export function AuctionMetrics({ className }: { className?: string } = {}) {
         )}
       </div>
       <div className="mt-5">
-        <h3 className="my-5 text-2xl font-light">
-          The Notorious $REAL Token: Where Champions Play 👑🥊
-        </h3>
-        <p className="mb-2 text-lg text-white/90">
-          <strong>$REAL</strong> is not just a token, it&apos;s Conor
-          McGregor&apos;s unstoppable spirit, delivering a knockout punch in the
-          fight for real change. By channeling the fearless energy of the
-          Notorious, <strong>$REAL</strong> is bringing citizens together to
-          champion bold new ways of funding and shaping leadership, putting
-          power back in the hands of the people.
-        </p>
-        <p className="mb-2 text-lg text-white/90">
-          This one-of-a-kind coin merges high-stakes spectacle with high-impact
-          ideals, forging a movement that hits harder, goes further, and demands
-          a new level of accountability - both in the ring and in the halls of
-          power.
-        </p>
-        <h4 className="my-5 text-xl font-light">Getting $REAL</h4>
+        <h3 className="my-5 text-2xl font-light">Getting $REAL</h3>
         <p className="mb-2 text-lg text-white/90">
           The $REAL token is launching via a sealed-bid auction followed by a
           Uniswap liquidity rollout. This process is designed to ensure fair
