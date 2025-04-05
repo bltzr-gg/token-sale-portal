@@ -20,7 +20,7 @@ const getFailReason = (auction: Auction) => {
   }
 
   // The raised amount was below the minimum fill
-  if (Number(auction.sold) < auction.minFilled) {
+  if (auction.sold < auction.minFilled) {
     return "The auction did not raise the minimum amount";
   }
 
@@ -97,7 +97,7 @@ export function AuctionFailedCard() {
         open={isTxnDialogOpen}
         signatureMutation={claimBidsTxn.claimTx}
         error={claimBidsTxn.error}
-        onConfirm={claimBidsTxn.handleClaim}
+        onConfirm={() => claimBidsTxn.handleClaim.mutateAsync()}
         mutation={claimBidsTxn.claimReceipt}
         chainId={auction.chainId}
         onOpenChange={(open: boolean) => {

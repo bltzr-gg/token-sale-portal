@@ -94,7 +94,7 @@ export const GET_AUCTION_BY_ID_QUERY: TypedDocumentNode<
 
   fragment BatchAuctionFields on BatchAuctionLot {
     maxBidId
-    bids(first: 1000) {
+    bids(first: 10000) {
       bidId
       bidder
       blockTimestamp

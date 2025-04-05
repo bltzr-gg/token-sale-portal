@@ -56,7 +56,7 @@ const defaultScreens: TransactionScreens = {
 };
 
 export type TransactionDialogProps = {
-  onConfirm: React.MouseEventHandler<HTMLButtonElement>;
+  onConfirm: (e: React.MouseEvent<HTMLButtonElement>) => void;
   mutation: UseWaitForTransactionReceiptReturnType;
   signatureMutation: UseWriteContractReturnType;
   triggerContent?: string | React.ReactNode;
