@@ -3,9 +3,13 @@ import react from "@vitejs/plugin-react";
 import { nodePolyfills } from "vite-plugin-node-polyfills";
 import tsconfigPaths from "vite-tsconfig-paths";
 import path from "path";
+import { sentryVitePlugin } from "@sentry/vite-plugin";
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
+  build: {
+    sourcemap: true,
+  },
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "src"),
@@ -27,6 +31,11 @@ export default defineConfig(({ mode }) => ({
     force: true,
   },
   plugins: [
+    sentryVitePlugin({
+      authToken: process.env.SENTRY_AUTH_TOKEN,
+      org: "rwg",
+      project: "token-sale-portal",
+    }),
     transformHTML(mode),
     react(),
     tsconfigPaths(),
