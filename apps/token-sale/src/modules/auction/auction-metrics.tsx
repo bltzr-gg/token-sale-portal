@@ -58,8 +58,14 @@ export function AuctionMetrics({ className }: { className?: string } = {}) {
   const baseTokenStats = useBaseTokenAuctionStats();
 
   return (
-    <Card
-      headerRightElement={
+    <Card className={className}>
+      <div className="mb-4 flex w-full flex-col items-center justify-between gap-4 md:flex-row">
+        <div className="flex items-center">
+          <h3 className="text-foreground-secondary inline-block font-mono text-[40px] font-light leading-[40px] tracking-tight">
+            $REAL Token Launch
+          </h3>
+        </div>
+
         <Popover>
           <PopoverTrigger className="group flex items-center gap-3 pl-2 text-right">
             <div>
@@ -117,10 +123,7 @@ export function AuctionMetrics({ className }: { className?: string } = {}) {
             </div>
           </PopoverContent>
         </Popover>
-      }
-      className={className}
-      title="$REAL Token Launch"
-    >
+      </div>
       <p className="text-red-600 empty:hidden">
         {baseTokenStats.error?.message &&
           "Error fetching base token metrics. Are you sure it implements the ERC20 standard?"}
