@@ -3,7 +3,7 @@ import { axisContracts } from "@axis-finance/deployments";
 import React from "react";
 import { useReadContract } from "wagmi";
 
-const BID_COUNT = 100n;
+const BID_COUNT = 1000n;
 
 export function useBidIndex(bidId: bigint = -1n) {
   const { data: auction } = useAuctionSuspense();
