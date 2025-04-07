@@ -12,7 +12,6 @@ import { AUCTION_CHAIN_ID, AUCTION_ID } from "../../app-config";
 import { useAuction } from "@/hooks/use-auction";
 import { AuctionMetrics } from "@/modules/auction/auction-metrics";
 import { AuctionPurchase } from "@/modules/auction/auction-purchase";
-import { SettledAuctionCard } from "@/modules/auction/settled-auction-card";
 import { UserBidsCardContainer } from "@/modules/auction/user-bids";
 import phoneVideo from "@/assets/videos/phone-connor-promo.mp4";
 import wideVideo from "@/assets/videos/large-connor-promo.mp4";
@@ -116,7 +115,6 @@ export default function AuctionPage() {
         {auction.status === "concluded" && <DecryptMarginalPriceSection />}
         {["settled", "aborted", "cancelled"].includes(auction?.status) && (
           <>
-            <SettledAuctionCard />
             <UserBidsCardContainer />
           </>
         )}

@@ -2,7 +2,6 @@ import { useAccount } from "wagmi";
 import { AuctionDerivativeTypes } from "@axis-finance/types";
 import { NotConnectedClaimCard } from "./not-connected";
 import { VestingCard } from "./vesting-card";
-import { AuctionFailedCard } from "../auction-failed-card";
 import { hasDerivative } from "../utils/auction-details";
 import { NoUserBidsCard } from "./no-user-bids-card";
 import { UserBidsCard } from "./user-bids-card";
@@ -58,7 +57,7 @@ export function UserBidsCardContainer() {
     }
 
     case "AUCTION_FAILED": {
-      return <AuctionFailedCard />;
+      return null;
     }
 
     case "AUCTION_VESTING": {
