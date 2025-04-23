@@ -1,8 +1,7 @@
-"use client";
-
 import React from "react";
 import logo from "../assets/images/logo.png";
 import ConnectButton from "./connect-button";
+import { DynamicUserProfile } from "@dynamic-labs/sdk-react-core";
 
 const Navbar: React.FC = () => {
   return (
@@ -19,7 +18,10 @@ const Navbar: React.FC = () => {
               aria-label="Real World Gaming Logo"
             />
           </a>
-          <ConnectButton />
+          <div className="flex max-w-[150px]">
+            <ConnectButton />
+            <DynamicUserProfile />
+          </div>
         </div>
       </nav>
     </>

@@ -17,6 +17,7 @@ import { CSVDownloader } from "components/csv-downloader";
 import { arrayToCSV } from "utils/csv";
 import { PriceCell } from "./cells/PriceCell";
 import { AmountInCell } from "./cells/AmountInCell";
+import { AmountOutCell } from "./cells/AmountOutCell";
 import { FilterIcon } from "lucide-react";
 import { auctionHouse } from "@/constants/contracts";
 import { AuctionBid } from "@/hooks/use-auction/types";
@@ -63,6 +64,12 @@ export const amountInCol = bidListColumnHelper.accessor("amountIn", {
   cell: (info) => <AmountInCell value={+info.getValue()} />,
 });
 
+export const amountOutCol = bidListColumnHelper.accessor("rawAmountOut", {
+  header: "Amount Out",
+  enableSorting: true,
+  cell: (info) => <AmountOutCell value={+info.getValue()!} />,
+});
+
 export const bidderCol = bidListColumnHelper.accessor("bidder", {
   header: "Bidder",
   enableSorting: true,
@@ -99,7 +106,13 @@ export const bidderCol = bidListColumnHelper.accessor("bidder", {
   },
 });
 
-const cols = [timestampCol, priceCol, amountInCol, bidderCol] as const;
+const fixedPriceCols = [
+  timestampCol,
+  amountInCol,
+  amountOutCol,
+  bidderCol,
+] as const;
+const sealedBidCols = [timestampCol, priceCol, amountInCol, bidderCol] as const;
 
 const screens = {
   idle: {
@@ -119,6 +132,8 @@ const screens = {
 export function BidList() {
   const { data: auction, refetch: refetchAuction } = useAuctionSuspense();
   const { address } = useAccount();
+
+  const cols = auction?.marginalPrice ? sealedBidCols : fixedPriceCols;
 
   const userBids = useStorageBids({
     auctionId: auction.id,
@@ -164,8 +179,9 @@ export function BidList() {
   const isLoading = refund.isPending || refundReceipt.isLoading;
 
   const handleRefund = (bidId?: string) => {
-    if (bidId === undefined || bidIndex === undefined)
+    if (bidId === undefined || bidIndex === undefined) {
       throw new Error("Unable to get bidId for refund");
+    }
 
     refund.writeContract({
       abi: auctionHouse.abi,

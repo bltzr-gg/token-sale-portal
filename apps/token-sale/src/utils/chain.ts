@@ -1,10 +1,10 @@
 import { deployments } from "@axis-finance/deployments";
-import { chains } from "@axis-finance/env";
-import { Chain } from "@axis-finance/types";
 
 import { environment } from "utils/environment";
+import { Chain } from "viem";
+import { mainnet, sepolia } from "viem/chains";
 
-const activeChains = chains.activeChains(environment.isTestnet);
+export const activeChains = environment.isTestnet ? [sepolia] : [mainnet];
 
 export const getBlockExplorer = (chain: Chain) => {
   return {
@@ -14,25 +14,9 @@ export const getBlockExplorer = (chain: Chain) => {
   };
 };
 
-/**
- * Map Rainbowkit chain names to their subgraph chain names.
- * Only used where there's discrepancies.
- */
-const CHAIN_NAME_MAP = {
-  arbitrum: "arbitrum-one",
-  mode: "mode-mainnet",
-  "mantle-sepolia": "mantle-sepolia-testnet",
-  mainnet: "ethereum",
-} as const;
-
 export function getChainId(chainName?: string): number {
-  const lowerChainName =
-    chainName?.toLowerCase() as keyof typeof CHAIN_NAME_MAP;
-  const mappedName = CHAIN_NAME_MAP[lowerChainName] || lowerChainName;
-  const name = mappedName?.replace(/-/g, " ");
-
   const chainId = activeChains.find(
-    (c) => c.name.toLocaleLowerCase() === name?.toLocaleLowerCase(),
+    (c) => c.name.toLocaleLowerCase() === chainName?.toLocaleLowerCase(),
   )?.id;
 
   if (chainId === undefined) {

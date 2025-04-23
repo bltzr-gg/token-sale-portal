@@ -5,16 +5,14 @@ export const auctionHouseTypes: Record<AuctionType, string> = {
   [AuctionType.FIXED_PRICE_BATCH]: "batch",
 };
 
-export function getAuctionType(auctionRef?: string) {
-  if (!auctionRef) return;
-  const key = auctionRef;
-  const type = key.toLowerCase().includes("emp")
+export function getAuctionType(auctionRef: string) {
+  const type = auctionRef.toLowerCase().includes("emp")
     ? AuctionType.SEALED_BID
     : AuctionType.FIXED_PRICE_BATCH;
 
   if (!type) {
     throw new Error(
-      `Unable to find AuctionType for hex:${auctionRef}->decoded:${key}`,
+      `Unable to find AuctionType for hex:${auctionRef}->decoded:${auctionRef}`,
     );
   }
 

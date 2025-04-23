@@ -1,5 +1,6 @@
 import { useAccount } from "wagmi";
 import ConnectButton from "./connect-button";
+import { cn } from "@bltzr-gg/ui";
 
 /** Renders a Connect Button if no connection detected, renders children otherwise */
 export function RequiresWalletConnection(
@@ -14,8 +15,7 @@ export function RequiresWalletConnection(
     <>{props.children}</>
   ) : (
     <ConnectButton
-      buttonClass={props.buttonClass}
-      className={props.className}
+      className={cn(props.className, props.buttonClass)}
       size="lg"
     />
   );

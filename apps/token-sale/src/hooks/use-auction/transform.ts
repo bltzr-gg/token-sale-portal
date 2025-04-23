@@ -1,4 +1,4 @@
-import { AuctionType, CallbacksType } from "@axis-finance/types";
+import { CallbacksType } from "@axis-finance/types";
 import type { BatchAuctionLot } from "../../queries/auction/types";
 import { AUCTION_CHAIN_ID } from "../../app-config";
 import { z } from "zod";
@@ -7,6 +7,7 @@ import { axisContracts } from "@axis-finance/deployments";
 import assert from "assert";
 import { AuctionStatusSchema } from "./types";
 import * as chains from "viem/chains";
+import { getAuctionType } from "@/modules/auction/utils/get-auction-type";
 
 export function getCallbacksType(callbacks?: `0x${string}`): CallbacksType {
   if (!callbacks || callbacks === zeroAddress) {
@@ -52,18 +53,17 @@ function getAuctionStatus({
   start,
   conclusion,
   encryptedMarginalPrice,
+  fixedPrice,
 }: Pick<
   BatchAuctionLot,
-  "start" | "conclusion" | "encryptedMarginalPrice"
+  "start" | "conclusion" | "encryptedMarginalPrice" | "fixedPrice"
 >): z.infer<typeof AuctionStatusSchema> {
-  assert(
-    encryptedMarginalPrice !== null,
-    "encryptedMarginalPrice is null, are you sure this is a Sealed Auction?",
-  );
   const currentTime = Date.now();
   const startTime = new Date(Number(start) * 1000).getTime();
   const conclusionTime = new Date(Number(conclusion) * 1000).getTime();
-  const subgraphStatus = encryptedMarginalPrice.status.toLowerCase();
+  const subgraphStatus = (
+    encryptedMarginalPrice?.status ?? fixedPrice?.status
+  )?.toLowerCase();
 
   if (subgraphStatus === "created") {
     if (currentTime > conclusionTime) return "concluded";
@@ -79,10 +79,6 @@ const convertNumberStringToBigInt = (
 ) => BigInt(Math.floor(parseFloat(str ?? "0") * 10 ** decimals));
 
 export const transform = (auction: BatchAuctionLot) => {
-  assert(
-    auction.encryptedMarginalPrice !== null,
-    "encryptedMarginalPrice is null, are you sure this is a Sealed Auction?",
-  );
   assert(auction.callbacks?.startsWith("0x"));
   assert(auction.quoteToken.address.startsWith("0x"));
   assert(auction.baseToken.address.startsWith("0x"));
@@ -171,6 +167,7 @@ export const transform = (auction: BatchAuctionLot) => {
     },
     lotId: Number(auction.lotId),
     marginalPrice,
+    fixedPrice: auction.fixedPrice,
     minBidSize,
     minFilled,
     minPrice: price,
@@ -190,7 +187,7 @@ export const transform = (auction: BatchAuctionLot) => {
     status,
     symbol: `${auction.quoteToken.symbol}/${auction.baseToken.symbol}`,
     targetRaise,
-    type: AuctionType.SEALED_BID,
+    type: getAuctionType(auction.auctionType),
   };
 };
 type GetArrayElementType<ArrayType extends readonly unknown[]> =

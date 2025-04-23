@@ -1,19 +1,17 @@
-import "@rainbow-me/rainbowkit/styles.css";
+import { EthereumWalletConnectors } from "@dynamic-labs/ethereum";
 
 import { PropsWithChildren } from "react";
-import { RainbowKitProvider, midnightTheme } from "@rainbow-me/rainbowkit";
+import { DynamicContextProvider } from "@dynamic-labs/sdk-react-core";
 
 export default function WalletProvider(props: PropsWithChildren) {
   return (
-    <RainbowKitProvider
-      appInfo={{
-        appName: "$REAL Public Token Sale",
-        learnMoreUrl: "https://docs.axis.finance",
+    <DynamicContextProvider
+      settings={{
+        environmentId: import.meta.env.VITE_DYNAMIC_ENVIRONMENT_ID,
+        walletConnectors: [EthereumWalletConnectors],
       }}
-      theme={midnightTheme()}
-      modalSize="compact"
     >
       {props.children}
-    </RainbowKitProvider>
+    </DynamicContextProvider>
   );
 }

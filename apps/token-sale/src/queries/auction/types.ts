@@ -15,10 +15,10 @@ export const BatchAuctionLotSchema = z
     capacityInitial: z.string(),
     start: z.string(),
     conclusion: z.string(),
-    auctionType: z.enum(["01EMPA"], {
+    auctionType: z.enum(["01EMPA", "01FPBA"], {
       errorMap: (issue, ctx) => {
         if (issue.code === "invalid_enum_value") {
-          return { message: "This app only supports sealed bid auctions" };
+          return { message: "Unsupported auction type" };
         }
         return { message: ctx.defaultError };
       },

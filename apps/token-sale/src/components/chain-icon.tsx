@@ -1,9 +1,7 @@
 import { Avatar } from "@bltzr-gg/ui";
-import { chains } from "@axis-finance/env";
+import Eth from "src/assets/icons/chains/ethereum.svg";
 
-import { environment } from "utils/environment";
-
-const activeChains = chains.activeChains(environment.isTestnet);
+import { activeChains } from "src/utils/chain";
 
 type ChainIconProps = {
   chainId: number;
@@ -11,7 +9,10 @@ type ChainIconProps = {
 
 export function ChainIcon(props: ChainIconProps) {
   const chain = activeChains.find((c) => c.id === props.chainId);
-  const icon = typeof chain?.iconUrl === "string" ? chain?.iconUrl : "";
 
-  return <Avatar src={icon} alt={chain?.name + " Logo"} />;
+  return (
+    <Avatar alt={chain?.name + " Logo"}>
+      <Eth />
+    </Avatar>
+  );
 }

@@ -23,6 +23,7 @@ import { QuestionMarkCircledIcon } from "@radix-ui/react-icons";
 import { useAuctionSuspense } from "@/hooks/use-auction";
 import { TransactionDialog } from "../transaction/transaction-dialog";
 import { useMutation } from "@tanstack/react-query";
+import { AuctionType } from "@axis-finance/types";
 
 const schema = z.object({
   baseTokenAmount: z.string(),
@@ -79,8 +80,9 @@ export function AuctionPurchase() {
         )
         .refine(
           (data) =>
+            auction.type !== AuctionType.SEALED_BID ||
             parseUnits(data.bidPrice ?? "0", auction.quoteToken.decimals) >
-            BigInt(0),
+              BigInt(0),
           {
             message: "Bid price must be greater than 0",
             path: ["bidPrice"],

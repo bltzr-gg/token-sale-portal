@@ -42,4 +42,4 @@ export const SUBGRAPH_URL = `https://subgraph.satsuma-prod.com/44c4cc082f74/spac
 // end
 
 export const chain = supportedChains[chainName];
-export const AUCTION_ID = `${chainName}-${AUCTION_HOUSE_CONTRACT_ADDRESS}-${AUCTION_LOT_ID}`;
+export const AUCTION_ID = `${chainName}-${AUCTION_HOUSE_CONTRACT_ADDRESS.toLowerCase()}-${AUCTION_LOT_ID}`;

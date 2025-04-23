@@ -1,6 +1,7 @@
-import type { Chain } from "@axis-finance/types";
 import { Badge, cn } from "@bltzr-gg/ui";
 import { CountdownChip } from "./countdown-chip";
+import { ChainIcon } from "@/components/chain-icon";
+import { Chain } from "viem";
 
 type AuctionCardBannerProps = {
   chain: Chain;
@@ -27,7 +28,7 @@ export function AuctionCardBanner(props: AuctionCardBannerProps) {
       <div className="flex justify-between">
         <Badge
           size={props.isGrid ? "s" : "m"}
-          icon={props.chain?.iconUrl as string}
+          icon={<ChainIcon chainId={props.chain.id} />}
         >
           {props.chain.name}
         </Badge>

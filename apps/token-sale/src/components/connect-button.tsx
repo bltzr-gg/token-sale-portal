@@ -1,95 +1,41 @@
-import { ConnectButton as RKConnectButton } from "@rainbow-me/rainbowkit";
-import {
-  Avatar,
-  Button,
-  type ButtonProps,
-  DropdownMenu,
-  DropdownMenuTrigger,
-} from "@bltzr-gg/ui";
+import { useDynamicAuthClickHandler } from "@/hooks/use-dynamic-auth-click-handler";
+import usePrimaryAddress from "@/hooks/use-primary-address";
+import { Button } from "@bltzr-gg/ui";
+import { useIsLoggedIn } from "@dynamic-labs/sdk-react-core";
+import { Wallet2 } from "lucide-react";
 
-export default function ConnectButton({
+const ConnectWallet = ({
   className,
-  buttonClass,
   size,
 }: {
   className?: string;
-  buttonClass?: string;
-  size?: ButtonProps["size"];
-}) {
+  size?: "default" | "lg";
+}) => {
+  const authHandler = useDynamicAuthClickHandler();
+  const isAuthenticated = useIsLoggedIn();
+  const primaryAddress = usePrimaryAddress();
+
   return (
-    <RKConnectButton.Custom>
-      {({ account, chain, openChainModal, openConnectModal, mounted }) => {
-        const ready = mounted;
-        const connected = ready && account && chain;
-
-        return (
-          <div
-            className={className}
-            {...(!ready && {
-              "aria-hidden": true,
-              style: {
-                opacity: 0,
-                pointerEvents: "none",
-                userSelect: "none",
-              },
-            })}
-          >
-            {(() => {
-              if (!connected) {
-                return (
-                  <Button
-                    className={buttonClass}
-                    size={size}
-                    onClick={openConnectModal}
-                  >
-                    Connect
-                  </Button>
-                );
-              }
-              if (chain.unsupported) {
-                return (
-                  <Button
-                    className={buttonClass}
-                    size={size}
-                    onClick={openChainModal}
-                  >
-                    Wrong network
-                  </Button>
-                );
-              }
-
-              return (
-                <div className={"flex items-center gap-x-1 "}>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <button className="flex items-center gap-x-1">
-                        <div className="space-y-1">
-                          <div className="leading-none">
-                            {account.ensName ?? account.displayName}
-                          </div>
-                        </div>
-                      </button>
-                    </DropdownMenuTrigger>
-                  </DropdownMenu>
-
-                  <Button variant="ghost" size="icon" onClick={openChainModal}>
-                    <div
-                      className="h-7 w-7 overflow-hidden rounded-full"
-                      style={{ background: chain.iconBackground }}
-                    >
-                      <Avatar
-                        className="hover:text-primary h-7 w-7"
-                        alt={chain.name ?? "???"}
-                        src={chain.iconUrl}
-                      />
-                    </div>
-                  </Button>
-                </div>
-              );
-            })()}
-          </div>
-        );
-      }}
-    </RKConnectButton.Custom>
+    <Button
+      data-testid="connect-button"
+      onClick={authHandler}
+      variant="default"
+      className={className}
+      size={size ?? "default"}
+    >
+      {isAuthenticated ? (
+        <>
+          <Wallet2 className="size-4 shrink-0" />
+          <span className="truncate">
+            {primaryAddress?.slice(0, primaryAddress?.length - 4)}
+          </span>
+          <span className="-ml-1">{primaryAddress?.slice(-4)}</span>
+        </>
+      ) : (
+        <>Connect Wallet</>
+      )}
+    </Button>
   );
-}
+};
+
+export default ConnectWallet;

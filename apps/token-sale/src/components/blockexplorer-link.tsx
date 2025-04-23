@@ -1,13 +1,8 @@
 import { Link, cn, trimAddress } from "@bltzr-gg/ui";
-import { chains } from "@axis-finance/env";
 import { ArrowUpRightIcon } from "lucide-react";
 
-import { getBlockExplorer } from "src/utils/chain";
+import { activeChains, getBlockExplorer } from "src/utils/chain";
 import { Address } from "viem";
-
-import { environment } from "utils/environment";
-
-const activeChains = chains.activeChains(environment.isTestnet);
 
 /** Renders a link to an address or transaction hash on a blockexplorer */
 export function BlockExplorerLink({
@@ -29,7 +24,9 @@ export function BlockExplorerLink({
 }) {
   const chain = activeChains.find((c) => c.id === chainId);
 
-  if (!chain) return null;
+  if (!chain) {
+    return null;
+  }
   const blockExplorer = getBlockExplorer(chain);
   const target = hash ?? address ?? "";
   const path = hash ? "tx/" : "address/";
